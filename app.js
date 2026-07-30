@@ -13,6 +13,17 @@ const CATEGORIES = [
   { key: "zippo", label: "Zippo" },
 ];
 
+// ใส่ข้อมูลร้านสปอนเซอร์ได้สูงสุด 6 ร้าน
+// ตัวอย่าง: { name: "ชื่อร้าน", description: "รายละเอียดสั้น ๆ", logo: "shop-01.jpg", url: "https://..." }
+const SPONSORS = [
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+];
+
 async function loadProducts() {
   setupHeaderContact();
   const res = await fetch("products.json");
@@ -114,6 +125,7 @@ function renderHome() {
       }
     </div>
 
+    ${sponsorSectionHTML()}
   `;
 
   APP.querySelector("#productSearch").addEventListener("input", (event) => {
@@ -138,6 +150,64 @@ function renderHome() {
       renderHome();
     });
   });
+}
+
+function sponsorSectionHTML() {
+  return `
+    <section class="sponsor-section" aria-labelledby="sponsorTitle">
+      <div class="sponsor-heading">
+        <span class="sponsor-eyebrow">// SHOP & SPONSOR</span>
+        <h2 id="sponsorTitle">ร้านค้าและผู้สนับสนุน</h2>
+        <p>ร้านค้าที่สนับสนุนฐานข้อมูลของสะสมไทย</p>
+      </div>
+      <div class="sponsor-grid">
+        ${SPONSORS.map((shop, index) => sponsorCardHTML(shop, index)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function sponsorCardHTML(shop, index) {
+  if (!shop) {
+    return `
+      <a
+        class="sponsor-card sponsor-empty"
+        href="https://lin.ee/rU7lTLb6"
+        target="_blank"
+        rel="noopener nofollow"
+        aria-label="ติดต่อเพื่อจองพื้นที่ร้านค้า ${index + 1}"
+      >
+        <span class="sponsor-slot">SHOP ${String(index + 1).padStart(2, "0")}</span>
+        <img
+          class="sponsor-ad-gif"
+          src="sponsor-open.gif"
+          alt="พื้นที่โฆษณาร้านค้า 2,000 บาทต่อเดือน ติดต่อผ่าน LINE"
+          loading="lazy"
+        />
+      </a>
+    `;
+  }
+
+  return `
+    <a
+      class="sponsor-card"
+      href="${esc(shop.url || "#")}"
+      target="_blank"
+      rel="noopener sponsored nofollow"
+      aria-label="เข้าชมร้าน ${esc(shop.name)}"
+    >
+      <span class="sponsor-slot">SHOP ${String(index + 1).padStart(2, "0")}</span>
+      <span class="sponsor-logo">
+        ${
+          shop.logo
+            ? `<img src="${esc(shop.logo)}" alt="โลโก้ ${esc(shop.name)}" loading="lazy" />`
+            : `<span>${esc((shop.name || "SHOP").slice(0, 2).toUpperCase())}</span>`
+        }
+      </span>
+      <strong>${esc(shop.name)}</strong>
+      <span>${esc(shop.description || "ร้านค้าผู้สนับสนุน")}</span>
+    </a>
+  `;
 }
 
 function cardHTML(p) {
