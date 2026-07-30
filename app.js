@@ -87,6 +87,8 @@ function renderHome() {
   });
 
   APP.innerHTML = `
+    ${sponsorSectionHTML()}
+
     <section class="hero">
       <div class="hero-eyebrow">// COLLECTOR'S DATABASE</div>
       <h1 class="hero-title">THAI COLLECTIBLE DATABASE</h1>
@@ -125,7 +127,6 @@ function renderHome() {
       }
     </div>
 
-    ${sponsorSectionHTML()}
   `;
 
   APP.querySelector("#productSearch").addEventListener("input", (event) => {

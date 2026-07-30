@@ -479,9 +479,9 @@ main { max-width: 1100px; margin: 0 auto; padding: 40px 28px 80px; min-height: 6
 
 /* ---------------- Shop & sponsor ---------------- */
 .sponsor-section {
-  margin-top: 64px;
-  padding-top: 30px;
-  border-top: 2px solid var(--ink);
+  margin: 0 0 54px;
+  padding: 0 0 30px;
+  border-bottom: 2px solid var(--ink);
 }
 .sponsor-heading {
   margin-bottom: 22px;
