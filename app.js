@@ -156,7 +156,9 @@ function renderDetail(p) {
           </div>
           ${
             p.videoEmbedUrl
-              ? `<div class="video-embed"><iframe src="${esc(p.videoEmbedUrl)}" allowfullscreen title="วิดีโอรีวิว ${esc(p.name)}"></iframe></div>`
+              ? `<div class="video-embed"><iframe src="${esc(p.videoEmbedUrl)}" title="วิดีโอรีวิว ${esc(
+                  p.name
+                )}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`
               : ""
           }
         </div>
