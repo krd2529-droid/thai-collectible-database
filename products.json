@@ -1654,12 +1654,11 @@
       }
     ],
     "catalogStatus": "verified-detail",
-    "condition": "",
     "sourceName": "Bandai Hobby Site",
     "sourceUrl": "https://global.bandai-hobby.net/en-us/item/01_5968/",
     "affiliateLinks": {
       "shopee": "https://s.shopee.co.th/20uGJjnVJ4",
-      "lazada": "",
+      "lazada": "https://s.lazada.co.th/s.ZiCwBk?c=d&t=p-iHZUMwJ-s2F0ZIMn",
       "tiktok": "",
       "page": ""
     },
@@ -1677,7 +1676,34 @@
       {
         "label": "Dalong.net — RG-043",
         "url": "https://www.dalong.net/reviews/rg/rg43/rg43_p.htm"
+      },
+      {
+        "label": "Bandai Hobby — คู่มือประกอบและ Parts List",
+        "url": "https://manual.bandai-hobby.net/pdf/3897.pdf"
       }
+    ],
+    "material": "PS (Polystyrene) — พลาสติกโพลิสไตรีน ไม่มีชิ้นส่วน Die-cast",
+    "manualImages": [
+      "rg43m_0001.jpg",
+      "rg43m_0002.jpg",
+      "rg43m_0003.jpg",
+      "rg43m_0004.jpg",
+      "rg43m_0005.jpg",
+      "rg43m_0006.jpg",
+      "rg43m_0007.jpg",
+      "rg43m_0008.jpg",
+      "rg43m_0009.jpg",
+      "rg43m_0010.jpg",
+      "rg43m_0011.jpg",
+      "rg43m_0012.jpg",
+      "rg43m_0013.jpg",
+      "rg43m_0014.jpg",
+      "rg43m_0015.jpg",
+      "rg43m_0016.jpg",
+      "rg43m_0017.jpg",
+      "rg43m_0018.jpg",
+      "rg43m_0019.jpg",
+      "rg43m_0020.jpg"
     ]
   }
 ]

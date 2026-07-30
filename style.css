@@ -353,6 +353,37 @@ main { max-width: 1100px; margin: 0 auto; padding: 40px 28px 80px; min-height: 6
 }
 .gallery-thumbs img.active { border-color: var(--blue); border-width: 2px; }
 
+.manual-note {
+  color: var(--ink-soft);
+  margin: 0 0 14px;
+}
+.manual-gallery-main {
+  max-width: 820px;
+  margin: 0 auto 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.manual-gallery-main img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 1100px;
+  object-fit: contain;
+}
+.manual-thumbs {
+  justify-content: center;
+}
+.manual-thumbs img {
+  width: 72px;
+  height: 96px;
+  object-fit: contain;
+  background: #fff;
+}
+
 .video-embed {
   margin-top: 16px;
   aspect-ratio: 16/9;

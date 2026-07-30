@@ -144,13 +144,13 @@ function renderDetail(p) {
       <div class="detail-grid">
         <div class="gallery">
           <div class="gallery-main">
-            ${img0 ? `<img id="mainImg" src="${esc(img0)}" alt="${esc(p.name)}" />` : `<span class="placeholder" style="font-family:var(--font-mono);color:var(--ink-soft)">ยังไม่มีรูปภาพ — เพิ่มได้ที่ data/products.json</span>`}
+            ${img0 ? `<img id="mainProductImg" src="${esc(img0)}" alt="${esc(p.name)}" />` : `<span class="placeholder" style="font-family:var(--font-mono);color:var(--ink-soft)">ยังไม่มีรูปภาพ — เพิ่มได้ที่ data/products.json</span>`}
           </div>
           <div class="gallery-thumbs">
             ${(p.images || [])
               .map(
                 (src, i) =>
-                  `<img src="${esc(src)}" data-src="${esc(src)}" class="${i === 0 ? "active" : ""}" alt="รูปสินค้า ${i + 1}" />`
+                  `<img src="${esc(src)}" data-src="${esc(src)}" data-target="mainProductImg" class="${i === 0 ? "active" : ""}" alt="รูปสินค้า ${i + 1}" />`
               )
               .join("")}
           </div>
@@ -179,7 +179,7 @@ function renderDetail(p) {
             <tr><td>ความสูงเมื่อประกอบ</td><td>${p.heightCm ? p.heightCm + " ซม." : "-"}</td></tr>
             <tr><td>อายุที่แนะนำ</td><td>${esc(p.recommendedAge || "-")}</td></tr>
             <tr><td>ประเภทสินค้า</td><td>${esc(p.productType || "-")}</td></tr>
-            <tr><td>สภาพสินค้า</td><td>${esc(p.condition || "-")}</td></tr>
+            <tr><td>วัสดุ</td><td>${esc(p.material || "-")}</td></tr>
           </table>
 
           ${
@@ -266,14 +266,40 @@ function renderDetail(p) {
           )
         : ""
     }
+
+    ${
+      p.manualImages && p.manualImages.length
+        ? section(
+            "06",
+            "คู่มือประกอบ",
+            `<div class="manual-album">
+              <p class="manual-note">คู่มือประกอบ ${p.manualImages.length} หน้า — เลือกรูปย่อเพื่อเปิดอ่านทีละหน้า</p>
+              <div class="manual-gallery-main">
+                <img id="mainManualImg" src="${esc(p.manualImages[0])}" alt="คู่มือประกอบ ${esc(p.name)} หน้า 1" />
+              </div>
+              <div class="gallery-thumbs manual-thumbs">
+                ${p.manualImages
+                  .map(
+                    (src, i) =>
+                      `<img src="${esc(src)}" data-src="${esc(src)}" data-target="mainManualImg" class="${i === 0 ? "active" : ""}" alt="คู่มือประกอบ หน้า ${i + 1}" loading="lazy" />`
+                  )
+                  .join("")}
+              </div>
+            </div>`
+          )
+        : ""
+    }
   `;
 
   // gallery thumb switching
-  APP.querySelectorAll(".gallery-thumbs img").forEach((thumb) => {
-    thumb.addEventListener("click", () => {
-      document.getElementById("mainImg").src = thumb.dataset.src;
-      APP.querySelectorAll(".gallery-thumbs img").forEach((t) => t.classList.remove("active"));
-      thumb.classList.add("active");
+  APP.querySelectorAll(".gallery-thumbs").forEach((thumbGroup) => {
+    thumbGroup.querySelectorAll("img[data-src][data-target]").forEach((thumb) => {
+      thumb.addEventListener("click", () => {
+        const mainImage = document.getElementById(thumb.dataset.target);
+        if (mainImage) mainImage.src = thumb.dataset.src;
+        thumbGroup.querySelectorAll("img").forEach((t) => t.classList.remove("active"));
+        thumb.classList.add("active");
+      });
     });
   });
 
