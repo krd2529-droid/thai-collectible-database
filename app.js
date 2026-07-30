@@ -14,10 +14,34 @@ const CATEGORIES = [
 ];
 
 async function loadProducts() {
+  setupHeaderContact();
   const res = await fetch("products.json");
   PRODUCTS = await res.json();
-  PRODUCT_COUNT_EL.textContent = String(PRODUCTS.length).padStart(2, "0");
+  if (PRODUCT_COUNT_EL) PRODUCT_COUNT_EL.textContent = String(PRODUCTS.length).padStart(2, "0");
   router();
+}
+
+function setupHeaderContact() {
+  const headerNav = document.querySelector(".header-nav");
+  if (!headerNav) return;
+
+  headerNav.classList.add("contact-ready");
+  headerNav.innerHTML = `
+    <a
+      class="header-line-contact"
+      href="https://lin.ee/rU7lTLb6"
+      target="_blank"
+      rel="noopener nofollow"
+      aria-label="ติดต่อเราทาง LINE"
+      title="ติดต่อเราทาง LINE"
+    >
+      <svg class="header-line-logo" viewBox="0 0 64 64" role="img" aria-hidden="true">
+        <path fill="currentColor" d="M32 7C17.1 7 5 16.8 5 28.9c0 10.8 9.6 19.8 22.6 21.5 3.2.7 2.8 1.9 2.1 6.3-.1.7-.6 2.8 2.4 1.5 3-1.6 16.4-9.7 22.4-16.6 4.1-4.5 4.5-9.1 4.5-12.7C59 16.8 46.9 7 32 7Z"/>
+        <path fill="#fff" d="M15.4 35.9h7.8v-3.2h-4.3V22.4h-3.5v13.5Zm10.1 0H29V22.4h-3.5v13.5Zm6.6 0h3.4v-7.6l5.6 7.6h3V22.4h-3.4V30l-5.6-7.6h-3v13.5Zm14.8 0h8.4v-3.2h-4.9v-2.1h4.6v-3.1h-4.6v-2h4.9v-3.1h-8.4v13.5Z"/>
+      </svg>
+      <span>ติดต่อเรา</span>
+    </a>
+  `;
 }
 
 function esc(str) {
@@ -90,7 +114,6 @@ function renderHome() {
       }
     </div>
 
-    ${lineContactHTML()}
   `;
 
   APP.querySelector("#productSearch").addEventListener("input", (event) => {
@@ -302,7 +325,6 @@ function renderDetail(p) {
         : ""
     }
 
-    ${lineContactHTML()}
   `;
 
   // gallery thumb switching
@@ -383,25 +405,6 @@ function showShareStatus(button, message) {
     label.textContent = original;
     button.classList.remove("share-success");
   }, 1800);
-}
-
-function lineContactHTML() {
-  return `
-    <a
-      class="line-contact"
-      href="https://lin.ee/rU7lTLb6"
-      target="_blank"
-      rel="noopener nofollow"
-      aria-label="ติดต่อเราทาง LINE"
-      title="ติดต่อเราทาง LINE"
-    >
-      <svg class="line-contact-logo" viewBox="0 0 64 64" role="img" aria-hidden="true">
-        <path fill="currentColor" d="M32 7C17.1 7 5 16.8 5 28.9c0 10.8 9.6 19.8 22.6 21.5 3.2.7 2.8 1.9 2.1 6.3-.1.7-.6 2.8 2.4 1.5 3-1.6 16.4-9.7 22.4-16.6 4.1-4.5 4.5-9.1 4.5-12.7C59 16.8 46.9 7 32 7Z"/>
-        <path fill="#fff" d="M15.4 35.9h7.8v-3.2h-4.3V22.4h-3.5v13.5Zm10.1 0H29V22.4h-3.5v13.5Zm6.6 0h3.4v-7.6l5.6 7.6h3V22.4h-3.4V30l-5.6-7.6h-3v13.5Zm14.8 0h8.4v-3.2h-4.9v-2.1h4.6v-3.1h-4.6v-2h4.9v-3.1h-8.4v13.5Z"/>
-      </svg>
-      <span class="line-contact-text">ติดต่อ LINE</span>
-    </a>
-  `;
 }
 
 function buyLinksHTML(links) {
