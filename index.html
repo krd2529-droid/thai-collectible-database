@@ -1,137 +1,42 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Thai Collectible Database | ฐานข้อมูลของสะสมไทย</title>
-  <meta name="description" content="ฐานข้อมูลโมเดล การ์ดสะสม และ Zippo สำหรับนักสะสมชาวไทย">
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      color: #f5f5f5;
-      background: #080d18;
-    }
-
-    header {
-      padding: 20px 8%;
-      background: #101827;
-      border-bottom: 1px solid #263349;
-    }
-
-    header h1 {
-      color: #5eead4;
-      font-size: 24px;
-    }
-
-    .hero {
-      text-align: center;
-      padding: 90px 20px 70px;
-      background: linear-gradient(135deg, #101827, #172554);
-    }
-
-    .hero h2 {
-      margin-bottom: 16px;
-      font-size: 42px;
-    }
-
-    .hero p {
-      margin-bottom: 30px;
-      color: #cbd5e1;
-      font-size: 18px;
-    }
-
-    .search {
-      width: min(620px, 90%);
-      padding: 16px 20px;
-      font-size: 16px;
-      border: 0;
-      border-radius: 12px;
-    }
-
-    .categories {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 24px;
-      max-width: 1050px;
-      margin: auto;
-      padding: 60px 20px;
-    }
-
-    .card {
-      min-height: 190px;
-      padding: 28px;
-      background: #111827;
-      border: 1px solid #273449;
-      border-radius: 18px;
-    }
-
-    .card:hover {
-      border-color: #5eead4;
-      transform: translateY(-4px);
-      transition: 0.2s;
-    }
-
-    .card h3 {
-      margin-bottom: 12px;
-      color: #5eead4;
-      font-size: 23px;
-    }
-
-    .card p {
-      color: #aebbd0;
-      line-height: 1.7;
-    }
-
-    footer {
-      padding: 28px;
-      color: #8b9bb4;
-      text-align: center;
-      border-top: 1px solid #263349;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Thai Collectible Database — ฐานข้อมูลของสะสมไทย</title>
+<meta name="description" content="ฐานข้อมูลของสะสมภาษาไทย แคตตาล็อกกันพลา Real Grade (RG) 43 รายการ พร้อมลำดับรุ่นและแหล่งอ้างอิง" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <header>
-    <h1>THAI COLLECTIBLE DATABASE</h1>
-  </header>
 
-  <main>
-    <section class="hero">
-      <h2>ฐานข้อมูลของสะสมไทย</h2>
-      <p>ค้นหาข้อมูล รุ่น ปีผลิต ราคา และรายละเอียดของสะสม</p>
-      <input class="search" type="search"
-             placeholder="ค้นหาชื่อสินค้า รุ่น หรือรหัสสินค้า">
-    </section>
+<div class="blueprint-bg" aria-hidden="true"></div>
 
-    <section class="categories">
-      <article class="card">
-        <h3>โมเดลและกันพลา</h3>
-        <p>ข้อมูลรุ่น เกรด สเกล วันวางจำหน่าย และราคาเปิดตัว</p>
-      </article>
+<header class="site-header">
+  <div class="corner-mark tl" aria-hidden="true"></div>
+  <div class="corner-mark tr" aria-hidden="true"></div>
+  <div class="header-inner">
+    <a href="#/" class="logo">
+      <span class="logo-mark">TH</span>
+      <span class="logo-text">THAI COLLECTIBLE<br/><small>DATABASE</small></span>
+    </a>
+    <nav class="header-nav">
+      <span class="nav-label">DATABASE No.</span>
+      <span class="nav-count" id="productCount">00</span>
+    </nav>
+  </div>
+</header>
 
-      <article class="card">
-        <h3>การ์ด One Piece</h3>
-        <p>ข้อมูลรหัสการ์ด ชุดที่วางจำหน่าย ความหายาก และราคา</p>
-      </article>
+<main id="app"></main>
 
-      <article class="card">
-        <h3>Zippo</h3>
-        <p>ข้อมูลรหัสรุ่น ลวดลาย ปีผลิต เทคนิคตกแต่ง และราคาตลาด</p>
-      </article>
-    </section>
-  </main>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p class="footer-plate">THAI COLLECTIBLE DATABASE / ฐานข้อมูลของสะสมไทย</p>
+    <p class="footer-note">รายชื่อ RG อ้างอิงแคตตาล็อก Dalong.net · รายละเอียดสินค้าแต่ละรุ่นจะทยอยตรวจสอบเพิ่มเติม</p>
+  </div>
+</footer>
 
-  <footer>
-    © 2026 Thai Collectible Database
-  </footer>
+<script src="app.js"></script>
 </body>
 </html>
