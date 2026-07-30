@@ -1566,38 +1566,152 @@
     "categoryLabel": "โมเดลและกันพลา",
     "sku": "RG-041",
     "rgNumber": 41,
-    "name": "RG 1/144 Akatsuki Gundam Oowashi unit",
+    "name": "RG 1/144 Akatsuki Gundam (Oowashi Unit)",
     "grade": "RG",
     "scale": "1/144",
-    "series": "",
+    "series": "Mobile Suit Gundam SEED DESTINY",
     "manufacturer": "Bandai Spirits",
-    "releaseDate": "",
-    "launchPriceJPY": null,
-    "recommendedAge": "",
+    "releaseDate": "2024-12-14",
+    "launchPriceJPY": 8000,
+    "recommendedAge": "15 ปีขึ้นไป",
     "heightCm": null,
     "productType": "โมเดลพลาสติกประกอบ (Gunpla Real Grade)",
     "images": [
-      "rg41.jpg"
+      "rg41.jpg",
+      "rg41-01.jpg",
+      "rg41-02.jpg",
+      "rg41-03.jpg",
+      "rg41-04.jpg",
+      "rg41-05.jpg",
+      "rg41-06.jpg",
+      "rg41-07.jpg",
+      "rg41-08.jpg"
     ],
     "videoEmbedUrl": "",
-    "summary": "รายการลำดับ RG 41 ในแคตตาล็อก Real Grade ชื่อ Akatsuki Gundam Oowashi unit ข้อมูลรายละเอียดเพิ่มเติมอยู่ระหว่างตรวจสอบจากแหล่งอ้างอิง",
-    "highlights": [],
-    "whatsDifferent": [],
-    "boxContents": [],
-    "notIncluded": [],
-    "pros": [],
-    "considerations": [],
-    "faq": [],
-    "catalogStatus": "catalogued",
-    "condition": "",
-    "sourceName": "Dalong.net Real Grade Catalog",
-    "sourceUrl": "https://www.dalong.net/reviews/rg/rg41/rg41_p.htm",
+    "summary": "Real Grade ลำดับที่ 41 ของ Akatsuki Gundam จาก Mobile Suit Gundam SEED DESTINY มาพร้อม Oowashi Pack และชิ้นส่วนเกราะเคลือบสีทอง 3 รูปแบบ โครงสร้างพื้นผิวหลายระนาบช่วยสะท้อนแสงให้ใกล้เคียงเกราะ Yata-no-Kagami พร้อมกลไกขยับบริเวณปีก ไหล่ สะโพก และเกราะแขนขา",
+    "highlights": [
+      "เกราะภายนอกเคลือบสีทองสำเร็จจากโรงงาน 3 รูปแบบ",
+      "พื้นผิวเกราะหลายระนาบช่วยสะท้อนแสงและแสดงลักษณะของ Yata-no-Kagami",
+      "Oowashi Pack ถอดออกจากตัวหุ่นและกางปีกได้",
+      "ส่วนหัว ช่องเปิด ปีก และปืนบีมของ Oowashi Pack ขยับได้",
+      "ไหล่มีกลไกดึงออกเพื่อเพิ่มระยะการเคลื่อนไหว",
+      "สะโพกกางได้กว้างและลำตัวมีกลไกโยกสำหรับจัดท่าต่อสู้",
+      "เกราะแขนและขามีกลไกเลื่อนสัมพันธ์กับการขยับ",
+      "รองรับการติด Zeus Silhouette เมื่อใช้ชิ้นส่วนเชื่อมต่อที่จำหน่ายแยก"
+    ],
+    "whatsDifferent": [
+      {
+        "title": "เกราะเคลือบสีทอง 3 รูปแบบ",
+        "detail": "แยกความเงาและเฉดของพื้นผิวเกราะเพื่อถ่ายทอดลักษณะของ Akatsuki Gundam โดยไม่ต้องพ่นสีทองเพิ่มเติม"
+      },
+      {
+        "title": "มาพร้อม Oowashi Pack",
+        "detail": "แบ็กแพ็กมีปีกและชิ้นส่วนขยับหลายตำแหน่ง สามารถถอดออกและจัดแสดงแยกจากตัวหุ่นได้"
+      },
+      {
+        "title": "โครงสร้างแบบ Real Grade",
+        "detail": "เพิ่มกลไกบริเวณลำตัว ไหล่ สะโพก แขน และขา เพื่อรองรับการจัดท่าที่หลากหลายในสเกล 1/144"
+      }
+    ],
+    "boxContents": [
+      "Akatsuki Gundam ×1",
+      "Oowashi Pack ×1",
+      "Beam Rifle Hyakuri ×1",
+      "Beam Saber แบบเชื่อมต่อ ×1",
+      "Shield ×1",
+      "ชุดชิ้นส่วนมือ ×1 ชุด",
+      "ชิ้นส่วนข้อต่อ ×1 ชุด",
+      "Realistic Decal ×1 แผ่น",
+      "ฐานจัดแสดง ×1"
+    ],
+    "notIncluded": [
+      "Zeus Silhouette",
+      "ชิ้นส่วนเชื่อมต่อ Zeus Silhouette"
+    ],
+    "pros": [
+      "เกราะชุบทองสำเร็จพร้อมประกอบ",
+      "Oowashi Pack และปีกมีจุดขยับหลายตำแหน่ง",
+      "รายละเอียดและการแยกสีสูงในสเกล 1/144",
+      "มีฐานจัดแสดงรวมมาในกล่อง"
+    ],
+    "considerations": [
+      "ผิวชุบทองเป็นรอยนิ้วมือและรอยขีดข่วนได้ง่าย",
+      "ควรตัดชิ้นส่วนอย่างระมัดระวังเพื่อไม่ให้ผิวเคลือบเสียหาย",
+      "มีชิ้นส่วนขนาดเล็กและกลไกหลายตำแหน่ง",
+      "การติด Zeus Silhouette ต้องซื้อชุดเสริมและชิ้นส่วนเชื่อมต่อแยก"
+    ],
+    "faq": [
+      {
+        "q": "RG Akatsuki Gundam Oowashi Unit วางจำหน่ายเมื่อไร",
+        "a": "วางจำหน่ายในญี่ปุ่นวันที่ 14 ธันวาคม 2024"
+      },
+      {
+        "q": "ราคาเปิดตัวเท่าไร",
+        "a": "ราคาเปิดตัว 8,000 เยน ไม่รวมภาษี"
+      },
+      {
+        "q": "ต้องพ่นสีทองเองหรือไม่",
+        "a": "ชิ้นส่วนเกราะภายนอกเคลือบสีทองสำเร็จมาแล้ว สามารถประกอบโดยไม่ต้องพ่นสีทองเพิ่มเติม"
+      },
+      {
+        "q": "ภายในกล่องมีฐานตั้งหรือไม่",
+        "a": "มีฐานจัดแสดงรวมมาในชุด"
+      },
+      {
+        "q": "ติด Zeus Silhouette ได้หรือไม่",
+        "a": "ติดได้ แต่ต้องใช้ Zeus Silhouette และชิ้นส่วนเชื่อมต่อจากชุดเสริมที่จำหน่ายแยก"
+      }
+    ],
+    "catalogStatus": "verified-detail-draft",
+    "sourceName": "Bandai Hobby Site",
+    "sourceUrl": "https://manual.bandai-hobby.net/menus/detail/2014",
     "affiliateLinks": {
-      "shopee": "",
-      "lazada": "",
+      "shopee": "https://s.shopee.co.th/7ps3djY22T",
+      "lazada": "https://s.lazada.co.th/s.ZiBWpc?c=c&t=p-i6Jxmd3-sQumplC",
       "tiktok": "",
       "page": ""
-    }
+    },
+    "modelCode": "ORB-01",
+    "priceTaxIncluded": false,
+    "references": [
+      {
+        "label": "Bandai Hobby Site — หน้าคู่มือผลิตภัณฑ์อย่างเป็นทางการ",
+        "url": "https://manual.bandai-hobby.net/menus/detail/2014"
+      },
+      {
+        "label": "Bandai Hobby Site — รายการสินค้า RG",
+        "url": "https://global.bandai-hobby.net/en-us/brand/rg/"
+      },
+      {
+        "label": "Dalong.net — RG-041",
+        "url": "https://www.dalong.net/reviews/rg/rg41/rg41_p.htm"
+      }
+    ],
+    "material": "PS (Polystyrene), ABS และ PP — พลาสติก ไม่มีชิ้นส่วน Die-cast",
+    "manualImages": [
+      "rg41m_0001.jpg",
+      "rg41m_0002.jpg",
+      "rg41m_0003.jpg",
+      "rg41m_0004.jpg",
+      "rg41m_0005.jpg",
+      "rg41m_0006.jpg",
+      "rg41m_0007.jpg",
+      "rg41m_0008.jpg",
+      "rg41m_0009.jpg",
+      "rg41m_0010.jpg",
+      "rg41m_0011.jpg",
+      "rg41m_0012.jpg",
+      "rg41m_0013.jpg",
+      "rg41m_0014.jpg",
+      "rg41m_0015.jpg",
+      "rg41m_0016.jpg",
+      "rg41m_0017.jpg",
+      "rg41m_0018.jpg",
+      "rg41m_0019.jpg",
+      "rg41m_0020.jpg",
+      "rg41m_0021.jpg"
+    ],
+    "catalogImage": "rg41.jpg"
   },
   {
     "id": "rg-042",
