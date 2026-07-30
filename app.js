@@ -89,6 +89,8 @@ function renderHome() {
           : `<div class="empty-state">ยังไม่มีสินค้าในหมวดนี้ — กำลังเตรียมข้อมูล</div>`
       }
     </div>
+
+    ${lineContactHTML()}
   `;
 
   APP.querySelector("#productSearch").addEventListener("input", (event) => {
@@ -122,7 +124,13 @@ function cardHTML(p) {
       <span class="card-tag">${esc(p.grade)} · ${esc(p.scale)}</span>
       <span class="card-stock ${p.inStock === true ? "in" : "out"}">${p.inStock === true ? "มีสินค้า" : "ข้อมูลแคตตาล็อก"}</span>
       <div class="card-image">
-        ${img ? `<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy" />` : `<span class="placeholder">ยังไม่มีรูปภาพ</span>`}
+        ${
+          img
+            ? `<img src="${esc(img)}" alt="${esc(
+                p.name
+              )}" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false" /><span class="placeholder" hidden>ยังไม่มีรูปภาพ</span>`
+            : `<span class="placeholder">ยังไม่มีรูปภาพ</span>`
+        }
       </div>
       <div class="card-body">
         <div class="card-sku">${esc(p.sku)}</div>
@@ -166,6 +174,10 @@ function renderDetail(p) {
         <div class="info">
           <span class="product-grade-badge">${esc(p.grade)} GRADE</span>
           <h1 class="product-title">${esc(p.name)}</h1>
+          <button class="share-button" id="shareProductButton" type="button" aria-label="แชร์หน้าสินค้า ${esc(p.name)}">
+            <span class="share-icon" aria-hidden="true">↗</span>
+            <span class="share-label">แชร์หน้านี้</span>
+          </button>
           <p class="product-summary">${esc(p.summary)}</p>
 
           <table class="spec-table">
@@ -289,6 +301,8 @@ function renderDetail(p) {
           )
         : ""
     }
+
+    ${lineContactHTML()}
   `;
 
   // gallery thumb switching
@@ -308,8 +322,86 @@ function renderDetail(p) {
     item.querySelector(".faq-q").addEventListener("click", () => item.classList.toggle("open"));
   });
 
+  // Native share on supported devices, with clipboard fallback for desktop.
+  const shareButton = APP.querySelector("#shareProductButton");
+  shareButton?.addEventListener("click", async () => {
+    const shareData = {
+      title: `${p.name} | Thai Collectible Database`,
+      text: `ดูข้อมูล ${p.name} ในฐานข้อมูลของสะสมไทย`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await copyText(shareData.url);
+      showShareStatus(shareButton, "คัดลอกลิงก์แล้ว");
+    } catch (error) {
+      // Closing the native share sheet is not an error the visitor needs to see.
+      if (error?.name === "AbortError") return;
+
+      try {
+        await copyText(shareData.url);
+        showShareStatus(shareButton, "คัดลอกลิงก์แล้ว");
+      } catch {
+        showShareStatus(shareButton, "คัดลอกไม่สำเร็จ");
+      }
+    }
+  });
+
   injectSchema(p);
   window.scrollTo(0, 0);
+}
+
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+
+  const input = document.createElement("textarea");
+  input.value = text;
+  input.setAttribute("readonly", "");
+  input.style.position = "fixed";
+  input.style.opacity = "0";
+  document.body.appendChild(input);
+  input.select();
+  const copied = document.execCommand("copy");
+  input.remove();
+  if (!copied) throw new Error("Copy failed");
+}
+
+function showShareStatus(button, message) {
+  const label = button.querySelector(".share-label");
+  if (!label) return;
+  const original = label.textContent;
+  label.textContent = message;
+  button.classList.add("share-success");
+  window.setTimeout(() => {
+    label.textContent = original;
+    button.classList.remove("share-success");
+  }, 1800);
+}
+
+function lineContactHTML() {
+  return `
+    <a
+      class="line-contact"
+      href="https://lin.ee/rU7lTLb6"
+      target="_blank"
+      rel="noopener nofollow"
+      aria-label="ติดต่อเราทาง LINE"
+      title="ติดต่อเราทาง LINE"
+    >
+      <svg class="line-contact-logo" viewBox="0 0 64 64" role="img" aria-hidden="true">
+        <path fill="currentColor" d="M32 7C17.1 7 5 16.8 5 28.9c0 10.8 9.6 19.8 22.6 21.5 3.2.7 2.8 1.9 2.1 6.3-.1.7-.6 2.8 2.4 1.5 3-1.6 16.4-9.7 22.4-16.6 4.1-4.5 4.5-9.1 4.5-12.7C59 16.8 46.9 7 32 7Z"/>
+        <path fill="#fff" d="M15.4 35.9h7.8v-3.2h-4.3V22.4h-3.5v13.5Zm10.1 0H29V22.4h-3.5v13.5Zm6.6 0h3.4v-7.6l5.6 7.6h3V22.4h-3.4V30l-5.6-7.6h-3v13.5Zm14.8 0h8.4v-3.2h-4.9v-2.1h4.6v-3.1h-4.6v-2h4.9v-3.1h-8.4v13.5Z"/>
+      </svg>
+      <span class="line-contact-text">ติดต่อ LINE</span>
+    </a>
+  `;
 }
 
 function buyLinksHTML(links) {

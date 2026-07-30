@@ -399,6 +399,92 @@ main { max-width: 1100px; margin: 0 auto; padding: 40px 28px 80px; min-height: 6
   margin: 0 0 6px;
   line-height: 1.25;
 }
+.share-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  margin: 4px 0 14px;
+  padding: 7px 13px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.share-button:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.share-button.share-success {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+}
+.share-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ---------------- LINE contact ---------------- */
+.line-contact {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 7px 15px 7px 8px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: #06c755;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 4px 4px 0 rgba(13, 21, 32, 0.18);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.line-contact:hover {
+  transform: translateY(-2px);
+  box-shadow: 5px 6px 0 rgba(13, 21, 32, 0.2);
+}
+.line-contact-logo {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+}
+.line-contact-text {
+  color: var(--ink);
+}
+@media (max-width: 520px) {
+  .line-contact {
+    right: 14px;
+    bottom: 14px;
+    width: 50px;
+    height: 50px;
+    min-height: 50px;
+    padding: 6px;
+    justify-content: center;
+  }
+  .line-contact-logo {
+    width: 36px;
+    height: 36px;
+  }
+  .line-contact-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
 .product-grade-badge {
   display: inline-block;
   font-family: var(--font-mono);
