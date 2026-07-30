@@ -14,7 +14,7 @@ const CATEGORIES = [
 ];
 
 async function loadProducts() {
-  const res = await fetch("data/products.json");
+  const res = await fetch("products.json");
   PRODUCTS = await res.json();
   PRODUCT_COUNT_EL.textContent = String(PRODUCTS.length).padStart(2, "0");
   router();
