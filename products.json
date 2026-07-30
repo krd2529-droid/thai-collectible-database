@@ -1563,32 +1563,110 @@
     "name": "RG 1/144 Wing Gundam Zero",
     "grade": "RG",
     "scale": "1/144",
-    "series": "",
+    "series": "Mobile Suit Gundam Wing (New Mobile Report Gundam Wing)",
     "manufacturer": "Bandai Spirits",
-    "releaseDate": "",
-    "launchPriceJPY": null,
-    "recommendedAge": "",
-    "heightCm": null,
+    "releaseDate": "2025-09-27",
+    "launchPriceJPY": 4200,
+    "recommendedAge": "15 ปีขึ้นไป",
+    "heightCm": 12,
     "productType": "โมเดลพลาสติกประกอบ (Gunpla Real Grade)",
-    "images": [],
+    "images": [
+      "images/rg43.jpg"
+    ],
     "videoEmbedUrl": "",
-    "summary": "รายการลำดับ RG 43 ในแคตตาล็อก Real Grade ชื่อ Wing Gundam Zero ข้อมูลรายละเอียดเพิ่มเติมอยู่ระหว่างตรวจสอบจากแหล่งอ้างอิง",
-    "highlights": [],
-    "whatsDifferent": [],
-    "boxContents": [],
-    "notIncluded": [],
-    "pros": [],
-    "considerations": [],
-    "faq": [],
-    "catalogStatus": "catalogued",
+    "summary": "Real Grade ลำดับที่ 43 ของ Wing Gundam Zero เวอร์ชันจากทีวีซีรีส์ Mobile Suit Gundam Wing ผลิตด้วยแม่พิมพ์ใหม่ทั้งหมด รองรับการแปลงเป็น Neo Bird Mode และติดตั้งกลไกเฉพาะของ RG ในวิงไบน์เดอร์ ทวินบัสเตอร์ไรเฟิล และชิลด์",
+    "highlights": [
+      "วิงไบน์เดอร์มีจุดขยับ 5 แกน ช่วยกางและปรับมุมปีกได้หลายทิศทาง",
+      "กลไกภายในวิงไบน์เดอร์ทำให้ยูนิตหมุน หัวฉีดด้านในยืด และฟินกางพร้อมกัน",
+      "เปลี่ยนเป็น Neo Bird Mode ได้ด้วยการสลับตำแหน่งชิ้นส่วน พร้อมกลไกแปลงปลายเท้า",
+      "ทวินบัสเตอร์ไรเฟิลแยกหรือประกบรวมกันได้ และลำกล้องยืดหดได้",
+      "ชิลด์ยืดส่วนโนสได้ และมีปีกย่อยที่ขยับเชื่อมโยงกัน",
+      "มือจับอาวุธมีกลไกล็อก เพิ่มความมั่นคงเมื่อตั้งท่าถือทวินบัสเตอร์ไรเฟิล",
+      "เกราะหัวไหล่เปิดเพื่อเผยเวอร์เนียร์และเก็บบีมเซเบอร์ได้",
+      "ค็อกพิท ฝาครอบช่องรับอากาศ และแมชชีนแคนนอนบริเวณหน้าอกสามารถเปิดได้"
+    ],
+    "whatsDifferent": [
+      {
+        "title": "เป็น Wing Gundam Zero เวอร์ชันทีวี",
+        "detail": "ไม่ใช่ Wing Gundam Zero EW ที่มีปีกขนนก รูปทรงและระบบแปลงร่างอ้างอิงดีไซน์จากทีวีซีรีส์"
+      },
+      {
+        "title": "แม่พิมพ์ใหม่ทั้งหมด",
+        "detail": "Bandai Spirits ออกแบบโครงสร้างและชิ้นส่วนใหม่สำหรับรุ่น RG-043 พร้อมกลไกการขยับเฉพาะรุ่น"
+      },
+      {
+        "title": "กลไกวิงไบน์เดอร์แบบเชื่อมโยง",
+        "detail": "การหมุนยูนิตทำให้หัวฉีดและฟินภายในเคลื่อนที่สัมพันธ์กัน เพิ่มรายละเอียดเชิงกลขณะจัดแสดง"
+      }
+    ],
+    "boxContents": [
+      "Twin Buster Rifle ×1 ชุด",
+      "Beam Saber ×2",
+      "Shield ×1",
+      "ชุดชิ้นส่วนมือ",
+      "Realistic Decal ×1 แผ่น"
+    ],
+    "notIncluded": [
+      "ฐานจัดแสดง Action Base"
+    ],
+    "pros": [
+      "แปลงเป็น Neo Bird Mode ได้",
+      "จุดขยับปีกและลำตัวรองรับท่าทางหลากหลาย",
+      "อาวุธหลักและชิลด์มีกลไกเฉพาะของ RG",
+      "แยกสีและรายละเอียดสูงในสเกล 1/144"
+    ],
+    "considerations": [
+      "มีชิ้นส่วนขนาดเล็กและกลไกหลายตำแหน่ง ควรประกอบอย่างระมัดระวัง",
+      "การแปลง Neo Bird Mode ต้องสลับตำแหน่งชิ้นส่วนบางส่วน",
+      "ฐานจัดแสดงไม่ได้ระบุว่าอยู่ในชุด ควรเตรียมแยกหากต้องการจัดท่าบิน"
+    ],
+    "faq": [
+      {
+        "q": "RG Wing Gundam Zero รุ่นนี้วางจำหน่ายเมื่อไร",
+        "a": "วางจำหน่ายในญี่ปุ่นวันที่ 27 กันยายน 2025"
+      },
+      {
+        "q": "ราคาเปิดตัวเท่าไร",
+        "a": "ราคาเปิดตัวในญี่ปุ่น 4,200 เยน ไม่รวมภาษี"
+      },
+      {
+        "q": "เป็นรุ่นเดียวกับ Wing Gundam Zero EW หรือไม่",
+        "a": "ไม่ใช่ รุ่น RG-043 เป็นดีไซน์ Wing Gundam Zero จากทีวีซีรีส์ ส่วนรุ่น EW มีรูปลักษณ์ปีกขนนกและเป็นสินค้าอีกแบบหนึ่ง"
+      },
+      {
+        "q": "แปลงเป็นยานได้หรือไม่",
+        "a": "ได้ สามารถเปลี่ยนเป็น Neo Bird Mode โดยสลับตำแหน่งชิ้นส่วน และมีระบบแปลงบริเวณปลายเท้า"
+      },
+      {
+        "q": "ภายในกล่องมีอาวุธอะไรบ้าง",
+        "a": "มี Twin Buster Rifle หนึ่งชุด Beam Saber สองอัน Shield หนึ่งชิ้น ชุดมือ และ Realistic Decal"
+      }
+    ],
+    "catalogStatus": "verified-detail",
     "condition": "",
-    "sourceName": "Dalong.net Real Grade Catalog",
-    "sourceUrl": "https://www.dalong.net/reviews/rg/rg43/rg43_p.htm",
+    "sourceName": "Bandai Hobby Site",
+    "sourceUrl": "https://global.bandai-hobby.net/en-us/item/01_5968/",
     "affiliateLinks": {
       "shopee": "",
       "lazada": "",
       "tiktok": "",
       "page": ""
-    }
+    },
+    "modelCode": "XXXG-00W0",
+    "priceTaxIncluded": false,
+    "references": [
+      {
+        "label": "Bandai Hobby Site — หน้าสินค้าอย่างเป็นทางการ",
+        "url": "https://global.bandai-hobby.net/en-us/item/01_5968/"
+      },
+      {
+        "label": "Bandai Hobby Site — รายการสินค้า RG",
+        "url": "https://global.bandai-hobby.net/en-us/brand/rg/"
+      },
+      {
+        "label": "Dalong.net — RG-043",
+        "url": "https://www.dalong.net/reviews/rg/rg43/rg43_p.htm"
+      }
+    ]
   }
 ]

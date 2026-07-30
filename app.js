@@ -168,10 +168,12 @@ function renderDetail(p) {
 
           <table class="spec-table">
             <tr><td>ลำดับ RG</td><td>${p.rgNumber ? String(p.rgNumber).padStart(2, "0") : "-"}</td></tr>
+            <tr><td>รหัสโมบิลสูท</td><td>${esc(p.modelCode || "-")}</td></tr>
             <tr><td>ผู้ผลิต</td><td>${esc(p.manufacturer)}</td></tr>
             <tr><td>ซีรีส์</td><td>${esc(p.series)}</td></tr>
             <tr><td>เกรด / สเกล</td><td>${esc(p.grade)} · ${esc(p.scale)}</td></tr>
             <tr><td>วันวางจำหน่าย</td><td>${esc(p.releaseDate || "-")}</td></tr>
+            <tr><td>ราคาเปิดตัวญี่ปุ่น (ไม่รวมภาษี)</td><td>${p.launchPriceJPY ? Number(p.launchPriceJPY).toLocaleString("th-TH") + " เยน" : "-"}</td></tr>
             <tr><td>ความสูงเมื่อประกอบ</td><td>${p.heightCm ? p.heightCm + " ซม." : "-"}</td></tr>
             <tr><td>อายุที่แนะนำ</td><td>${esc(p.recommendedAge || "-")}</td></tr>
             <tr><td>ประเภทสินค้า</td><td>${esc(p.productType || "-")}</td></tr>
@@ -181,6 +183,16 @@ function renderDetail(p) {
           ${
             p.sourceUrl
               ? `<p><a class="back-link" href="${esc(p.sourceUrl)}" target="_blank" rel="noopener nofollow">เปิดแหล่งอ้างอิง ↗</a></p>`
+              : ""
+          }
+          ${
+            p.references && p.references.length
+              ? `<div class="reference-list">${p.references
+                  .map(
+                    (ref) =>
+                      `<p><a class="back-link" href="${esc(ref.url)}" target="_blank" rel="noopener nofollow">${esc(ref.label)} ↗</a></p>`
+                  )
+                  .join("")}</div>`
               : ""
           }
 
