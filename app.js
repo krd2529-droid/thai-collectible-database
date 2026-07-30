@@ -32,10 +32,22 @@ const SPONSORS = [
 
 async function loadProducts() {
   setupHeaderContact();
-  const res = await fetch("products.json?v=category-rg041-20260730-3", { cache: "no-store" });
-  PRODUCTS = await res.json();
-  if (PRODUCT_COUNT_EL) PRODUCT_COUNT_EL.textContent = String(PRODUCTS.length).padStart(2, "0");
-  router();
+  try {
+    const res = await fetch("./products.json?v=rg-recovery-20260731-1", { cache: "no-store" });
+    if (!res.ok) throw new Error(`products.json HTTP ${res.status}`);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error("products.json ต้องเป็นรายการสินค้า");
+    PRODUCTS = data;
+    if (PRODUCT_COUNT_EL) PRODUCT_COUNT_EL.textContent = String(PRODUCTS.length).padStart(2, "0");
+    router();
+  } catch (error) {
+    console.error("โหลดข้อมูลสินค้าไม่สำเร็จ", error);
+    APP.innerHTML = `
+      <section class="empty-state">
+        โหลดข้อมูลสินค้าไม่สำเร็จ กรุณาตรวจสอบว่าไฟล์ products.json ถูกอัปโหลดไว้โฟลเดอร์เดียวกับ index.html
+      </section>
+    `;
+  }
 }
 
 function setupHeaderContact() {
