@@ -2,21 +2,21 @@ const APP = document.getElementById("app");
 const PRODUCT_COUNT_EL = document.getElementById("productCount");
 
 let PRODUCTS = [];
-let activeCategory = "";
-let activeProductLine = "";
-let activeGrade = "";
+let activeFilter = "RG";
+let activeCategory = "model";
+let activeProductType = "gunpla";
 let searchTerm = "";
 
 const CATEGORIES = [
-  { key: "gundam", label: "Gundam", description: "รวมสินค้าจากจักรวาล Gundam" },
-  { key: "one-piece-card", label: "การ์ด One Piece" },
-  { key: "zippo", label: "Zippo" },
+  { key: "model", label: "Gundam", description: "รวมสินค้าของสะสม Gundam" },
+  { key: "one-piece-card", label: "การ์ด One Piece", description: "กำลังเพิ่มข้อมูล" },
+  { key: "zippo", label: "Zippo", description: "กำลังเพิ่มข้อมูล" },
 ];
 
-const PRODUCT_LINES = {
-  gundam: [
-    { key: "gunpla", label: "Gunpla", description: "โมเดลพลาสติกประกอบ แบ่งตามเกรด" },
-  ],
+const PRODUCT_TYPES = {
+  model: [{ key: "gunpla", label: "Gunpla", description: "โมเดลพลาสติกประกอบ แยกตามเกรด" }],
+  "one-piece-card": [{ key: "one-piece-card", label: "การ์ด One Piece", description: "การ์ดสะสม One Piece" }],
+  zippo: [{ key: "zippo", label: "Zippo", description: "ไฟแช็กและของสะสม Zippo" }],
 };
 
 // ใส่ข้อมูลร้านสปอนเซอร์ได้สูงสุด 6 ร้าน
@@ -32,7 +32,7 @@ const SPONSORS = [
 
 async function loadProducts() {
   setupHeaderContact();
-  const res = await fetch("products.json");
+  const res = await fetch("products.json?v=category-rg041-20260730-3", { cache: "no-store" });
   PRODUCTS = await res.json();
   if (PRODUCT_COUNT_EL) PRODUCT_COUNT_EL.textContent = String(PRODUCTS.length).padStart(2, "0");
   router();
@@ -75,17 +75,6 @@ function router() {
     const product = PRODUCTS.find((p) => p.id === match[1]);
     if (product) return renderDetail(product);
   }
-
-  const catalogMatch = hash.match(/^#\/catalog\/([^/]+)(?:\/([^/]+))?(?:\/([^/]+))?$/);
-  if (catalogMatch) {
-    activeCategory = decodeURIComponent(catalogMatch[1] || "");
-    activeProductLine = decodeURIComponent(catalogMatch[2] || "");
-    activeGrade = decodeURIComponent(catalogMatch[3] || "").toUpperCase();
-  } else {
-    activeCategory = "";
-    activeProductLine = "";
-    activeGrade = "";
-  }
   renderHome();
 }
 window.addEventListener("hashchange", router);
@@ -93,23 +82,19 @@ window.addEventListener("hashchange", router);
 // ---------------- Home / Grid ----------------
 function renderHome() {
   removeSchema();
-  const categoryProducts = activeCategory
-    ? PRODUCTS.filter((p) => p.category === activeCategory)
-    : PRODUCTS;
-  const lineProducts = activeProductLine
-    ? categoryProducts.filter((p) => p.productLine === activeProductLine)
-    : categoryProducts;
-  const grades = [...new Set(lineProducts.map((p) => p.grade).filter(Boolean))];
-  const productLines = PRODUCT_LINES[activeCategory] || [];
+  const categoryProducts = PRODUCTS.filter((p) => p.category === activeCategory);
+  const typeProducts = categoryProducts.filter((p) => productTypeKey(p) === activeProductType);
+  const grades = [...new Set(typeProducts.map((p) => p.grade).filter(Boolean))];
 
-  const filtered = PRODUCTS.filter((p) => {
-    const categoryMatches = !activeCategory || p.category === activeCategory;
-    const lineMatches = !activeProductLine || p.productLine === activeProductLine;
-    const gradeMatches = !activeGrade || p.grade === activeGrade;
+  const filtered = typeProducts.filter((p) => {
+    const gradeMatches = !activeFilter || p.grade === activeFilter;
     const haystack = `${p.name || ""} ${p.sku || ""} ${p.series || ""} ${p.manufacturer || ""}`.toLowerCase();
-    return categoryMatches && lineMatches && gradeMatches && haystack.includes(searchTerm.toLowerCase());
+    return gradeMatches && haystack.includes(searchTerm.toLowerCase());
   });
-  const showProducts = Boolean(searchTerm || activeGrade);
+
+  const selectedCategory = CATEGORIES.find((category) => category.key === activeCategory);
+  const typeOptions = PRODUCT_TYPES[activeCategory] || [];
+  const selectedType = typeOptions.find((type) => type.key === activeProductType);
 
   APP.innerHTML = `
     ${sponsorSectionHTML()}
@@ -124,79 +109,53 @@ function renderHome() {
       </label>
     </section>
 
-    ${catalogBreadcrumbHTML()}
+    <nav class="catalog-breadcrumb" aria-label="หมวดสินค้า">
+      <span>หน้าหลัก</span><b>›</b><span>${esc(selectedCategory?.label || "")}</span><b>›</b>
+      <span>${esc(selectedType?.label || "")}</span><b>›</b><strong>${esc(activeFilter || "")}</strong>
+    </nav>
 
-    <section class="catalog-level" aria-labelledby="mainCategoryTitle">
-      <div class="catalog-level-heading">
-        <span>01</span>
-        <h2 id="mainCategoryTitle">เลือกหมวดหลัก</h2>
-      </div>
-      <div class="category-bar">
-      ${CATEGORIES.map(
+    ${catalogStepHTML(
+      "01",
+      "เลือกหมวดหลัก",
+      CATEGORIES.map(
         (category) =>
-          `<button class="category-chip ${category.key === activeCategory ? "active" : ""}" data-category="${category.key}">
-            <strong>${esc(category.label)}</strong>
-            <small>${esc(category.description || "กำลังเตรียมข้อมูล")}</small>
+          `<button class="catalog-choice category-chip ${category.key === activeCategory ? "active" : ""}" data-category="${category.key}">
+            <strong>${esc(category.label)}</strong><small>${esc(category.description)}</small>
           </button>`
-      ).join("")}
-      </div>
-    </section>
+      ).join("")
+    )}
 
-    ${
-      activeCategory
-        ? `<section class="catalog-level" aria-labelledby="productLineTitle">
-            <div class="catalog-level-heading">
-              <span>02</span>
-              <h2 id="productLineTitle">เลือกประเภทสินค้า</h2>
-            </div>
-            <div class="category-bar product-line-bar">
-              ${
-                productLines.length
-                  ? productLines
-                      .map(
-                        (line) =>
-                          `<button class="category-chip ${line.key === activeProductLine ? "active" : ""}" data-line="${line.key}">
-                            <strong>${esc(line.label)}</strong>
-                            <small>${esc(line.description)}</small>
-                          </button>`
-                      )
-                      .join("")
-                  : `<div class="empty-state">หมวดนี้กำลังเตรียมข้อมูล</div>`
-              }
-            </div>
-          </section>`
-        : ""
-    }
+    ${catalogStepHTML(
+      "02",
+      "เลือกประเภทสินค้า",
+      typeOptions
+        .map(
+          (type) =>
+            `<button class="catalog-choice type-chip ${type.key === activeProductType ? "active" : ""}" data-type="${type.key}">
+              <strong>${esc(type.label)}</strong><small>${esc(type.description)}</small>
+            </button>`
+        )
+        .join("")
+    )}
 
-    ${
-      activeProductLine
-        ? `<section class="catalog-level" aria-labelledby="gradeTitle">
-            <div class="catalog-level-heading">
-              <span>03</span>
-              <h2 id="gradeTitle">เลือกเกรด</h2>
-            </div>
-            <div class="filter-bar">
-              ${grades
-                .map(
-                  (grade) =>
-                    `<button class="grade-card ${grade === activeGrade ? "active" : ""}" data-grade="${esc(grade)}">
-                      <strong>${esc(grade)}</strong>
-                      <small>${lineProducts.filter((p) => p.grade === grade).length} รายการ</small>
-                    </button>`
-                )
-                .join("")}
-            </div>
-          </section>`
-        : ""
-    }
+    ${catalogStepHTML(
+      "03",
+      "เลือกเกรด",
+      grades
+        .map(
+          (grade) =>
+            `<button class="grade-choice filter-chip ${grade === activeFilter ? "active" : ""}" data-grade="${esc(grade)}">
+              <strong>${esc(grade)}</strong><small>${typeProducts.filter((p) => p.grade === grade).length} รายการ</small>
+            </button>`
+        )
+        .join("")
+    )}
 
-    <div class="product-grid ${showProducts ? "" : "catalog-hidden"}">
+    <div class="product-grid">
       ${
-        showProducts && filtered.length
+        filtered.length
           ? filtered.map(cardHTML).join("")
-          : showProducts
-            ? `<div class="empty-state">ไม่พบสินค้าในหมวดหรือคำค้นนี้</div>`
-            : ""
+          : `<div class="empty-state">ยังไม่มีสินค้าในหมวดนี้ — กำลังเตรียมข้อมูล</div>`
       }
     </div>
 
@@ -212,42 +171,47 @@ function renderHome() {
 
   APP.querySelectorAll(".category-chip").forEach((btn) => {
     btn.addEventListener("click", () => {
-      if (btn.dataset.category) {
-        window.location.hash = `#/catalog/${btn.dataset.category}`;
-      }
-      if (btn.dataset.line) {
-        window.location.hash = `#/catalog/${activeCategory}/${btn.dataset.line}`;
-      }
+      activeCategory = btn.dataset.category;
+      activeProductType = (PRODUCT_TYPES[activeCategory] || [])[0]?.key || "";
+      const availableProducts = PRODUCTS.filter(
+        (p) => p.category === activeCategory && productTypeKey(p) === activeProductType
+      );
+      activeFilter = availableProducts[0]?.grade || "";
+      renderHome();
     });
   });
 
-  APP.querySelectorAll(".grade-card").forEach((btn) => {
+  APP.querySelectorAll(".type-chip").forEach((btn) => {
     btn.addEventListener("click", () => {
-      window.location.hash = `#/catalog/${activeCategory}/${activeProductLine}/${btn.dataset.grade.toLowerCase()}`;
+      activeProductType = btn.dataset.type;
+      const availableProducts = PRODUCTS.filter(
+        (p) => p.category === activeCategory && productTypeKey(p) === activeProductType
+      );
+      activeFilter = availableProducts[0]?.grade || "";
+      renderHome();
+    });
+  });
+
+  APP.querySelectorAll(".filter-chip").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      activeFilter = btn.dataset.grade;
+      renderHome();
     });
   });
 }
 
-function catalogBreadcrumbHTML(product) {
-  const category = product?.category || activeCategory;
-  const productLine = product?.productLine || activeProductLine;
-  const grade = product?.grade || activeGrade;
-  const parts = [`<a href="#/">หน้าหลัก</a>`];
+function productTypeKey(product) {
+  if (product.category === "model") return "gunpla";
+  return product.category || "";
+}
 
-  if (category) parts.push(`<a href="#/catalog/${esc(category)}">${esc(product?.categoryLabel || "Gundam")}</a>`);
-  if (productLine) {
-    parts.push(
-      `<a href="#/catalog/${esc(category)}/${esc(productLine)}">${esc(product?.productLineLabel || "Gunpla")}</a>`
-    );
-  }
-  if (grade) {
-    parts.push(
-      `<a href="#/catalog/${esc(category)}/${esc(productLine)}/${esc(String(grade).toLowerCase())}">${esc(grade)}</a>`
-    );
-  }
-  if (product) parts.push(`<span>${esc(product.sku)}</span>`);
-
-  return `<nav class="catalog-breadcrumb" aria-label="เส้นทางหมวดสินค้า">${parts.join("<b>›</b>")}</nav>`;
+function catalogStepHTML(number, title, content) {
+  return `
+    <section class="catalog-step">
+      <div class="catalog-step-title"><span>${number}</span><strong>${esc(title)}</strong></div>
+      <div class="catalog-choice-row">${content || `<p class="empty-state">กำลังเพิ่มข้อมูล</p>`}</div>
+    </section>
+  `;
 }
 
 function sponsorSectionHTML() {
@@ -335,13 +299,9 @@ function cardHTML(p) {
 // ---------------- Detail Page ----------------
 function renderDetail(p) {
   const img0 = (p.images && p.images[0]) || "";
-  const catalogUrl = `#/catalog/${esc(p.category || "gundam")}/${esc(
-    p.productLine || "gunpla"
-  )}/${esc(String(p.grade || "rg").toLowerCase())}`;
 
   APP.innerHTML = `
-    ${catalogBreadcrumbHTML(p)}
-    <a href="${catalogUrl}" class="back-link">← กลับหน้า ${esc(p.grade || "RG")}</a>
+    <a href="#/" class="back-link">← กลับหน้ารวมสินค้า</a>
 
     <div class="spec-plate" data-sku="${esc(p.sku)}">
       <div class="detail-grid">
