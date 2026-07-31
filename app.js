@@ -97,6 +97,11 @@ function esc(str) {
   return div.innerHTML;
 }
 
+function trackMetaEvent(method, eventName, parameters = {}) {
+  if (typeof window.fbq !== "function") return;
+  window.fbq(method, eventName, parameters);
+}
+
 // ---------------- Router ----------------
 async function router() {
   const hash = window.location.hash || "#/";
@@ -562,6 +567,25 @@ function renderDetail(p) {
     }
   });
 
+  trackMetaEvent("track", "ViewContent", {
+    content_ids: [p.sku || p.id],
+    content_name: p.name,
+    content_category: `${p.categoryLabel || "Gundam"} > ${p.productType || "Gunpla"} > ${p.grade || ""}`,
+    content_type: "product",
+  });
+
+  APP.querySelectorAll("a.buy-link[data-affiliate-platform]").forEach((link) => {
+    link.addEventListener("click", () => {
+      trackMetaEvent("trackCustom", "AffiliateClick", {
+        content_ids: [p.sku || p.id],
+        content_name: p.name,
+        content_category: `${p.categoryLabel || "Gundam"} > ${p.productType || "Gunpla"} > ${p.grade || ""}`,
+        content_type: "product",
+        platform: link.dataset.affiliatePlatform,
+      });
+    });
+  });
+
   injectSchema(p);
   window.scrollTo(0, 0);
 }
@@ -610,7 +634,7 @@ function buyLinksHTML(links) {
           const url = l[it.key];
           const has = url && url.trim() !== "";
           return has
-            ? `<a class="buy-link ${it.cls}" href="${esc(url)}" target="_blank" rel="noopener sponsored nofollow">
+            ? `<a class="buy-link ${it.cls}" data-affiliate-platform="${it.key}" href="${esc(url)}" target="_blank" rel="noopener sponsored nofollow">
                  <span class="platform-name">${it.label}</span>
                  <span class="platform-hint">ดูสินค้า →</span>
                </a>`
