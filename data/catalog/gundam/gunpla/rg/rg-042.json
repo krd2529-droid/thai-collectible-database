@@ -1,0 +1,163 @@
+{
+  "id": "rg-042",
+  "category": "model",
+  "categoryLabel": "โมเดลและกันพลา",
+  "sku": "RG-042",
+  "rgNumber": 42,
+  "name": "RG 1/144 Shining Gundam",
+  "grade": "RG",
+  "scale": "1/144",
+  "series": "Mobile Fighter G Gundam",
+  "manufacturer": "Bandai Spirits",
+  "releaseDate": "2025-06-28",
+  "launchPriceJPY": 3500,
+  "recommendedAge": "15 ปีขึ้นไป",
+  "heightCm": 13,
+  "productType": "โมเดลพลาสติกประกอบ (Gunpla Real Grade)",
+  "images": [
+    "images/gundam/gunpla/rg/rg-042/rg42.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42-01.jpeg",
+    "images/gundam/gunpla/rg/rg-042/rg42-02.jpeg",
+    "images/gundam/gunpla/rg/rg-042/rg42-03.jpeg",
+    "images/gundam/gunpla/rg/rg-042/rg42-04.jpeg",
+    "images/gundam/gunpla/rg/rg-042/rg42-05.jpeg",
+    "images/gundam/gunpla/rg/rg-042/rg42-06.jpeg",
+    "images/gundam/gunpla/rg/rg-042/rg42-07.jpeg",
+    "images/gundam/gunpla/rg/rg-042/rg42-08.jpeg",
+    "images/gundam/gunpla/rg/rg-042/rg42-09.jpeg",
+    "images/gundam/gunpla/rg/rg-042/rg42-10.jpeg",
+    "images/gundam/gunpla/rg/rg-042/rg42-11.jpeg"
+  ],
+  "videoEmbedUrl": "https://www.youtube.com/embed/fHJAb0aNrOE?si=gaIqVb7LmuAfe0Sd",
+  "summary": "Real Grade ลำดับที่ 42 ของ Shining Gundam จาก Mobile Fighter G Gundam ออกแบบโครงสร้างเพื่อรองรับท่าทางการต่อสู้แบบศิลปะการต่อสู้ และสามารถเปลี่ยนจาก Normal Mode เป็น Super Mode ได้โดยไม่ต้องเปลี่ยนชิ้นส่วน พร้อมมือ Shining Finger และ Core Lander",
+  "highlights": [
+    "เปลี่ยนเป็น Super Mode ได้โดยไม่ต้องเปลี่ยนชิ้นส่วน รวมถึงกลไกเปลี่ยนรูปบริเวณศีรษะ",
+    "ฝาครอบไหล่กางออกเพื่อเผยรายละเอียดภายในและสร้างรูปทรงของ Super Mode",
+    "ฝาครอบแขนมีกลไกดึงออกและกาง ส่วนฝาครอบขาเปิดพร้อมเผยเวอร์เนียร์ภายใน",
+    "ปลายเท้ายืดไปด้านหน้าและฝาครอบข้อเท้าหมุนไปด้านหลัง ช่วยเพิ่มพื้นที่รองรับเมื่อตั้งท่าต่อสู้",
+    "โครงสร้างข้อต่อออกแบบให้เลียนแบบการเคลื่อนไหวของมนุษย์ รองรับท่าเตะและท่าต่อสู้ได้หลากหลาย",
+    "คอขยับแบบ 3 แกนและมีกลไกสวิง ช่วยสร้างท่าทางการหันและเงยศีรษะแบบไดนามิก",
+    "มีมือเอฟเฟกต์สีเขียวสำหรับท่า Shining Finger และชุดมือหลายรูปแบบ",
+    "Core Lander สามารถถอดออกจากด้านหลังและเปิดส่วนค็อกพิทได้"
+  ],
+  "whatsDifferent": [
+    {
+      "title": "ถ่ายทอด Super Mode ด้วยกลไกในตัว",
+      "detail": "ส่วนศีรษะ ไหล่ แขน ขา และเท้ากางหรือเลื่อนด้วยชิ้นส่วนของโมเดล โดยไม่ต้องใช้ชิ้นส่วนเปลี่ยนสำหรับการเปลี่ยนโหมดหลัก"
+    },
+    {
+      "title": "โครงสร้างเน้นท่าศิลปะการต่อสู้",
+      "detail": "ข้อต่อคอ ลำตัว สะโพก แขนและขาออกแบบให้เคลื่อนไหวกว้าง รองรับท่าชก ท่าเตะ และท่า Shining Finger"
+    },
+    {
+      "title": "แยกสีและพื้นผิวแบบ Real Grade",
+      "detail": "ใช้ชิ้นส่วนหลายเฉดสีและชิ้นส่วนสีทองเงาเพื่อเพิ่มมิติ พร้อมรายละเอียดเชิงกลบนเกราะและโครงภายใน"
+    }
+  ],
+  "boxContents": [
+    "Beam Sword ×2",
+    "ชุดชิ้นส่วนมือ",
+    "มือเอฟเฟกต์ Shining Finger",
+    "Core Lander",
+    "Realistic Decal ×1 แผ่น"
+  ],
+  "notIncluded": [
+    "ฐานจัดแสดง Action Base"
+  ],
+  "pros": [
+    "เปลี่ยนเป็น Super Mode ได้โดยไม่ต้องเปลี่ยนชิ้นส่วนหลัก",
+    "จุดขยับกว้าง เหมาะกับท่าทางการต่อสู้และท่าเตะ",
+    "มีมือ Shining Finger และมือหลายแบบให้เลือกใช้",
+    "Core Lander ถอดแยกและแสดงรายละเอียดได้",
+    "แยกสีและรายละเอียดสูงตามมาตรฐาน Real Grade"
+  ],
+  "considerations": [
+    "ส่วนศีรษะและกลไก Super Mode มีชิ้นส่วนขนาดเล็ก ควรอ่านคู่มือและประกอบอย่างระมัดระวัง",
+    "ข้อต่อบางตำแหน่งค่อนข้างแน่น ไม่ควรฝืนหมุนผิดทิศทาง",
+    "ฐานจัดแสดงไม่ได้รวมมาในชุด",
+    "ชิ้นส่วนเอฟเฟกต์หลักที่ให้มาเป็นมือ Shining Finger ไม่มีเอฟเฟกต์วงแหวนขนาดใหญ่"
+  ],
+  "faq": [
+    {
+      "q": "RG Shining Gundam วางจำหน่ายเมื่อไร",
+      "a": "วางจำหน่ายในญี่ปุ่นวันที่ 28 มิถุนายน 2025"
+    },
+    {
+      "q": "ราคาเปิดตัวเท่าไร",
+      "a": "ราคาเปิดตัว 3,500 เยน ไม่รวมภาษี"
+    },
+    {
+      "q": "เปลี่ยนเป็น Super Mode ต้องเปลี่ยนชิ้นส่วนหรือไม่",
+      "a": "กลไก Super Mode หลักสามารถกางและเปลี่ยนรูปได้โดยไม่ต้องเปลี่ยนชิ้นส่วน รวมถึงบริเวณศีรษะ"
+    },
+    {
+      "q": "มีมือ Shining Finger หรือไม่",
+      "a": "มีมือเอฟเฟกต์สีเขียวสำหรับจำลองท่า Shining Finger พร้อมชุดมือสำหรับจัดท่าหลายรูปแบบ"
+    },
+    {
+      "q": "Core Lander ถอดออกได้หรือไม่",
+      "a": "ถอดออกจากด้านหลังเพื่อจัดแสดงแยกได้ และมีรายละเอียดส่วนค็อกพิท"
+    },
+    {
+      "q": "วัสดุเป็น Die-cast หรือไม่",
+      "a": "ไม่ใช่ เป็นโมเดลพลาสติกประกอบ ใช้วัสดุ PS, ABS และ PP ไม่มีชิ้นส่วน Die-cast"
+    }
+  ],
+  "catalogStatus": "verified-detail",
+  "sourceName": "Bandai Hobby Site",
+  "sourceUrl": "https://global.bandai-hobby.net/en-us/item/01_5544/",
+  "affiliateLinks": {
+    "shopee": "https://s.shopee.co.th/3B6Dvbn5Tz",
+    "lazada": "https://s.lazada.co.th/s.Ziyl5l?c=d&t=p-i6Jmzqj-sQuBWzy",
+    "tiktok": "",
+    "page": ""
+  },
+  "modelCode": "GF13-017NJ",
+  "priceTaxIncluded": false,
+  "references": [
+    {
+      "label": "Bandai Hobby Site — หน้าสินค้าอย่างเป็นทางการ",
+      "url": "https://global.bandai-hobby.net/en-us/item/01_5544/"
+    },
+    {
+      "label": "Gundam Official — ข่าวเปิดตัวและรายละเอียดสินค้า",
+      "url": "https://en.gundam-official.com/news/i/news/gunpla/01_17715"
+    },
+    {
+      "label": "Bandai Hobby — คู่มือประกอบและ Parts List",
+      "url": "https://manual.bandai-hobby.net/pdf/3169.pdf"
+    },
+    {
+      "label": "Dalong.net — RG-042 Information",
+      "url": "https://www.dalong.net/reviews/rg/rg42/rg42_i.htm"
+    },
+    {
+      "label": "Dalong.net — RG-042 Review",
+      "url": "https://www.dalong.net/reviews/rg/rg42/rg42_p.htm"
+    }
+  ],
+  "material": "PS (Polystyrene), ABS และ PP — ไม่มีชิ้นส่วน Die-cast",
+  "manualImages": [
+    "images/gundam/gunpla/rg/rg-042/rg42m_0001.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0002.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0003.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0004.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0005.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0006.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0007.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0008.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0009.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0010.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0011.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0012.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0013.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0014.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0015.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0016.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0017.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0018.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0019.jpg",
+    "images/gundam/gunpla/rg/rg-042/rg42m_0020.jpg"
+  ],
+  "catalogImage": "images/gundam/gunpla/rg/rg-042/rg42.jpg"
+}

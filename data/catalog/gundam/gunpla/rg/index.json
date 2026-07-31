@@ -1,0 +1,776 @@
+[
+  {
+    "id": "rg-001",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-001",
+    "rgNumber": 1,
+    "name": "RG 1/144 Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "Mobile Suit Gundam",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-001/rg1.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-001/rg1.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-001.json"
+  },
+  {
+    "id": "rg-002",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-002",
+    "rgNumber": 2,
+    "name": "RG 1/144 Char's Zaku II",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "Mobile Suit Gundam",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-002/rg2.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-002/rg2.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-002.json"
+  },
+  {
+    "id": "rg-003",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-003",
+    "rgNumber": 3,
+    "name": "RG 1/144 Aile Strike Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-003/rg3.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-003/rg3.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-003.json"
+  },
+  {
+    "id": "rg-004",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-004",
+    "rgNumber": 4,
+    "name": "RG 1/144 Zaku II",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-004/rg4.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-004/rg4.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-004.json"
+  },
+  {
+    "id": "rg-005",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-005",
+    "rgNumber": 5,
+    "name": "RG 1/144 Freedom Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-005/rg5.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-005/rg5.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-005.json"
+  },
+  {
+    "id": "rg-006",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-006",
+    "rgNumber": 6,
+    "name": "RG 1/144 Sky Grasper",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-006/rg6.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-006/rg6.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-006.json"
+  },
+  {
+    "id": "rg-007",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-007",
+    "rgNumber": 7,
+    "name": "RG 1/144 Gundam Mk-II Titans",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-007/rg7.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-007/rg7.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-007.json"
+  },
+  {
+    "id": "rg-008",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-008",
+    "rgNumber": 8,
+    "name": "RG 1/144 Gundam Mk-II A.E.U.G.",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-008/rg8.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-008/rg8.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-008.json"
+  },
+  {
+    "id": "rg-009",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-009",
+    "rgNumber": 9,
+    "name": "RG 1/144 Justice Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-009/rg9.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-009/rg9.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-009.json"
+  },
+  {
+    "id": "rg-010",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-010",
+    "rgNumber": 10,
+    "name": "RG 1/144 Zeta Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-010/rg10.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-010/rg10.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-010.json"
+  },
+  {
+    "id": "rg-011",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-011",
+    "rgNumber": 11,
+    "name": "RG 1/144 Destiny Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-011/rg11.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-011/rg11.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-011.json"
+  },
+  {
+    "id": "rg-012",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-012",
+    "rgNumber": 12,
+    "name": "RG 1/144 Zephyranthes",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-012/rg12.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-012/rg12.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-012.json"
+  },
+  {
+    "id": "rg-013",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-013",
+    "rgNumber": 13,
+    "name": "RG 1/144 Full Burnern",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-013/rg13.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-013/rg13.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-013.json"
+  },
+  {
+    "id": "rg-014",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-014",
+    "rgNumber": 14,
+    "name": "RG 1/144 Strike Freedom Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-014/rg14.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-014/rg14.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-014.json"
+  },
+  {
+    "id": "rg-015",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-015",
+    "rgNumber": 15,
+    "name": "RG 1/144 Gundam Exia",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-015/rg15.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-015/rg15.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-015.json"
+  },
+  {
+    "id": "rg-016",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-016",
+    "rgNumber": 16,
+    "name": "RG 1/144 Char's Z'gok",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-016/rg16.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-016/rg16.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-016.json"
+  },
+  {
+    "id": "rg-017",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-017",
+    "rgNumber": 17,
+    "name": "RG 1/144 Wing Gundam Zero EW",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-017/rg17.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-017/rg17.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-017.json"
+  },
+  {
+    "id": "rg-018",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-018",
+    "rgNumber": 18,
+    "name": "RG 1/144 OO Raiser",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-018/rg18.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-018/rg18.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-018.json"
+  },
+  {
+    "id": "rg-019",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-019",
+    "rgNumber": 19,
+    "name": "RG 1/144 Gundam Astray Red Frame",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-019/rg19.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-019/rg19.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-019.json"
+  },
+  {
+    "id": "rg-020",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-020",
+    "rgNumber": 20,
+    "name": "RG 1/144 Wing Gundam EW",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-020/rg20.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-020/rg20.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-020.json"
+  },
+  {
+    "id": "rg-021",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-021",
+    "rgNumber": 21,
+    "name": "RG 1/144 OO Qan[T]",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-021/rg21.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-021/rg21.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-021.json"
+  },
+  {
+    "id": "rg-022",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-022",
+    "rgNumber": 22,
+    "name": "RG 1/144 Sinanju",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-022/rg22.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-022/rg22.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-022.json"
+  },
+  {
+    "id": "rg-023",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-023",
+    "rgNumber": 23,
+    "name": "RG 1/144 Build Strike Gundam Full Package",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-023/rg23.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-023/rg23.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-023.json"
+  },
+  {
+    "id": "rg-024",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-024",
+    "rgNumber": 24,
+    "name": "RG 1/144 Gundam Astray Gold Frame Amatsu Mina",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-024/rg24.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-024/rg24.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-024.json"
+  },
+  {
+    "id": "rg-025",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-025",
+    "rgNumber": 25,
+    "name": "RG 1/144 Unicorn Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-025/rg25.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-025/rg25.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-025.json"
+  },
+  {
+    "id": "rg-026",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-026",
+    "rgNumber": 26,
+    "name": "RG 1/144 Johnny Ridden's Zaku II",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-026/rg26.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-026/rg26.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-026.json"
+  },
+  {
+    "id": "rg-027",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-027",
+    "rgNumber": 27,
+    "name": "RG 1/144 Unicorn Gundam 02 Banshee Norn",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-027/rg27.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-027/rg27.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-027.json"
+  },
+  {
+    "id": "rg-028",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-028",
+    "rgNumber": 28,
+    "name": "RG 1/144 Tallgeese EW",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-028/rg28.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-028/rg28.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-028.json"
+  },
+  {
+    "id": "rg-029",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-029",
+    "rgNumber": 29,
+    "name": "RG 1/144 Sazabi",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-029/rg29.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-029/rg29.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-029.json"
+  },
+  {
+    "id": "rg-030",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-030",
+    "rgNumber": 30,
+    "name": "RG 1/144 Full Armor Unicorn Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-030/rg30.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-030/rg30.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-030.json"
+  },
+  {
+    "id": "rg-031",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-031",
+    "rgNumber": 31,
+    "name": "RG 1/144 Crossbone Gundam X1",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-031/rg31.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-031/rg31.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-031.json"
+  },
+  {
+    "id": "rg-032",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-032",
+    "rgNumber": 32,
+    "name": "RG 1/144 Nu Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-032/rg32.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-032/rg32.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-032.json"
+  },
+  {
+    "id": "rg-033",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-033",
+    "rgNumber": 33,
+    "name": "RG 1/144 Force Impulse Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-033/rg33.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-033/rg33.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-033.json"
+  },
+  {
+    "id": "rg-034",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-034",
+    "rgNumber": 34,
+    "name": "RG 1/144 Zeong",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-034/rg34.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-034/rg34.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-034.json"
+  },
+  {
+    "id": "rg-035",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-035",
+    "rgNumber": 35,
+    "name": "RG 1/144 Wing Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-035/rg35.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-035/rg35.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-035.json"
+  },
+  {
+    "id": "rg-036",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-036",
+    "rgNumber": 36,
+    "name": "RG 1/144 Hi-Nu Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-036/rg36.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-036/rg36.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-036.json"
+  },
+  {
+    "id": "rg-037",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-037",
+    "rgNumber": 37,
+    "name": "RG 1/144 God Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-037/rg37.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-037/rg37.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-037.json"
+  },
+  {
+    "id": "rg-038",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-038",
+    "rgNumber": 38,
+    "name": "RG 1/144 Gundam Epyon",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-038/rg38.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-038/rg38.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-038.json"
+  },
+  {
+    "id": "rg-039",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-039",
+    "rgNumber": 39,
+    "name": "RG 1/144 Force Impulse Gundam Spec II",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-039/rg39.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-039/rg39.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-039.json"
+  },
+  {
+    "id": "rg-040",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-040",
+    "rgNumber": 40,
+    "name": "RG 1/144 RX-78-2 Gundam Ver. 2.0",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "Mobile Suit Gundam",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-040/rg40.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-040/rg40.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-040.json"
+  },
+  {
+    "id": "rg-041",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-041",
+    "rgNumber": 41,
+    "name": "RG 1/144 Akatsuki Gundam (Oowashi Unit)",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "Mobile Suit Gundam SEED DESTINY",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-041/rg41.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-041/rg41.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-041.json"
+  },
+  {
+    "id": "rg-042",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-042",
+    "rgNumber": 42,
+    "name": "RG 1/144 Shining Gundam",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "Mobile Fighter G Gundam",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-042/rg42.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-042/rg42.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-042.json"
+  },
+  {
+    "id": "rg-043",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "RG-043",
+    "rgNumber": 43,
+    "name": "RG 1/144 Wing Gundam Zero",
+    "grade": "RG",
+    "scale": "1/144",
+    "series": "Mobile Suit Gundam Wing (New Mobile Report Gundam Wing)",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/rg/rg-043/rg43.jpg",
+    "images": [
+      "images/gundam/gunpla/rg/rg-043/rg43.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/rg/rg-043.json"
+  }
+]

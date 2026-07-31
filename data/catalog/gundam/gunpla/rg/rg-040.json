@@ -1,0 +1,150 @@
+{
+  "id": "rg-040",
+  "category": "model",
+  "categoryLabel": "โมเดลและกันพลา",
+  "sku": "RG-040",
+  "rgNumber": 40,
+  "name": "RG 1/144 RX-78-2 Gundam Ver. 2.0",
+  "grade": "RG",
+  "scale": "1/144",
+  "series": "Mobile Suit Gundam",
+  "manufacturer": "Bandai Spirits",
+  "releaseDate": "2024-08-10",
+  "launchPriceJPY": 3500,
+  "recommendedAge": "15 ปีขึ้นไป",
+  "heightCm": null,
+  "productType": "โมเดลพลาสติกประกอบ (Gunpla Real Grade)",
+  "images": [
+    "images/gundam/gunpla/rg/rg-040/rg40.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40-01.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40-02.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40-03.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40-04.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40-05.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40-06.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40-07.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40-08.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40-09.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40-10.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40-11.jpg"
+  ],
+  "videoEmbedUrl": "https://www.youtube.com/embed/8vZM_vgFVSE?si=x0B7epB_ZbzC_vbW",
+  "summary": "Real Grade ลำดับที่ 40 นำ RX-78-2 Gundam มาปรับโครงสร้างใหม่เป็น Ver. 2.0 เน้นโครงภายในแบบเซมิโมโนค็อก กลไกข้อต่อที่เคลื่อนไหวเป็นธรรมชาติ ความมั่นคงในการจัดท่า และระบบ Core Block ที่ยังช่วยให้ช่วงลำตัวขยับได้เมื่อประกอบ Core Fighter หรือ Core Block",
+  "highlights": [
+    "โครงภายในออกแบบใหม่โดยอิงโครงสร้างเซมิโมโนค็อก",
+    "ระบบ Core Fighter สามารถแปลงและติดตั้งภายในลำตัว",
+    "ลำตัวยังขยับได้เมื่อประกอบ Core Block",
+    "ข้อต่อสะโพกเลื่อนตำแหน่งเพื่อเพิ่มระยะการเคลื่อนไหว",
+    "หัวไหล่ใช้ข้อต่อสองชั้นและเกราะไหล่เคลื่อนที่ได้",
+    "กลไกเข่าและเกราะขาเลื่อนสัมพันธ์กับการขยับ",
+    "เท้าแบ่งการเคลื่อนไหวหลายส่วนเพื่อช่วยจัดท่ายืน",
+    "โล่และกระโปรงหลังมีตำแหน่งเก็บอาวุธ"
+  ],
+  "whatsDifferent": [
+    {
+      "title": "โครงสร้าง Ver. 2.0",
+      "detail": "ออกแบบเฟรมและกลไกข้อต่อใหม่เพื่อเพิ่มทั้งรายละเอียด ความมั่นคง และระยะการเคลื่อนไหวเมื่อเทียบกับ RG RX-78-2 รุ่นแรก"
+    },
+    {
+      "title": "ระบบ Core Block",
+      "detail": "Core Fighter แปลงเป็น Core Block และติดตั้งในลำตัวได้ โดยโครงสร้างยังรองรับการขยับช่วงเอวและลำตัว"
+    },
+    {
+      "title": "จุดเก็บอาวุธ",
+      "detail": "โล่และกระโปรงหลังรองรับการติดตั้งหรือเก็บ Beam Rifle, Hyper Bazooka และ Beam Saber ตามตำแหน่งที่ออกแบบไว้"
+    }
+  ],
+  "boxContents": [
+    "RX-78-2 Gundam Ver. 2.0 ×1",
+    "Core Fighter ×1",
+    "Beam Rifle ×1",
+    "Hyper Bazooka ×1",
+    "Shield ×1",
+    "Beam Saber ×2",
+    "ชุดชิ้นส่วนมือ ×1 ชุด",
+    "Realistic Decal ×1 แผ่น",
+    "คู่มือประกอบและ Technical Guide"
+  ],
+  "notIncluded": [
+    "Action Base",
+    "Weapon Set for RX-78-2 Gundam Ver. 2.0",
+    "Gundam Hammer, Beam Javelin และอาวุธเสริมใน Weapon Set"
+  ],
+  "pros": [
+    "เฟรมภายในและรายละเอียดสูงในสเกล 1/144",
+    "ข้อต่อมั่นคงและจัดท่าได้เป็นธรรมชาติ",
+    "มี Core Fighter และอาวุธหลักครบ",
+    "มีจุดเก็บอาวุธบนตัวโมเดล"
+  ],
+  "considerations": [
+    "มีชิ้นส่วนขนาดเล็กและโครงสร้างซับซ้อน",
+    "ควรอ่านคู่มือและตัดชิ้นส่วนตามลำดับ",
+    "อาวุธเสริมและฐานจัดแสดงต้องซื้อแยก"
+  ],
+  "faq": [
+    {
+      "q": "RG RX-78-2 Gundam Ver. 2.0 วางจำหน่ายเมื่อไร",
+      "a": "วางจำหน่ายในญี่ปุ่นวันที่ 10 สิงหาคม 2024"
+    },
+    {
+      "q": "ราคาเปิดตัวเท่าไร",
+      "a": "ราคาเปิดตัว 3,500 เยน ไม่รวมภาษี"
+    },
+    {
+      "q": "Core Fighter แปลงและติดตั้งในลำตัวได้หรือไม่",
+      "a": "ได้ Core Fighter สามารถแปลงเป็น Core Block และติดตั้งภายในลำตัว"
+    },
+    {
+      "q": "Weapon Set รวมมาในกล่องหรือไม่",
+      "a": "ไม่รวม ชุดอาวุธเสริมจำหน่ายแยก"
+    }
+  ],
+  "catalogStatus": "verified-detail-draft",
+  "sourceName": "Bandai Hobby Site",
+  "sourceUrl": "https://manual.bandai-hobby.net/menus/detail/1585",
+  "affiliateLinks": {
+    "shopee": "https://s.shopee.co.th/2BDhPkrhvm",
+    "lazada": "https://s.lazada.co.th/s.ZizDSJ?c=d&t=p-iHYqC1v-s2EKV8ju",
+    "tiktok": "",
+    "page": ""
+  },
+  "modelCode": "RX-78-2",
+  "priceTaxIncluded": false,
+  "references": [
+    {
+      "label": "Bandai Hobby Site — หน้าคู่มือผลิตภัณฑ์อย่างเป็นทางการ",
+      "url": "https://manual.bandai-hobby.net/menus/detail/1585"
+    },
+    {
+      "label": "Dalong.net — RG-040",
+      "url": "https://www.dalong.net/reviews/rg/rg40/rg40_p.htm"
+    }
+  ],
+  "material": "PS (Polystyrene) เป็นหลัก — พลาสติก ไม่มีชิ้นส่วน Die-cast",
+  "manualImages": [
+    "images/gundam/gunpla/rg/rg-040/rg40m_0001.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0002.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0003.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0004.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0005.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0006.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0007.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0008.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0012.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0013.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0014.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0015.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0016.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0017.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0018.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0019.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0020.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0024.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0025.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0026.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0027.jpg",
+    "images/gundam/gunpla/rg/rg-040/rg40m_0028.jpg"
+  ],
+  "catalogImage": "images/gundam/gunpla/rg/rg-040/rg40.jpg",
+  "inStock": null
+}

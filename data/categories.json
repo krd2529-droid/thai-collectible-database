@@ -1,0 +1,15 @@
+{
+  "gundam": {
+    "label": "Gundam",
+    "productTypes": {
+      "gunpla": {
+        "label": "Gunpla",
+        "grades": {
+          "RG": "data/catalog/gundam/gunpla/rg/index.json",
+          "MG": "data/catalog/gundam/gunpla/mg/index.json",
+          "HG": "data/catalog/gundam/gunpla/hg/index.json"
+        }
+      }
+    }
+  }
+}
