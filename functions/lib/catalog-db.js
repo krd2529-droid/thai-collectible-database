@@ -49,7 +49,9 @@ export function normalizeCatalogInput(raw = {}) {
     name: String(raw.name || '').trim(),
     grade: line,
     scale: String(raw.scale || '').trim(),
-    series: String(raw.series || '').trim().toUpperCase(),
+    seriesGroup: String(raw.seriesGroup || '').trim(),
+    seriesGroupOrder: Number(raw.seriesGroupOrder) || 0,
+    series: String(raw.series || '').trim(),
     manufacturer: String(raw.manufacturer || '').trim(),
     releaseDate: String(raw.releaseDate || '').trim(),
     launchPriceJPY: raw.launchPriceJPY === '' || raw.launchPriceJPY == null ? null : Number(raw.launchPriceJPY),
@@ -92,7 +94,7 @@ export function summaryFromPayload(p) {
     id:p.id, category:p.category, categoryLabel:p.categoryLabel, categoryCode:p.categoryCode,
     productType:p.productType, productTypeCode:p.productTypeCode, line:p.line, lineCode:p.lineCode,
     sku:p.sku, rgNumber:p.rgNumber, name:p.name, grade:p.grade, scale:p.scale,
-    series:p.series, manufacturer:p.manufacturer, catalogImage:p.catalogImage,
+    seriesGroup:p.seriesGroup, seriesGroupOrder:p.seriesGroupOrder, series:p.series, manufacturer:p.manufacturer, catalogImage:p.catalogImage,
     images:p.images?.length ? p.images : (p.catalogImage ? [p.catalogImage] : []),
     catalogPath:p.catalogPath, inStock:null, source:'d1'
   };

@@ -224,13 +224,7 @@ function renderHome() {
         .join("")
     )}
 
-    <div class="product-grid">
-      ${
-        filtered.length
-          ? filtered.map(cardHTML).join("")
-          : `<div class="empty-state">ยังไม่มีสินค้าในหมวดนี้ — กำลังเตรียมข้อมูล</div>`
-      }
-    </div>
+    ${catalogGroupedGridHTML(filtered, activeFilter)}
 
   `;
 
@@ -271,6 +265,33 @@ function renderHome() {
       renderHome();
     });
   });
+}
+
+function catalogGroupName(product, activeLine) {
+  const explicit = String(product.seriesGroup || "").trim();
+  if (explicit) return explicit;
+  if (activeLine === "RG") return "Gundam";
+  return String(product.series || "").trim() || "รายการอื่น ๆ";
+}
+
+function catalogGroupedGridHTML(products, activeLine) {
+  if (!products.length) return `<div class="product-grid"><div class="empty-state">ยังไม่มีสินค้าในหมวดนี้ — กำลังเตรียมข้อมูล</div></div>`;
+  const groups = new Map();
+  for (const product of products) {
+    const name = catalogGroupName(product, activeLine);
+    if (!groups.has(name)) groups.set(name, { name, order: Number(product.seriesGroupOrder) || 9999, items: [] });
+    const group = groups.get(name);
+    group.order = Math.min(group.order, Number(product.seriesGroupOrder) || 9999);
+    group.items.push(product);
+  }
+  const preferred = ["Gundam", "Evangelion", "Gaogaigar", "Patlabor", "Special Version"];
+  const rank = name => { const i = preferred.indexOf(name); return i < 0 ? 999 : i; };
+  const sorted = [...groups.values()].sort((a,b)=>(a.order-b.order)||(rank(a.name)-rank(b.name))||a.name.localeCompare(b.name));
+  return sorted.map(group => `
+    <section class="catalog-series-section">
+      <div class="catalog-series-heading"><h2>${esc(group.name)}</h2><span>${group.items.length} รายการ</span></div>
+      <div class="product-grid">${group.items.map(cardHTML).join("")}</div>
+    </section>`).join("");
 }
 
 function productTypeKey(product) {
