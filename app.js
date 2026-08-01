@@ -161,9 +161,9 @@ function renderHome() {
     ${sponsorSectionHTML()}
 
     <section class="hero">
-      <div class="hero-eyebrow">// COLLECTOR'S DATABASE</div>
-      <h1 class="hero-title">THAI COLLECTIBLE DATABASE</h1>
-      <p class="hero-sub">ฐานข้อมูลของสะสมภาษาไทย · เลือกหมวด Gundam → Gunpla → เกรด เพื่อเปิดดูแคตตาล็อกสินค้า</p>
+      <div class="hero-eyebrow">// TOYS DATA BASE</div>
+      <h1 class="hero-title">TOYSKUB</h1>
+      <p class="hero-sub">ฐานข้อมูลและแคตตาล็อกของสะสม สำหรับนักสะสมชาวไทย · เลือกหมวด Gundam → Gunpla → เกรด เพื่อเปิดดูแคตตาล็อกสินค้า</p>
       <label class="search-box">
         <span>SEARCH</span>
         <input id="productSearch" type="search" value="${esc(searchTerm)}" placeholder="ค้นหาชื่อสินค้า รุ่น รหัส หรือผู้ผลิต" />
@@ -281,7 +281,7 @@ function sponsorSectionHTML() {
       <div class="sponsor-heading">
         <span class="sponsor-eyebrow">// SHOP & SPONSOR</span>
         <h2 id="sponsorTitle">ร้านค้าและผู้สนับสนุน</h2>
-        <p>ร้านค้าที่สนับสนุนฐานข้อมูลของสะสมไทย</p>
+        <p>ร้านค้าที่สนับสนุน TOYSKUB</p>
       </div>
       <div class="sponsor-grid">
         ${SPONSORS.map((shop, index) => sponsorCardHTML(shop, index)).join("")}
@@ -541,8 +541,8 @@ function renderDetail(p) {
   const shareButton = APP.querySelector("#shareProductButton");
   shareButton?.addEventListener("click", async () => {
     const shareData = {
-      title: `${p.name} | Thai Collectible Database`,
-      text: `ดูข้อมูล ${p.name} ในฐานข้อมูลของสะสมไทย`,
+      title: `${p.name} | TOYSKUB`,
+      text: `ดูข้อมูล ${p.name} บน TOYSKUB`,
       url: window.location.href,
     };
 
