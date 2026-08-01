@@ -414,6 +414,13 @@ function renderDetail(p) {
   APP.innerHTML = `
     <a href="#/" class="back-link">← กลับหน้ารวมสินค้า</a>
 
+    <div class="catalog-admin-actions" aria-label="เครื่องมือจัดการหน้าแคตตาล็อก">
+      <a class="catalog-admin-action" href="/admin/rg-template/">+ เพิ่มหน้าใหม่</a>
+      <a class="catalog-admin-action primary" href="/admin/rg-template/?id=${encodeURIComponent(p.id)}">แก้ไข / เพิ่มข้อมูล</a>
+      <button class="catalog-admin-action" id="catalogMoveButton" type="button">ย้าย / จัดลำดับ</button>
+      <button class="catalog-admin-action danger" id="catalogTrashButton" type="button">ลบ / ถังขยะ</button>
+    </div>
+
     <div class="spec-plate" data-sku="${esc(p.sku)}">
       <div class="detail-grid">
         <div class="gallery">
@@ -636,8 +643,34 @@ function renderDetail(p) {
     });
   });
 
+  document.getElementById("catalogMoveButton")?.addEventListener("click", () => openFrontendMoveDialog(p));
+  document.getElementById("catalogTrashButton")?.addEventListener("click", async (event) => {
+    if (!confirm(`ย้าย ${p.id} ไปถังขยะหรือไม่? หน้าเว็บจะถูกซ่อน แต่ยังกู้คืนได้`)) return;
+    const button = event.currentTarget;
+    button.disabled = true;
+    button.textContent = "กำลังย้าย…";
+    try {
+      const result = await fetch(`/api/admin/catalog/${encodeURIComponent(p.id)}`, {
+        method: "DELETE",
+        credentials: "same-origin",
+      });
+      const data = await result.json().catch(() => ({}));
+      if (result.status === 401) {
+        location.href = "/admin/";
+        return;
+      }
+      if (!result.ok) throw new Error(data.error || "ย้ายไปถังขยะไม่สำเร็จ");
+      PRODUCT_CACHE.delete(p.id);
+      PRODUCTS = PRODUCTS.filter((item) => item.id !== p.id);
+      location.hash = "#/";
+    } catch (error) {
+      alert(error.message || "ย้ายไปถังขยะไม่สำเร็จ");
+      button.disabled = false;
+      button.textContent = "ลบ / ถังขยะ";
+    }
+  });
+
   injectSchema(p);
-  setupFrontendAdminToolbar(p);
   window.scrollTo(0, 0);
 }
 
@@ -686,21 +719,20 @@ async function setupFrontendAdminToolbar(product) {
     });
   };
 
-  // V10: สร้างแถบเครื่องมือทุกครั้งที่เปิดหน้ารายการ
-  // เพื่อไม่ให้ UI หายเพราะ localStorage/cookie/session ไม่ตรงกัน
-  // สิทธิ์ของคำสั่งที่แก้ข้อมูลจริงยังตรวจที่ API ฝั่งเซิร์ฟเวอร์เสมอ
-  renderToolbar();
+  // แสดงทันทีเมื่อเคยล็อกอินจากหน้า /admin/ แล้ว ไม่ต้องรอ API
+  if (uiFlag) renderToolbar();
 
   try {
     const response = await fetch('/api/admin/session', { cache: 'no-store', credentials: 'same-origin' });
     const session = await response.json().catch(() => ({}));
     if (response.ok && session.authenticated) {
       localStorage.setItem('toyskub_admin_ui', '1');
+      if (!document.querySelector('.frontend-admin-toolbar')) renderToolbar();
       return;
     }
-    localStorage.removeItem('toyskub_admin_ui');
+    if (!uiFlag) document.querySelector('.frontend-admin-toolbar')?.remove();
   } catch {
-    // แถบปุ่มยังแสดงได้ แม้ตรวจ session ไม่สำเร็จ
+    // ถ้า network สะดุด แต่เคยล็อกอินแล้ว ให้ปุ่มยังอยู่
   }
 }
 

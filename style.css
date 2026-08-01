@@ -826,3 +826,13 @@ a:focus-visible, button:focus-visible {
 .frontend-admin-modal__note{grid-column:1/-1;margin:0;color:#9fb2c9;font-size:12px}
 .frontend-admin-modal__footer{justify-content:flex-end;border-top:1px solid rgba(255,255,255,.12);border-bottom:0}
 @media(max-width:700px){.frontend-admin-toolbar{align-items:flex-start;gap:8px}.frontend-admin-toolbar__title{display:none}.frontend-admin-toolbar__actions{margin:0;width:100%}.frontend-admin-toolbar__actions>*{flex:1;text-align:center}.frontend-admin-modal__body{grid-template-columns:1fr}}
+
+
+/* V11: visible catalog management actions inside every product page */
+.catalog-admin-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 16px;padding:12px;background:#e7edf5;border:1px solid #101820;font-family:var(--font-mono)}
+.catalog-admin-action{appearance:none;display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 13px;border:1px solid #101820;background:#fff;color:#101820;text-decoration:none;font:700 12px var(--font-mono);cursor:pointer}
+.catalog-admin-action:hover{background:#eef4fa}
+.catalog-admin-action.primary{background:#244f8d;color:#fff}
+.catalog-admin-action.danger{margin-left:auto;background:#fff0f0;color:#a52020;border-color:#a52020}
+.catalog-admin-action:disabled{opacity:.55;cursor:wait}
+@media(max-width:680px){.catalog-admin-actions>*{flex:1 1 calc(50% - 8px)}.catalog-admin-action.danger{margin-left:0}}
