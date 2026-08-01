@@ -686,20 +686,21 @@ async function setupFrontendAdminToolbar(product) {
     });
   };
 
-  // แสดงทันทีเมื่อเคยล็อกอินจากหน้า /admin/ แล้ว ไม่ต้องรอ API
-  if (uiFlag) renderToolbar();
+  // V10: สร้างแถบเครื่องมือทุกครั้งที่เปิดหน้ารายการ
+  // เพื่อไม่ให้ UI หายเพราะ localStorage/cookie/session ไม่ตรงกัน
+  // สิทธิ์ของคำสั่งที่แก้ข้อมูลจริงยังตรวจที่ API ฝั่งเซิร์ฟเวอร์เสมอ
+  renderToolbar();
 
   try {
     const response = await fetch('/api/admin/session', { cache: 'no-store', credentials: 'same-origin' });
     const session = await response.json().catch(() => ({}));
     if (response.ok && session.authenticated) {
       localStorage.setItem('toyskub_admin_ui', '1');
-      if (!document.querySelector('.frontend-admin-toolbar')) renderToolbar();
       return;
     }
-    if (!uiFlag) document.querySelector('.frontend-admin-toolbar')?.remove();
+    localStorage.removeItem('toyskub_admin_ui');
   } catch {
-    // ถ้า network สะดุด แต่เคยล็อกอินแล้ว ให้ปุ่มยังอยู่
+    // แถบปุ่มยังแสดงได้ แม้ตรวจ session ไม่สำเร็จ
   }
 }
 
