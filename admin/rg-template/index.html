@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <title>RG Blank Template · TOYSKUB</title>
   <link rel="stylesheet" href="/style.css?v=template1">
-  <link rel="stylesheet" href="./template.css?v=1">
+  <link rel="stylesheet" href="./template.css?v=toyskub-template-fix-20260802-2">
 </head>
 <body>
 <div class="blueprint-bg"></div>
@@ -51,7 +51,7 @@
         <label class="title-field-label" for="name">ชื่อรุ่น</label>
         <input class="product-title title-input" id="name" placeholder="กรอกชื่อรุ่น (เว้นว่างได้เมื่อบันทึกฉบับร่าง)">
         <button class="share-button" type="button" disabled><span class="share-icon">↗</span><span>แชร์หน้านี้</span></button>
-        <p class="product-summary editable-text" id="summary" contenteditable="false" data-placeholder="สรุปข้อมูลรุ่น"></p>
+        <textarea class="product-summary summary-input" id="summary" placeholder="สรุปข้อมูลรุ่น"></textarea>
 
         <table class="spec-table">
           <tr><td>ลำดับ RG</td><td><input id="rgNumber" type="number" placeholder="ลำดับ RG"></td></tr>
@@ -117,6 +117,6 @@
 <dialog id="mediaDialog" class="media-dialog"><div class="media-dialog-box"><div class="media-dialog-head"><div><h3>เลือกจากแคตตาล็อก</h3><p>เลือกรูปที่มีอยู่แล้ว ไม่ต้องอัปโหลดซ้ำ</p></div><button id="mediaClose" class="tool-button" type="button">ปิด</button></div><div class="media-search-row"><input id="mediaCatalogId" placeholder="รหัสรายการ เช่น rg-039"><button id="mediaLoad" class="tool-button primary" type="button">โหลดรูป</button></div><div id="mediaCatalogInfo" class="media-catalog-info"></div><div id="mediaGrid" class="media-grid"></div><div class="media-dialog-foot"><span id="mediaSelectedCount">เลือกแล้ว 0 รูป</span><button id="mediaUseSelected" class="tool-button primary" type="button">ใช้รูปที่เลือก</button></div></div></dialog>
 
 <dialog id="messageDialog"><div class="dialog-box"><h3 id="dialogTitle">แจ้งเตือน</h3><p id="dialogMessage"></p><button id="dialogClose" class="tool-button primary">ตกลง</button></div></dialog>
-<script src="./template.js?v=toyskub-template-main-20260802"></script>
+<script src="./template.js?v=toyskub-template-fix-20260802-2"></script>
 </body>
 </html>
