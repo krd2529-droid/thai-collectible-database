@@ -807,7 +807,7 @@ a:focus-visible, button:focus-visible {
 
 
 /* Frontend admin toolbar v6 */
-.frontend-admin-toolbar{position:fixed;left:50%;bottom:18px;z-index:9999;transform:translateX(-50%);display:flex;align-items:center;gap:18px;min-width:min(720px,calc(100vw - 24px));padding:12px 14px;background:rgba(11,20,34,.96);border:1px solid rgba(67,183,255,.7);box-shadow:0 18px 48px rgba(0,0,0,.35);backdrop-filter:blur(12px);font-family:var(--font-mono)}
+.frontend-admin-toolbar{position:fixed;left:50%;top:12px;bottom:auto;z-index:99999;transform:translateX(-50%);display:flex;align-items:center;gap:18px;min-width:min(900px,calc(100vw - 24px));padding:12px 14px;background:rgba(11,20,34,.96);border:1px solid rgba(67,183,255,.7);box-shadow:0 18px 48px rgba(0,0,0,.35);backdrop-filter:blur(12px);font-family:var(--font-mono)}
 .frontend-admin-toolbar__title{font-size:12px;color:#a9dfff;letter-spacing:.06em;white-space:nowrap}
 .frontend-admin-toolbar__actions{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
 .frontend-admin-button{appearance:none;border:1px solid rgba(255,255,255,.22);background:#16243a;color:#fff;padding:9px 14px;font:600 12px var(--font-mono);cursor:pointer;text-decoration:none}

@@ -1,5 +1,5 @@
 const COOKIE_NAME = "toyskub_admin";
-const SESSION_SECONDS = 60 * 60 * 12;
+const SESSION_SECONDS = 60 * 60 * 24 * 7;
 
 function base64Url(bytes) {
   let binary = "";

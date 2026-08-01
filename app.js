@@ -32,6 +32,19 @@ const SPONSORS = [
   null,
 ];
 
+function catalogOrderValue(item) {
+  const explicit = Number(item?.sortOrder);
+  if (Number.isFinite(explicit) && explicit > 0) return explicit;
+  const rg = Number(item?.rgNumber);
+  if (Number.isFinite(rg) && rg > 0) return rg;
+  const match = String(item?.id || '').match(/(\d+)(?!.*\d)/);
+  return match ? Number(match[1]) : 999999;
+}
+
+function sortCatalogItems(a, b) {
+  return catalogOrderValue(a) - catalogOrderValue(b) || String(a?.id || '').localeCompare(String(b?.id || ''));
+}
+
 async function loadProducts() {
   setupHeaderContact();
   try {
@@ -64,7 +77,7 @@ async function loadProducts() {
         const excludedIds = new Set(Array.isArray(dynamicData.excludedIds) ? dynamicData.excludedIds : []);
         const byId = new Map(PRODUCTS.filter(item => !excludedIds.has(item.id)).map(item => [item.id, item]));
         dynamicItems.forEach(item => byId.set(item.id, item));
-        PRODUCTS = [...byId.values()].sort((a,b)=>{const ao=Number(a.sortOrder ?? a.rgNumber);const bo=Number(b.sortOrder ?? b.rgNumber);return (Number.isFinite(ao)?ao:9999)-(Number.isFinite(bo)?bo:9999)||String(a.id).localeCompare(String(b.id));});
+        PRODUCTS = [...byId.values()].sort(sortCatalogItems);
       }
     } catch (dynamicError) { console.warn("โหลดแคตตาล็อกจาก D1 ไม่สำเร็จ", dynamicError); }
     if (PRODUCT_COUNT_EL) PRODUCT_COUNT_EL.textContent = String(PRODUCTS.length).padStart(2, "0");
@@ -290,7 +303,7 @@ function catalogGroupedGridHTML(products, activeLine) {
   const preferred = ["Gundam", "Evangelion", "Gaogaigar", "Patlabor", "Special Version"];
   const rank = name => { const i = preferred.indexOf(name); return i < 0 ? 999 : i; };
   const sorted = [...groups.values()].sort((a,b)=>(a.order-b.order)||(rank(a.name)-rank(b.name))||a.name.localeCompare(b.name));
-  sorted.forEach(group=>group.items.sort((a,b)=>{const ao=Number(a.sortOrder ?? a.rgNumber);const bo=Number(b.sortOrder ?? b.rgNumber);return (Number.isFinite(ao)?ao:9999)-(Number.isFinite(bo)?bo:9999)||String(a.id).localeCompare(String(b.id));}));
+  sorted.forEach(group=>group.items.sort(sortCatalogItems));
   return sorted.map(group => `
     <section class="catalog-series-section">
       <div class="catalog-series-heading"><h2>${esc(group.name)}</h2><span>${group.items.length} รายการ</span></div>
@@ -630,7 +643,7 @@ function renderDetail(p) {
 
 async function setupFrontendAdminToolbar(product) {
   try {
-    const response = await fetch('/api/admin/session', { cache: 'no-store' });
+    const response = await fetch('/api/admin/session', { cache: 'no-store', credentials: 'same-origin' });
     const session = await response.json().catch(() => ({}));
     if (!response.ok || !session.authenticated) return;
 
@@ -640,9 +653,10 @@ async function setupFrontendAdminToolbar(product) {
     toolbar.innerHTML = `
       <div class="frontend-admin-toolbar__title">ADMIN · ${esc(product.id || '')}</div>
       <div class="frontend-admin-toolbar__actions">
-        <a class="frontend-admin-button primary" href="/admin/rg-template/?id=${encodeURIComponent(product.id)}">แก้ไข</a>
-        <button class="frontend-admin-button" type="button" data-admin-move>ย้าย</button>
-        <button class="frontend-admin-button danger" type="button" data-admin-trash>ย้ายไปถังขยะ</button>
+        <a class="frontend-admin-button" href="/admin/rg-template/">เพิ่มหน้าใหม่</a>
+        <a class="frontend-admin-button primary" href="/admin/rg-template/?id=${encodeURIComponent(product.id)}">แก้ไข / เพิ่มข้อมูล</a>
+        <button class="frontend-admin-button" type="button" data-admin-move>ย้าย / จัดลำดับ</button>
+        <button class="frontend-admin-button danger" type="button" data-admin-trash>ลบ / ถังขยะ</button>
       </div>
     `;
     document.body.appendChild(toolbar);
@@ -654,7 +668,7 @@ async function setupFrontendAdminToolbar(product) {
       button.disabled = true;
       button.textContent = 'กำลังย้าย…';
       try {
-        const result = await fetch(`/api/admin/catalog/${encodeURIComponent(product.id)}`, { method: 'DELETE' });
+        const result = await fetch(`/api/admin/catalog/${encodeURIComponent(product.id)}`, { method: 'DELETE', credentials: 'same-origin' });
         const data = await result.json().catch(() => ({}));
         if (!result.ok) throw new Error(data.error || 'ย้ายไปถังขยะไม่สำเร็จ');
         PRODUCT_CACHE.delete(product.id);
@@ -723,13 +737,14 @@ function openFrontendMoveDialog(product) {
       const response = await fetch(`/api/admin/catalog/${encodeURIComponent(product.id)}`, {
         method: 'PUT',
         headers: { 'content-type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify(patch),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || 'บันทึกการย้ายไม่สำเร็จ');
       Object.assign(product, patch);
       PRODUCT_CACHE.set(product.id, product);
-      PRODUCTS = PRODUCTS.map(item => item.id === product.id ? {...item,...patch} : item).sort((a,b)=>{const ao=Number(a.sortOrder ?? a.rgNumber);const bo=Number(b.sortOrder ?? b.rgNumber);return (Number.isFinite(ao)?ao:9999)-(Number.isFinite(bo)?bo:9999)||String(a.id).localeCompare(String(b.id));});
+      PRODUCTS = PRODUCTS.map(item => item.id === product.id ? {...item,...patch} : item).sort(sortCatalogItems);
       close();
       alert('ย้ายและบันทึกลำดับเรียบร้อย');
       if(location.hash.startsWith('#/product/')) renderDetail(product); else renderHome();
