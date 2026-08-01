@@ -642,11 +642,9 @@ function renderDetail(p) {
 }
 
 async function setupFrontendAdminToolbar(product) {
-  try {
-    const response = await fetch('/api/admin/session', { cache: 'no-store', credentials: 'same-origin' });
-    const session = await response.json().catch(() => ({}));
-    if (!response.ok || !session.authenticated) return;
+  const uiFlag = localStorage.getItem('toyskub_admin_ui') === '1';
 
+  const renderToolbar = () => {
     document.querySelector('.frontend-admin-toolbar')?.remove();
     const toolbar = document.createElement('div');
     toolbar.className = 'frontend-admin-toolbar';
@@ -670,6 +668,11 @@ async function setupFrontendAdminToolbar(product) {
       try {
         const result = await fetch(`/api/admin/catalog/${encodeURIComponent(product.id)}`, { method: 'DELETE', credentials: 'same-origin' });
         const data = await result.json().catch(() => ({}));
+        if (result.status === 401) {
+          localStorage.removeItem('toyskub_admin_ui');
+          location.href = '/admin/';
+          return;
+        }
         if (!result.ok) throw new Error(data.error || 'ย้ายไปถังขยะไม่สำเร็จ');
         PRODUCT_CACHE.delete(product.id);
         PRODUCTS = PRODUCTS.filter(item => item.id !== product.id);
@@ -678,11 +681,25 @@ async function setupFrontendAdminToolbar(product) {
       } catch (error) {
         alert(error.message || 'ย้ายไปถังขยะไม่สำเร็จ');
         button.disabled = false;
-        button.textContent = 'ย้ายไปถังขยะ';
+        button.textContent = 'ลบ / ถังขยะ';
       }
     });
-  } catch (error) {
-    console.warn('ตรวจสอบสิทธิ์แถบผู้ดูแลไม่สำเร็จ', error);
+  };
+
+  // แสดงทันทีเมื่อเคยล็อกอินจากหน้า /admin/ แล้ว ไม่ต้องรอ API
+  if (uiFlag) renderToolbar();
+
+  try {
+    const response = await fetch('/api/admin/session', { cache: 'no-store', credentials: 'same-origin' });
+    const session = await response.json().catch(() => ({}));
+    if (response.ok && session.authenticated) {
+      localStorage.setItem('toyskub_admin_ui', '1');
+      if (!document.querySelector('.frontend-admin-toolbar')) renderToolbar();
+      return;
+    }
+    if (!uiFlag) document.querySelector('.frontend-admin-toolbar')?.remove();
+  } catch {
+    // ถ้า network สะดุด แต่เคยล็อกอินแล้ว ให้ปุ่มยังอยู่
   }
 }
 
