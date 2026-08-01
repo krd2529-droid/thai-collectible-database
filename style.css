@@ -784,3 +784,19 @@ a:focus-visible, button:focus-visible {
   outline: 2px solid var(--blue);
   outline-offset: 2px;
 }
+
+/* Admin shortcut */
+.header-nav.contact-ready { gap: 8px; }
+.header-admin-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 5px 10px;
+  border: 1px solid var(--ink);
+  background: var(--blue);
+  color: #fff;
+  font: 700 11px var(--font-mono);
+  letter-spacing: .08em;
+}
+.header-admin-link:hover { background: var(--ink); }
+@media (max-width: 520px) { .header-admin-link { display: none; } }

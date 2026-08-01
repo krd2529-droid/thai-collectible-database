@@ -74,6 +74,7 @@ function setupHeaderContact() {
 
   headerNav.classList.add("contact-ready");
   headerNav.innerHTML = `
+    <a class="header-admin-link" href="/admin/" rel="nofollow">ADMIN</a>
     <a
       class="header-line-contact"
       href="https://lin.ee/rU7lTLb6"
