@@ -7,7 +7,7 @@
 <meta name="description" content="TOYSKUB ฐานข้อมูลและแคตตาล็อกของสะสม สำหรับนักสะสมชาวไทย พร้อมข้อมูลรุ่นและแหล่งอ้างอิง" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=toyskub-main-20260802-2" />
+<link rel="stylesheet" href="style.css?v=toyskub-v13-force-toolbar" />
 </head>
 <body>
 
@@ -38,6 +38,34 @@
   </div>
 </footer>
 
-<script src="app.js?v=toyskub-main-20260802-2"></script>
+<script src="app.js?v=toyskub-main-20260802-3"></script>
+
+<style id="catalog-admin-hardbar-style">
+  #catalogAdminHardbar{position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:2147483647;display:none;gap:8px;align-items:center;flex-wrap:wrap;width:min(920px,calc(100vw - 20px));padding:10px;background:#101820;border:2px solid #2b4c7e;box-shadow:0 8px 30px rgba(0,0,0,.35);font-family:Arial,sans-serif}
+  #catalogAdminHardbar a,#catalogAdminHardbar button{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 12px;border:1px solid #fff;background:#fff;color:#101820;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer}
+  #catalogAdminHardbar .primary{background:#2b4c7e;color:#fff}
+  #catalogAdminHardbar .danger{margin-left:auto;background:#fff0f0;color:#a52020;border-color:#ff7a7a}
+  @media(max-width:680px){#catalogAdminHardbar a,#catalogAdminHardbar button{flex:1 1 calc(50% - 8px)}#catalogAdminHardbar .danger{margin-left:0}}
+</style>
+<div id="catalogAdminHardbar" aria-label="เครื่องมือจัดการแคตตาล็อก">
+  <a href="/admin/rg-template/">+ เพิ่มหน้าใหม่</a>
+  <a id="catalogHardEdit" class="primary" href="/admin/rg-template/">แก้ไข / เพิ่มข้อมูล</a>
+  <button id="catalogHardMove" type="button">ย้าย / จัดลำดับ</button>
+  <button id="catalogHardTrash" class="danger" type="button">ลบ / ถังขยะ</button>
+</div>
+<script>
+(function(){
+  const bar=document.getElementById('catalogAdminHardbar');
+  const edit=document.getElementById('catalogHardEdit');
+  function currentId(){const m=(location.hash||'').match(/^#\/product\/([^/?#]+)/);return m?decodeURIComponent(m[1]):'';}
+  function sync(){const id=currentId();bar.style.display=id?'flex':'none';edit.href=id?'/admin/rg-template/?id='+encodeURIComponent(id):'/admin/rg-template/';}
+  window.addEventListener('hashchange',sync);
+  document.addEventListener('DOMContentLoaded',sync);
+  sync();
+  document.getElementById('catalogHardMove').addEventListener('click',()=>{const id=currentId(); if(!id)return; alert('ปุ่มย้ายแสดงแล้ว: '+id+' — ขั้นต่อไปค่อยเชื่อม API');});
+  document.getElementById('catalogHardTrash').addEventListener('click',()=>{const id=currentId(); if(!id)return; alert('ปุ่มลบแสดงแล้ว: '+id+' — ขั้นต่อไปค่อยเชื่อม API');});
+})();
+</script>
+
 </body>
 </html>
