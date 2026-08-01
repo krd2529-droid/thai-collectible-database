@@ -671,6 +671,7 @@ function renderDetail(p) {
   });
 
   injectSchema(p);
+  void setupFrontendAdminToolbar(p);
   window.scrollTo(0, 0);
 }
 
