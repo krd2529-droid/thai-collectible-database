@@ -35,6 +35,8 @@ export function normalizeCatalogInput(raw = {}) {
   const cleanPairs = (value, a, b) => Array.isArray(value) ? value.map(x => ({[a]: String(x?.[a] || '').trim(), [b]: String(x?.[b] || '').trim()})).filter(x => x[a] || x[b]) : [];
   const id = code(raw.id);
   const line = String(raw.line || raw.grade || '').trim().toUpperCase();
+  const idNumberMatch = id.match(/^rg-(\d+)$/i);
+  const inferredRgNumber = idNumberMatch ? Number(idNumberMatch[1]) : null;
   const p = {
     id,
     category: String(raw.category || 'model').trim(),
@@ -45,7 +47,7 @@ export function normalizeCatalogInput(raw = {}) {
     line,
     lineCode: code(raw.lineCode || line),
     sku: String(raw.sku || id.toUpperCase()).trim(),
-    rgNumber: raw.rgNumber === '' || raw.rgNumber == null ? null : Number(raw.rgNumber),
+    rgNumber: raw.rgNumber === '' || raw.rgNumber == null ? inferredRgNumber : Number(raw.rgNumber),
     name: String(raw.name || '').trim(),
     grade: line,
     scale: String(raw.scale || '').trim(),
@@ -84,7 +86,7 @@ export function normalizeCatalogInput(raw = {}) {
     catalogImage: String(raw.catalogImage || cleanList(raw.images)[0] || '').trim(),
     inStock: null,
     status: ['draft','published','hidden','trash','deleted'].includes(raw.status) ? raw.status : 'draft',
-    sortOrder: Number(raw.sortOrder) || 0,
+    sortOrder: raw.sortOrder === '' || raw.sortOrder == null ? (raw.rgNumber === '' || raw.rgNumber == null ? (inferredRgNumber || 0) : Number(raw.rgNumber)) : Number(raw.sortOrder),
   };
   p.catalogPath = [p.categoryCode,p.productTypeCode,p.lineCode,code(p.series)].filter(Boolean).join('/');
   return p;
@@ -96,7 +98,7 @@ export function summaryFromPayload(p) {
     sku:p.sku, rgNumber:p.rgNumber, name:p.name, grade:p.grade, scale:p.scale,
     seriesGroup:p.seriesGroup, seriesGroupOrder:p.seriesGroupOrder, series:p.series, manufacturer:p.manufacturer, catalogImage:p.catalogImage,
     images:p.images?.length ? p.images : (p.catalogImage ? [p.catalogImage] : []),
-    catalogPath:p.catalogPath, inStock:null, source:'d1'
+    catalogPath:p.catalogPath, sortOrder:Number(p.sortOrder)||Number(p.rgNumber)||0, status:p.status, inStock:null, source:'d1'
   };
 }
 

@@ -64,7 +64,7 @@ async function loadProducts() {
         const excludedIds = new Set(Array.isArray(dynamicData.excludedIds) ? dynamicData.excludedIds : []);
         const byId = new Map(PRODUCTS.filter(item => !excludedIds.has(item.id)).map(item => [item.id, item]));
         dynamicItems.forEach(item => byId.set(item.id, item));
-        PRODUCTS = [...byId.values()].sort((a,b)=>(Number(a.rgNumber)||9999)-(Number(b.rgNumber)||9999));
+        PRODUCTS = [...byId.values()].sort((a,b)=>{const ao=Number(a.sortOrder ?? a.rgNumber);const bo=Number(b.sortOrder ?? b.rgNumber);return (Number.isFinite(ao)?ao:9999)-(Number.isFinite(bo)?bo:9999)||String(a.id).localeCompare(String(b.id));});
       }
     } catch (dynamicError) { console.warn("โหลดแคตตาล็อกจาก D1 ไม่สำเร็จ", dynamicError); }
     if (PRODUCT_COUNT_EL) PRODUCT_COUNT_EL.textContent = String(PRODUCTS.length).padStart(2, "0");
@@ -290,6 +290,7 @@ function catalogGroupedGridHTML(products, activeLine) {
   const preferred = ["Gundam", "Evangelion", "Gaogaigar", "Patlabor", "Special Version"];
   const rank = name => { const i = preferred.indexOf(name); return i < 0 ? 999 : i; };
   const sorted = [...groups.values()].sort((a,b)=>(a.order-b.order)||(rank(a.name)-rank(b.name))||a.name.localeCompare(b.name));
+  sorted.forEach(group=>group.items.sort((a,b)=>{const ao=Number(a.sortOrder ?? a.rgNumber);const bo=Number(b.sortOrder ?? b.rgNumber);return (Number.isFinite(ao)?ao:9999)-(Number.isFinite(bo)?bo:9999)||String(a.id).localeCompare(String(b.id));}));
   return sorted.map(group => `
     <section class="catalog-series-section">
       <div class="catalog-series-heading"><h2>${esc(group.name)}</h2><span>${group.items.length} รายการ</span></div>
@@ -728,8 +729,10 @@ function openFrontendMoveDialog(product) {
       if (!response.ok) throw new Error(data.error || 'บันทึกการย้ายไม่สำเร็จ');
       Object.assign(product, patch);
       PRODUCT_CACHE.set(product.id, product);
+      PRODUCTS = PRODUCTS.map(item => item.id === product.id ? {...item,...patch} : item).sort((a,b)=>{const ao=Number(a.sortOrder ?? a.rgNumber);const bo=Number(b.sortOrder ?? b.rgNumber);return (Number.isFinite(ao)?ao:9999)-(Number.isFinite(bo)?bo:9999)||String(a.id).localeCompare(String(b.id));});
       close();
-      alert('ย้ายและบันทึกเรียบร้อย');
+      alert('ย้ายและบันทึกลำดับเรียบร้อย');
+      if(location.hash.startsWith('#/product/')) renderDetail(product); else renderHome();
     } catch (error) {
       alert(error.message || 'บันทึกการย้ายไม่สำเร็จ');
       button.disabled = false;
