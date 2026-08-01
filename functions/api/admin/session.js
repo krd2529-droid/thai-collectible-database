@@ -1,37 +1,36 @@
-function normalizeEmail(value) {
-  return String(value || "").trim().toLowerCase();
-}
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "content-type": "application/json; charset=UTF-8",
-      "cache-control": "no-store",
-    },
-  });
-}
+import { getAdminPassword, isAuthorized, json } from "../../lib/admin-auth.js";
 
 export async function onRequestGet(context) {
-  const configuredAdmin = normalizeEmail(context.env.ADMIN_EMAIL);
-  const accessEmail = normalizeEmail(
-    context.request.headers.get("Cf-Access-Authenticated-User-Email"),
-  );
+  const configured = Boolean(getAdminPassword(context.env));
+  if (!configured) {
+    return json({ ok: false, configured: false, error: "ยังไม่ได้ตั้งค่า ADMIN_PASSWORD" }, 503);
+  }
 
-  if (!configuredAdmin) {
-    return json({ ok: false, error: "ADMIN_EMAIL_NOT_CONFIGURED" }, 503);
+  const authorized = await isAuthorized(context.request, context.env);
+  if (!authorized) {
+    return json({ ok: false, configured: true, authenticated: false }, 401);
   }
-  if (!accessEmail) {
-    return json({ ok: false, error: "ACCESS_LOGIN_REQUIRED" }, 401);
-  }
-  if (accessEmail !== configuredAdmin) {
-    return json({ ok: false, error: "FORBIDDEN" }, 403);
+
+  let databaseConnected = false;
+  try {
+    if (context.env.TOYSKUB_DB) {
+      await context.env.TOYSKUB_DB.prepare("SELECT 1 AS ok").first();
+      databaseConnected = true;
+    }
+  } catch {
+    databaseConnected = false;
   }
 
   return json({
     ok: true,
-    admin: { email: accessEmail },
-    database: { binding: "TOYSKUB_DB", connected: Boolean(context.env.TOYSKUB_DB) },
-    phase: 1,
+    configured: true,
+    authenticated: true,
+    admin: { email: String(context.env.ADMIN_EMAIL || "เจ้าของเว็บไซต์") },
+    database: { binding: "TOYSKUB_DB", connected: databaseConnected },
+    version: "Admin Panel v2",
   });
+}
+
+export function onRequest() {
+  return json({ ok: false, error: "Method not allowed" }, 405);
 }

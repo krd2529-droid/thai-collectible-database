@@ -4,53 +4,62 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
-  <title>TOYSKUB Admin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./admin.css?v=part1-20260801" />
+  <title>TOYSKUB Admin v2</title>
+  <link rel="stylesheet" href="./admin.css?v=2" />
 </head>
 <body>
-  <div class="grid-bg" aria-hidden="true"></div>
   <header class="admin-header">
-    <a class="brand" href="/">
-      <span class="brand-mark">TK</span>
-      <span>TOYSKUB<br><small>ADMIN CONTROL</small></span>
-    </a>
+    <a class="brand" href="/"><span class="brand-mark">TK</span><span>TOYSKUB<br><small>ADMIN PANEL v2</small></span></a>
     <a class="back-link" href="/">กลับหน้าเว็บ</a>
   </header>
 
   <main class="admin-main">
-    <section class="welcome">
-      <p class="eyebrow">// ADMIN PART 01</p>
-      <h1>ศูนย์จัดการ TOYSKUB</h1>
-      <p>พาร์ทนี้เปิดระบบตรวจสิทธิ์แอดมินแล้ว เมนูจัดการข้อมูลจะเริ่มใช้งานในพาร์ทถัดไป</p>
-      <div id="sessionStatus" class="status loading">กำลังตรวจสอบสิทธิ์…</div>
+    <section id="loginPanel" class="login-panel hidden">
+      <p class="eyebrow">// SECURE LOGIN</p>
+      <h1>เข้าสู่ระบบแอดมิน</h1>
+      <p>ใส่รหัสผ่านที่ตั้งไว้ใน Cloudflare ชื่อ <code>ADMIN_PASSWORD</code></p>
+      <form id="loginForm">
+        <label for="password">รหัสผ่านแอดมิน</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <button type="submit">เข้าสู่ระบบ</button>
+      </form>
+      <div id="loginMessage" class="status"></div>
     </section>
 
-    <section class="dashboard" aria-label="เมนูผู้ดูแลระบบ">
-      <article class="admin-card">
-        <span class="card-no">01</span><h2>จัดการหมวด</h2><p>เพิ่มและแก้ไขหมวดหลัก ประเภทสินค้า และเกรด</p><button disabled>เริ่มในพาร์ท 2</button>
-      </article>
-      <article class="admin-card">
-        <span class="card-no">02</span><h2>จัดการสินค้า</h2><p>เพิ่มสินค้าใหม่ ดูรายการ และแก้ไขข้อมูลสินค้า</p><button disabled>เริ่มในพาร์ท 2</button>
-      </article>
-      <article class="admin-card">
-        <span class="card-no">03</span><h2>จัดการรูปภาพ</h2><p>อัปโหลดภาพปกและภาพรายละเอียดสินค้า</p><button disabled>เริ่มในพาร์ท 3</button>
-      </article>
-      <article class="admin-card">
-        <span class="card-no">04</span><h2>เผยแพร่และลบ</h2><p>ควบคุมสถานะเผยแพร่ แก้ไข และลบรายการ</p><button disabled>เริ่มในพาร์ท 4</button>
-      </article>
+    <section id="setupPanel" class="login-panel hidden">
+      <p class="eyebrow">// SETUP REQUIRED</p>
+      <h1>ยังไม่ได้ตั้งรหัสผ่าน</h1>
+      <p>ไปที่ Cloudflare → Settings → Variables and secrets แล้วเพิ่ม:</p>
+      <div class="setup-code"><b>Name</b> ADMIN_PASSWORD<br><b>Value</b> รหัสผ่านที่นายตั้งเอง</div>
+      <p>จากนั้นกด Save และ Redeploy หนึ่งครั้ง</p>
     </section>
 
-    <section class="system-panel">
-      <h2>สถานะระบบ</h2>
-      <dl>
-        <div><dt>Admin email</dt><dd id="adminEmail">—</dd></div>
-        <div><dt>D1 binding</dt><dd id="databaseStatus">—</dd></div>
-        <div><dt>Current phase</dt><dd>Part 1 — Access control</dd></div>
-      </dl>
+    <section id="dashboardPanel" class="hidden">
+      <section class="welcome">
+        <p class="eyebrow">// ADMIN PANEL v2</p>
+        <h1>ศูนย์จัดการ TOYSKUB</h1>
+        <p>ระบบล็อกอินพร้อมแล้ว พาร์ทถัดไปจะเปิดเพิ่มหมวดและเพิ่มสินค้า</p>
+        <div id="sessionStatus" class="status success">เข้าสู่ระบบแล้ว</div>
+      </section>
+
+      <section class="dashboard">
+        <article class="admin-card"><span class="card-no">01</span><h2>จัดการหมวด</h2><p>เพิ่มและแก้ไขหมวดสินค้า</p><button disabled>พาร์ท 2</button></article>
+        <article class="admin-card"><span class="card-no">02</span><h2>จัดการสินค้า</h2><p>เพิ่ม แก้ไข และดูรายการสินค้า</p><button disabled>พาร์ท 2</button></article>
+        <article class="admin-card"><span class="card-no">03</span><h2>จัดการรูปภาพ</h2><p>อัปโหลดภาพสินค้า</p><button disabled>พาร์ท 3</button></article>
+        <article class="admin-card"><span class="card-no">04</span><h2>เผยแพร่และลบ</h2><p>ควบคุมสถานะข้อมูล</p><button disabled>พาร์ท 4</button></article>
+      </section>
+
+      <section class="system-panel">
+        <h2>สถานะระบบ</h2>
+        <dl>
+          <div><dt>Admin</dt><dd id="adminEmail">—</dd></div>
+          <div><dt>D1 binding</dt><dd id="databaseStatus">—</dd></div>
+          <div><dt>Version</dt><dd>Admin Panel v2</dd></div>
+        </dl>
+        <button id="logoutButton" class="logout-button">ออกจากระบบ</button>
+      </section>
     </section>
   </main>
-  <script src="./admin.js?v=part1-20260801"></script>
+  <script src="./admin.js?v=2"></script>
 </body>
 </html>
