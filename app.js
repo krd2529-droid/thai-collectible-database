@@ -156,6 +156,8 @@ window.addEventListener("hashchange", () => {
 // ---------------- Home / Grid ----------------
 function renderHome() {
   removeSchema();
+  document.querySelector('.frontend-admin-toolbar')?.remove();
+  document.querySelector('.frontend-admin-modal')?.remove();
   const categoryProducts = PRODUCTS.filter((p) => p.category === activeCategory);
   const typeProducts = categoryProducts.filter((p) => productTypeKey(p) === activeProductType);
   const grades = [...new Set(typeProducts.map((p) => p.grade).filter(Boolean))];
@@ -621,7 +623,119 @@ function renderDetail(p) {
   });
 
   injectSchema(p);
+  setupFrontendAdminToolbar(p);
   window.scrollTo(0, 0);
+}
+
+async function setupFrontendAdminToolbar(product) {
+  try {
+    const response = await fetch('/api/admin/session', { cache: 'no-store' });
+    const session = await response.json().catch(() => ({}));
+    if (!response.ok || !session.authenticated) return;
+
+    document.querySelector('.frontend-admin-toolbar')?.remove();
+    const toolbar = document.createElement('div');
+    toolbar.className = 'frontend-admin-toolbar';
+    toolbar.innerHTML = `
+      <div class="frontend-admin-toolbar__title">ADMIN · ${esc(product.id || '')}</div>
+      <div class="frontend-admin-toolbar__actions">
+        <a class="frontend-admin-button primary" href="/admin/rg-template/?id=${encodeURIComponent(product.id)}">แก้ไข</a>
+        <button class="frontend-admin-button" type="button" data-admin-move>ย้าย</button>
+        <button class="frontend-admin-button danger" type="button" data-admin-trash>ย้ายไปถังขยะ</button>
+      </div>
+    `;
+    document.body.appendChild(toolbar);
+
+    toolbar.querySelector('[data-admin-move]')?.addEventListener('click', () => openFrontendMoveDialog(product));
+    toolbar.querySelector('[data-admin-trash]')?.addEventListener('click', async () => {
+      if (!confirm(`ย้าย ${product.id} ไปถังขยะหรือไม่? หน้าเว็บจะถูกซ่อน แต่ยังกู้คืนได้`)) return;
+      const button = toolbar.querySelector('[data-admin-trash]');
+      button.disabled = true;
+      button.textContent = 'กำลังย้าย…';
+      try {
+        const result = await fetch(`/api/admin/catalog/${encodeURIComponent(product.id)}`, { method: 'DELETE' });
+        const data = await result.json().catch(() => ({}));
+        if (!result.ok) throw new Error(data.error || 'ย้ายไปถังขยะไม่สำเร็จ');
+        PRODUCT_CACHE.delete(product.id);
+        PRODUCTS = PRODUCTS.filter(item => item.id !== product.id);
+        location.hash = '#/';
+        renderHome();
+      } catch (error) {
+        alert(error.message || 'ย้ายไปถังขยะไม่สำเร็จ');
+        button.disabled = false;
+        button.textContent = 'ย้ายไปถังขยะ';
+      }
+    });
+  } catch (error) {
+    console.warn('ตรวจสอบสิทธิ์แถบผู้ดูแลไม่สำเร็จ', error);
+  }
+}
+
+function openFrontendMoveDialog(product) {
+  document.querySelector('.frontend-admin-modal')?.remove();
+  const modal = document.createElement('div');
+  modal.className = 'frontend-admin-modal';
+  modal.innerHTML = `
+    <div class="frontend-admin-modal__panel" role="dialog" aria-modal="true" aria-label="ย้ายหน้าแคตตาล็อก">
+      <div class="frontend-admin-modal__header">
+        <div><strong>ย้ายหน้าแคตตาล็อก</strong><small>${esc(product.id)}</small></div>
+        <button type="button" class="frontend-admin-modal__close" aria-label="ปิด">×</button>
+      </div>
+      <div class="frontend-admin-modal__body">
+        <label>หมวดหลัก<input name="categoryLabel" value="${esc(product.categoryLabel || 'Gundam')}" /></label>
+        <label>รหัสหมวด<input name="categoryCode" value="${esc(product.categoryCode || 'gd')}" /></label>
+        <label>ประเภท<input name="productType" value="${esc(product.productType || 'Gunpla')}" /></label>
+        <label>รหัสประเภท<input name="productTypeCode" value="${esc(product.productTypeCode || 'gp')}" /></label>
+        <label>ไลน์ / เกรด<input name="line" value="${esc(product.line || product.grade || 'RG')}" /></label>
+        <label>รหัสไลน์<input name="lineCode" value="${esc(product.lineCode || String(product.grade || 'rg').toLowerCase())}" /></label>
+        <label>กลุ่มในหน้า<input name="catalogGroup" value="${esc(product.catalogGroup || product.groupName || 'Gundam')}" /></label>
+        <label>ลำดับ<input name="sortOrder" type="number" value="${Number(product.sortOrder || product.rgNumber || 0)}" /></label>
+        <p class="frontend-admin-modal__note">การย้ายจะไม่เปลี่ยนรหัสรายการหรือ URL เดิม</p>
+      </div>
+      <div class="frontend-admin-modal__footer">
+        <button type="button" class="frontend-admin-button" data-cancel>ยกเลิก</button>
+        <button type="button" class="frontend-admin-button primary" data-save>บันทึกการย้าย</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  const close = () => modal.remove();
+  modal.querySelector('.frontend-admin-modal__close').onclick = close;
+  modal.querySelector('[data-cancel]').onclick = close;
+  modal.addEventListener('click', event => { if (event.target === modal) close(); });
+  modal.querySelector('[data-save]').onclick = async () => {
+    const button = modal.querySelector('[data-save]');
+    const value = name => modal.querySelector(`[name="${name}"]`).value.trim();
+    const patch = {
+      categoryLabel: value('categoryLabel'),
+      categoryCode: value('categoryCode'),
+      productType: value('productType'),
+      productTypeCode: value('productTypeCode'),
+      line: value('line'),
+      grade: value('line'),
+      lineCode: value('lineCode'),
+      catalogGroup: value('catalogGroup'),
+      sortOrder: Number(value('sortOrder')) || 0,
+    };
+    button.disabled = true;
+    button.textContent = 'กำลังบันทึก…';
+    try {
+      const response = await fetch(`/api/admin/catalog/${encodeURIComponent(product.id)}`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(patch),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'บันทึกการย้ายไม่สำเร็จ');
+      Object.assign(product, patch);
+      PRODUCT_CACHE.set(product.id, product);
+      close();
+      alert('ย้ายและบันทึกเรียบร้อย');
+    } catch (error) {
+      alert(error.message || 'บันทึกการย้ายไม่สำเร็จ');
+      button.disabled = false;
+      button.textContent = 'บันทึกการย้าย';
+    }
+  };
 }
 
 async function copyText(text) {
