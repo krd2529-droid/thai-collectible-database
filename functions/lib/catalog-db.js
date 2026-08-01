@@ -99,3 +99,40 @@ export function summaryFromPayload(p) {
     catalogPath:p.catalogPath, inStock:null, source:'d1'
   };
 }
+
+function isEmptyIncoming(value) {
+  if (value === undefined || value === null || value === '') return true;
+  if (Array.isArray(value)) return value.length === 0;
+  if (typeof value === 'object') return Object.keys(value).length === 0;
+  return false;
+}
+
+export function mergeCatalogPayload(base = {}, incoming = {}) {
+  const out = { ...base };
+  for (const [key, value] of Object.entries(incoming || {})) {
+    if (key === 'id' || key === 'status' || key === 'catalogStatus' || key === 'mergeMode') {
+      if (value !== undefined && value !== null && value !== '') out[key] = value;
+      continue;
+    }
+    if (key === 'affiliateLinks') {
+      out[key] = { ...(base[key] || {}) };
+      for (const [subKey, subValue] of Object.entries(value || {})) {
+        if (!isEmptyIncoming(subValue)) out[key][subKey] = subValue;
+      }
+      continue;
+    }
+    if (!isEmptyIncoming(value)) out[key] = value;
+  }
+  return out;
+}
+
+export async function loadStaticCatalogItem(request, id) {
+  try {
+    const url = new URL(`/data/catalog/gundam/gunpla/rg/${encodeURIComponent(id)}.json`, request.url);
+    const response = await fetch(url.toString(), { headers: { accept: 'application/json' } });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (_) {
+    return null;
+  }
+}

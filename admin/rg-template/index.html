@@ -15,7 +15,8 @@
   <div class="top-actions">
     <span id="saveState" class="save-state">เทมเพลตเปล่า</span>
     <button id="previewButton" class="tool-button" type="button">Preview</button>
-    <button id="saveAllButton" class="tool-button primary" type="button">Save ทั้งหน้า</button>
+    <button id="saveAllButton" class="tool-button primary" type="button">💾 Save Draft</button>
+    <button id="publishButton" class="tool-button publish" type="button">🚀 Publish</button>
     <a class="tool-button" href="/admin/catalog/">กลับรายการ</a>
   </div>
 </header>
@@ -34,7 +35,7 @@
         <div class="block-toolbar"><span>รูปภาพ</span><div><button class="edit-block" type="button">Edit</button><button class="save-block" type="button">Save</button></div></div>
         <div class="gallery-main upload-drop" id="galleryDrop">
           <img id="mainProductImg" hidden alt="รูปปก">
-          <div id="coverPlaceholder" class="upload-placeholder"><b>รูปแรก = รูปปกหน้าหลัก</b><span>กดอัปโหลดหรือลากรูปมาวาง</span><button id="uploadGalleryButton" type="button">+ อัปโหลดรูป</button></div>
+          <div id="coverPlaceholder" class="upload-placeholder"><b>รูปแรก = รูปปกหน้าหลัก</b><span>กดอัปโหลดหรือลากรูปมาวาง</span><div class="media-buttons"><button id="uploadGalleryButton" type="button">+ อัปโหลดรูปใหม่</button><button id="catalogGalleryButton" class="catalog-media-button" type="button">▣ เลือกจากแคตตาล็อก</button></div></div>
           <input id="galleryInput" type="file" accept="image/*" multiple hidden>
         </div>
         <div id="galleryThumbs" class="gallery-thumbs editable-gallery"></div>
@@ -105,13 +106,15 @@
     <div class="section-head"><span class="section-no">06</span><h2>คู่มือประกอบ</h2><div class="section-line"></div><div class="block-actions"><button class="edit-block">Edit</button><button class="save-block">Save</button></div></div>
     <div class="manual-album">
       <p class="manual-note">อัปโหลดรูปคู่มือหลายหน้า — แยกจาก Gallery สินค้า</p>
-      <div class="manual-gallery-main upload-drop" id="manualDrop"><img id="mainManualImg" hidden alt="คู่มือ"><div id="manualPlaceholder" class="upload-placeholder"><b>รูปคู่มือ</b><span>กดอัปโหลดหรือลากหลายรูปมาวาง</span><button id="uploadManualButton" type="button">+ อัปโหลดรูปคู่มือ</button></div><input id="manualInput" type="file" accept="image/*" multiple hidden></div>
+      <div class="manual-gallery-main upload-drop" id="manualDrop"><img id="mainManualImg" hidden alt="คู่มือ"><div id="manualPlaceholder" class="upload-placeholder"><b>รูปคู่มือ</b><span>กดอัปโหลดหรือลากหลายรูปมาวาง</span><div class="media-buttons"><button id="uploadManualButton" type="button">+ อัปโหลดรูปคู่มือ</button><button id="catalogManualButton" class="catalog-media-button" type="button">▣ เลือกจากแคตตาล็อก</button></div></div><input id="manualInput" type="file" accept="image/*" multiple hidden></div>
       <div id="manualThumbs" class="gallery-thumbs manual-thumbs editable-gallery"></div>
     </div>
   </section>
 </main>
 
+<dialog id="mediaDialog" class="media-dialog"><div class="media-dialog-box"><div class="media-dialog-head"><div><h3>เลือกจากแคตตาล็อก</h3><p>เลือกรูปที่มีอยู่แล้ว ไม่ต้องอัปโหลดซ้ำ</p></div><button id="mediaClose" class="tool-button" type="button">ปิด</button></div><div class="media-search-row"><input id="mediaCatalogId" placeholder="รหัสรายการ เช่น rg-039"><button id="mediaLoad" class="tool-button primary" type="button">โหลดรูป</button></div><div id="mediaCatalogInfo" class="media-catalog-info"></div><div id="mediaGrid" class="media-grid"></div><div class="media-dialog-foot"><span id="mediaSelectedCount">เลือกแล้ว 0 รูป</span><button id="mediaUseSelected" class="tool-button primary" type="button">ใช้รูปที่เลือก</button></div></div></dialog>
+
 <dialog id="messageDialog"><div class="dialog-box"><h3 id="dialogTitle">แจ้งเตือน</h3><p id="dialogMessage"></p><button id="dialogClose" class="tool-button primary">ตกลง</button></div></dialog>
-<script src="./template-v2.js?v=2"></script>
+<script src="./template-v4.js?v=4"></script>
 </body>
 </html>
