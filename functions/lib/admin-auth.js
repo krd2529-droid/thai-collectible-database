@@ -65,6 +65,12 @@ export function clearSessionCookie() {
 }
 
 export async function isAuthorized(request, env) {
+  // รองรับทั้ง session สมาชิกที่มีสิทธิ์ และ cookie แอดมินเดิม
+  try {
+    const { getCurrentMember } = await import("./member-auth.js");
+    const member = await getCurrentMember(request, env);
+    if (member && ["super_admin", "admin", "editor"].includes(member.role)) return true;
+  } catch {}
   const secret = getAdminPassword(env);
   if (!secret) return false;
   const value = getCookie(request, COOKIE_NAME);

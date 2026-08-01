@@ -1,0 +1,6 @@
+import { json } from '../../../lib/admin-auth.js';
+import { ensureMemberTables, normalizeEmail } from '../../../lib/members-db.js';
+import { verifyPassword } from '../../../lib/passwords.js';
+import { createMemberSession } from '../../../lib/member-auth.js';
+export async function onRequestPost(context){const db=context.env.TOYSKUB_DB;if(!db)return json({ok:false,error:'ไม่พบฐานข้อมูล'},503);await ensureMemberTables(db);const body=await context.request.json().catch(()=>({}));const email=normalizeEmail(body.email),password=String(body.password||'');const user=await db.prepare('SELECT * FROM users WHERE email=? LIMIT 1').bind(email).first();if(!user||!(await verifyPassword(password,user.password_hash,user.password_salt,user.password_iterations)))return json({ok:false,error:'อีเมลหรือรหัสผ่านไม่ถูกต้อง'},401);if(user.status!=='active')return json({ok:false,error:'บัญชีนี้ถูกระงับ'},403);await db.prepare('UPDATE users SET last_login_at=CURRENT_TIMESTAMP WHERE id=?').bind(user.id).run();return json({ok:true,user:{id:user.id,email:user.email,phone:user.phone,displayName:user.display_name,role:user.role}},200,{'set-cookie':await createMemberSession(db,user.id)})}
+export function onRequest(){return json({ok:false,error:'Method not allowed'},405)}

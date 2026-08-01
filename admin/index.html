@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
   <title>TOYSKUB Admin v2</title>
-  <link rel="stylesheet" href="./admin.css?v=3" />
+  <link rel="stylesheet" href="./admin.css?v=4" />
 </head>
 <body>
   <header class="admin-header">
@@ -36,7 +36,7 @@
 
     <section id="dashboardPanel" class="hidden">
       <section class="welcome">
-        <p class="eyebrow">// ADMIN PANEL v2 · PART 2</p>
+        <p class="eyebrow">// ADMIN PANEL v2 · PART 2.2</p>
         <h1>ศูนย์จัดการ TOYSKUB</h1>
         <p>จัดการหมวดสินค้าได้จากหลังบ้านและบันทึกลง D1 โดยตรง</p>
         <div id="sessionStatus" class="status success">เข้าสู่ระบบแล้ว</div>
@@ -44,9 +44,10 @@
 
       <section class="dashboard">
         <article class="admin-card active-card"><span class="card-no">01</span><h2>จัดการหมวด</h2><p>เพิ่ม แก้ไข เรียงลำดับ และลบหมวดสินค้า</p><button id="openCategoriesButton" type="button">เปิดจัดการหมวด</button></article>
-        <article class="admin-card"><span class="card-no">02</span><h2>จัดการสินค้า</h2><p>เพิ่ม แก้ไข และดูรายการสินค้า</p><button disabled>พาร์ท 3</button></article>
-        <article class="admin-card"><span class="card-no">03</span><h2>จัดการรูปภาพ</h2><p>อัปโหลดภาพสินค้า</p><button disabled>พาร์ท 4</button></article>
-        <article class="admin-card"><span class="card-no">04</span><h2>เผยแพร่และลบ</h2><p>ควบคุมสถานะข้อมูล</p><button disabled>พาร์ท 5</button></article>
+        <article class="admin-card active-card"><span class="card-no">02</span><h2>สมาชิก</h2><p>ดูอีเมล เบอร์โทร บทบาท และสถานะสมาชิก</p><button id="openMembersButton" type="button">เปิดรายชื่อสมาชิก</button></article>
+        <article class="admin-card"><span class="card-no">03</span><h2>จัดการสินค้า</h2><p>เพิ่ม แก้ไข และดูรายการสินค้า</p><button disabled>พาร์ท 3</button></article>
+        <article class="admin-card"><span class="card-no">04</span><h2>จัดการรูปภาพ</h2><p>อัปโหลดภาพสินค้า</p><button disabled>พาร์ท 4</button></article>
+        <article class="admin-card"><span class="card-no">05</span><h2>เผยแพร่และลบ</h2><p>ควบคุมสถานะข้อมูล</p><button disabled>พาร์ท 5</button></article>
       </section>
 
       <section id="categoriesPanel" class="management-panel hidden">
@@ -63,13 +64,19 @@
         </div>
       </section>
 
+      <section id="membersPanel" class="management-panel hidden">
+        <div class="panel-heading"><div><p class="eyebrow">// MEMBER MANAGER</p><h2>รายชื่อสมาชิก</h2></div><div id="memberCount">—</div></div>
+        <div id="memberMessage" class="status hidden"></div>
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>ชื่อ</th><th>อีเมล</th><th>เบอร์โทร</th><th>สิทธิ์</th><th>สถานะ</th><th>วันที่สมัคร</th></tr></thead><tbody id="memberRows"><tr><td colspan="7">กดเปิดรายชื่อสมาชิก</td></tr></tbody></table></div>
+      </section>
+
       <section class="system-panel">
         <h2>สถานะระบบ</h2>
         <dl>
           <div><dt>Admin</dt><dd id="adminEmail">—</dd></div>
           <div><dt>D1 binding</dt><dd id="databaseStatus">—</dd></div>
           <div><dt>จำนวนหมวด</dt><dd id="categoryCount">—</dd></div>
-          <div><dt>Version</dt><dd>Admin Panel v2 · Part 2.1</dd></div>
+          <div><dt>Version</dt><dd>Admin Panel v2 · Part 2.2</dd></div>
         </dl>
         <button id="logoutButton" class="logout-button">ออกจากระบบ</button>
       </section>
@@ -93,6 +100,6 @@
     </form>
   </dialog>
 
-  <script src="./admin.js?v=3"></script>
+  <script src="./admin.js?v=4"></script>
 </body>
 </html>

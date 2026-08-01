@@ -1,0 +1,2 @@
+import { json } from '../../../lib/admin-auth.js';import { getCurrentMember } from '../../../lib/member-auth.js';
+export async function onRequestGet(context){const user=await getCurrentMember(context.request,context.env);if(!user)return json({ok:false,authenticated:false},401);return json({ok:true,authenticated:true,user})}export function onRequest(){return json({ok:false,error:'Method not allowed'},405)}
