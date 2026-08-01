@@ -56,6 +56,16 @@ async function loadProducts() {
     const data = await indexRes.json();
     if (!Array.isArray(data)) throw new Error("RG index ต้องเป็นรายการสินค้า");
     PRODUCTS = data;
+    try {
+      const dynamicRes = await fetch("/api/catalog", { cache: "no-store" });
+      if (dynamicRes.ok) {
+        const dynamicData = await dynamicRes.json();
+        const dynamicItems = Array.isArray(dynamicData.items) ? dynamicData.items : [];
+        const byId = new Map(PRODUCTS.map(item => [item.id, item]));
+        dynamicItems.forEach(item => byId.set(item.id, item));
+        PRODUCTS = [...byId.values()].sort((a,b)=>(Number(a.rgNumber)||9999)-(Number(b.rgNumber)||9999));
+      }
+    } catch (dynamicError) { console.warn("โหลดแคตตาล็อกจาก D1 ไม่สำเร็จ", dynamicError); }
     if (PRODUCT_COUNT_EL) PRODUCT_COUNT_EL.textContent = String(PRODUCTS.length).padStart(2, "0");
     await router();
   } catch (error) {
@@ -106,6 +116,9 @@ function trackMetaEvent(method, eventName, parameters = {}) {
 // ---------------- Router ----------------
 async function router() {
   const hash = window.location.hash || "#/";
+  if (hash === "#/product-preview") {
+    try { const preview = JSON.parse(localStorage.getItem("toyskub_catalog_preview") || "null"); if (preview) return renderDetail(preview); } catch {}
+  }
   const match = hash.match(/^#\/product\/(.+)$/);
   if (match) {
     const summary = PRODUCTS.find((product) => product.id === match[1]);
@@ -113,10 +126,8 @@ async function router() {
       try {
         let product = PRODUCT_CACHE.get(summary.id);
         if (!product) {
-          const detailRes = await fetch(
-            `./${summary.dataFile}?v=split-json-20260731-1`,
-            { cache: "no-store" },
-          );
+          const detailUrl = summary.source === "d1" ? `/api/catalog/${encodeURIComponent(summary.id)}` : `./${summary.dataFile}?v=split-json-20260731-1`;
+          const detailRes = await fetch(detailUrl, { cache: "no-store" });
           if (!detailRes.ok) {
             throw new Error(`${summary.dataFile} HTTP ${detailRes.status}`);
           }
