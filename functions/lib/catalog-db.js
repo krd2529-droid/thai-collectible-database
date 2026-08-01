@@ -83,7 +83,7 @@ export function normalizeCatalogInput(raw = {}) {
     manualImages: cleanList(raw.manualImages),
     catalogImage: String(raw.catalogImage || cleanList(raw.images)[0] || '').trim(),
     inStock: null,
-    status: ['draft','published','hidden'].includes(raw.status) ? raw.status : 'draft',
+    status: ['draft','published','hidden','trash','deleted'].includes(raw.status) ? raw.status : 'draft',
     sortOrder: Number(raw.sortOrder) || 0,
   };
   p.catalogPath = [p.categoryCode,p.productTypeCode,p.lineCode,code(p.series)].filter(Boolean).join('/');

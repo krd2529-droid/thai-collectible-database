@@ -61,7 +61,8 @@ async function loadProducts() {
       if (dynamicRes.ok) {
         const dynamicData = await dynamicRes.json();
         const dynamicItems = Array.isArray(dynamicData.items) ? dynamicData.items : [];
-        const byId = new Map(PRODUCTS.map(item => [item.id, item]));
+        const excludedIds = new Set(Array.isArray(dynamicData.excludedIds) ? dynamicData.excludedIds : []);
+        const byId = new Map(PRODUCTS.filter(item => !excludedIds.has(item.id)).map(item => [item.id, item]));
         dynamicItems.forEach(item => byId.set(item.id, item));
         PRODUCTS = [...byId.values()].sort((a,b)=>(Number(a.rgNumber)||9999)-(Number(b.rgNumber)||9999));
       }
