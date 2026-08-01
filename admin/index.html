@@ -52,13 +52,13 @@
       <section id="categoriesPanel" class="management-panel hidden">
         <div class="panel-heading">
           <div><p class="eyebrow">// CATEGORY MANAGER</p><h2>จัดการหมวดสินค้า</h2></div>
-          <button id="newCategoryButton" class="primary-button" type="button">+ เพิ่มหมวด</button>
+          <div class="panel-buttons"><button id="importCategoriesButton" class="secondary-button" type="button">นำเข้าหมวดเดิม</button><button id="newCategoryButton" class="primary-button" type="button">+ เพิ่มหมวด</button></div>
         </div>
         <div id="categoryMessage" class="status hidden"></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>ลำดับ</th><th>ชื่อหมวด</th><th>Slug</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
-            <tbody id="categoryRows"><tr><td colspan="5">กำลังโหลดข้อมูล…</td></tr></tbody>
+            <thead><tr><th>ลำดับ</th><th>ชื่อหมวด</th><th>ระดับ</th><th>Slug</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+            <tbody id="categoryRows"><tr><td colspan="6">กำลังโหลดข้อมูล…</td></tr></tbody>
           </table>
         </div>
       </section>
@@ -69,7 +69,7 @@
           <div><dt>Admin</dt><dd id="adminEmail">—</dd></div>
           <div><dt>D1 binding</dt><dd id="databaseStatus">—</dd></div>
           <div><dt>จำนวนหมวด</dt><dd id="categoryCount">—</dd></div>
-          <div><dt>Version</dt><dd>Admin Panel v2 · Part 2</dd></div>
+          <div><dt>Version</dt><dd>Admin Panel v2 · Part 2.1</dd></div>
         </dl>
         <button id="logoutButton" class="logout-button">ออกจากระบบ</button>
       </section>
@@ -85,7 +85,7 @@
       <label for="categorySlug">Slug ภาษาอังกฤษ</label>
       <input id="categorySlug" maxlength="120" required placeholder="เช่น trading-card" />
       <small>ใช้ตัวอักษรอังกฤษ ตัวเลข และขีดกลางเท่านั้น</small>
-      <label for="categoryDescription">คำอธิบาย</label>
+      <label for="categoryNodeType">ระดับ</label><select id="categoryNodeType"><option value="category">หมวดหลัก</option><option value="product_type">ประเภท</option><option value="grade">เกรด</option></select><label for="categoryParent">อยู่ภายใต้</label><select id="categoryParent"><option value="">— หมวดหลัก —</option></select><label for="categoryDescription">คำอธิบาย</label>
       <textarea id="categoryDescription" rows="4" maxlength="500" placeholder="คำอธิบายสั้น ๆ ของหมวด"></textarea>
       <div class="form-grid"><div><label for="categorySortOrder">ลำดับ</label><input id="categorySortOrder" type="number" value="0" /></div><label class="check-label"><input id="categoryActive" type="checkbox" checked /> เปิดใช้งาน</label></div>
       <div id="formMessage" class="status hidden"></div>

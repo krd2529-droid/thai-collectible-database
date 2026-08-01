@@ -1,0 +1,3 @@
+import { isAuthorized, json } from "../../../../lib/admin-auth.js";
+import { ensureCategoriesTable } from "../../../../lib/categories-db.js";
+export async function onRequestPost(context){if(!(await isAuthorized(context.request,context.env)))return json({ok:false,error:"กรุณาเข้าสู่ระบบใหม่"},401);const db=context.env.TOYSKUB_DB;if(!db)return json({ok:false,error:"ไม่พบ TOYSKUB_DB"},503);await ensureCategoriesTable(db);const body=await context.request.json().catch(()=>({}));const ids=Array.isArray(body.ids)?body.ids.map(Number).filter(Number.isInteger):[];for(let i=0;i<ids.length;i++)await db.prepare("UPDATE categories SET sort_order=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(i+1,ids[i]).run();return json({ok:true})}
