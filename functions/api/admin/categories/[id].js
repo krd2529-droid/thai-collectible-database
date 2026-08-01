@@ -1,0 +1,58 @@
+import { isAuthorized, json } from "../../../lib/admin-auth.js";
+import { ensureCategoriesTable, normalizeCategoryInput } from "../../../lib/categories-db.js";
+
+async function getDb(context) {
+  if (!(await isAuthorized(context.request, context.env))) {
+    return { response: json({ ok: false, error: "กรุณาเข้าสู่ระบบใหม่" }, 401) };
+  }
+  if (!context.env.TOYSKUB_DB) {
+    return { response: json({ ok: false, error: "ไม่พบ D1 binding ชื่อ TOYSKUB_DB" }, 503) };
+  }
+  await ensureCategoriesTable(context.env.TOYSKUB_DB);
+  return { db: context.env.TOYSKUB_DB };
+}
+
+function getId(context) {
+  const id = Number(context.params.id);
+  return Number.isInteger(id) && id > 0 ? id : 0;
+}
+
+export async function onRequestPut(context) {
+  const access = await getDb(context);
+  if (access.response) return access.response;
+  const id = getId(context);
+  if (!id) return json({ ok: false, error: "รหัสหมวดไม่ถูกต้อง" }, 400);
+  const body = await context.request.json().catch(() => ({}));
+  const category = normalizeCategoryInput(body);
+  if (!category.name || !category.slug) {
+    return json({ ok: false, error: "กรุณากรอกชื่อหมวดและ Slug" }, 400);
+  }
+  try {
+    const result = await access.db.prepare(`
+      UPDATE categories
+      SET name = ?, slug = ?, description = ?, sort_order = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(category.name, category.slug, category.description, category.sortOrder, category.isActive, id).run();
+    if (!result.meta?.changes) return json({ ok: false, error: "ไม่พบหมวดนี้" }, 404);
+    return json({ ok: true, message: "แก้ไขหมวดเรียบร้อย" });
+  } catch (error) {
+    if (String(error).toLowerCase().includes("unique")) {
+      return json({ ok: false, error: "Slug นี้มีอยู่แล้ว" }, 409);
+    }
+    return json({ ok: false, error: "แก้ไขหมวดไม่สำเร็จ" }, 500);
+  }
+}
+
+export async function onRequestDelete(context) {
+  const access = await getDb(context);
+  if (access.response) return access.response;
+  const id = getId(context);
+  if (!id) return json({ ok: false, error: "รหัสหมวดไม่ถูกต้อง" }, 400);
+  const result = await access.db.prepare("DELETE FROM categories WHERE id = ?").bind(id).run();
+  if (!result.meta?.changes) return json({ ok: false, error: "ไม่พบหมวดนี้" }, 404);
+  return json({ ok: true, message: "ลบหมวดเรียบร้อย" });
+}
+
+export function onRequest() {
+  return json({ ok: false, error: "Method not allowed" }, 405);
+}

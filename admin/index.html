@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
   <title>TOYSKUB Admin v2</title>
-  <link rel="stylesheet" href="./admin.css?v=2" />
+  <link rel="stylesheet" href="./admin.css?v=3" />
 </head>
 <body>
   <header class="admin-header">
@@ -23,7 +23,7 @@
         <input id="password" name="password" type="password" autocomplete="current-password" required />
         <button type="submit">เข้าสู่ระบบ</button>
       </form>
-      <div id="loginMessage" class="status"></div>
+      <div id="loginMessage" class="status hidden"></div>
     </section>
 
     <section id="setupPanel" class="login-panel hidden">
@@ -36,17 +36,31 @@
 
     <section id="dashboardPanel" class="hidden">
       <section class="welcome">
-        <p class="eyebrow">// ADMIN PANEL v2</p>
+        <p class="eyebrow">// ADMIN PANEL v2 · PART 2</p>
         <h1>ศูนย์จัดการ TOYSKUB</h1>
-        <p>ระบบล็อกอินพร้อมแล้ว พาร์ทถัดไปจะเปิดเพิ่มหมวดและเพิ่มสินค้า</p>
+        <p>จัดการหมวดสินค้าได้จากหลังบ้านและบันทึกลง D1 โดยตรง</p>
         <div id="sessionStatus" class="status success">เข้าสู่ระบบแล้ว</div>
       </section>
 
       <section class="dashboard">
-        <article class="admin-card"><span class="card-no">01</span><h2>จัดการหมวด</h2><p>เพิ่มและแก้ไขหมวดสินค้า</p><button disabled>พาร์ท 2</button></article>
-        <article class="admin-card"><span class="card-no">02</span><h2>จัดการสินค้า</h2><p>เพิ่ม แก้ไข และดูรายการสินค้า</p><button disabled>พาร์ท 2</button></article>
-        <article class="admin-card"><span class="card-no">03</span><h2>จัดการรูปภาพ</h2><p>อัปโหลดภาพสินค้า</p><button disabled>พาร์ท 3</button></article>
-        <article class="admin-card"><span class="card-no">04</span><h2>เผยแพร่และลบ</h2><p>ควบคุมสถานะข้อมูล</p><button disabled>พาร์ท 4</button></article>
+        <article class="admin-card active-card"><span class="card-no">01</span><h2>จัดการหมวด</h2><p>เพิ่ม แก้ไข เรียงลำดับ และลบหมวดสินค้า</p><button id="openCategoriesButton" type="button">เปิดจัดการหมวด</button></article>
+        <article class="admin-card"><span class="card-no">02</span><h2>จัดการสินค้า</h2><p>เพิ่ม แก้ไข และดูรายการสินค้า</p><button disabled>พาร์ท 3</button></article>
+        <article class="admin-card"><span class="card-no">03</span><h2>จัดการรูปภาพ</h2><p>อัปโหลดภาพสินค้า</p><button disabled>พาร์ท 4</button></article>
+        <article class="admin-card"><span class="card-no">04</span><h2>เผยแพร่และลบ</h2><p>ควบคุมสถานะข้อมูล</p><button disabled>พาร์ท 5</button></article>
+      </section>
+
+      <section id="categoriesPanel" class="management-panel hidden">
+        <div class="panel-heading">
+          <div><p class="eyebrow">// CATEGORY MANAGER</p><h2>จัดการหมวดสินค้า</h2></div>
+          <button id="newCategoryButton" class="primary-button" type="button">+ เพิ่มหมวด</button>
+        </div>
+        <div id="categoryMessage" class="status hidden"></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ลำดับ</th><th>ชื่อหมวด</th><th>Slug</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+            <tbody id="categoryRows"><tr><td colspan="5">กำลังโหลดข้อมูล…</td></tr></tbody>
+          </table>
+        </div>
       </section>
 
       <section class="system-panel">
@@ -54,12 +68,31 @@
         <dl>
           <div><dt>Admin</dt><dd id="adminEmail">—</dd></div>
           <div><dt>D1 binding</dt><dd id="databaseStatus">—</dd></div>
-          <div><dt>Version</dt><dd>Admin Panel v2</dd></div>
+          <div><dt>จำนวนหมวด</dt><dd id="categoryCount">—</dd></div>
+          <div><dt>Version</dt><dd>Admin Panel v2 · Part 2</dd></div>
         </dl>
         <button id="logoutButton" class="logout-button">ออกจากระบบ</button>
       </section>
     </section>
   </main>
-  <script src="./admin.js?v=2"></script>
+
+  <dialog id="categoryDialog">
+    <form id="categoryForm" method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">// CATEGORY</p><h2 id="dialogTitle">เพิ่มหมวด</h2></div><button id="closeDialogButton" class="icon-button" type="button" aria-label="ปิด">×</button></div>
+      <input id="categoryId" type="hidden" />
+      <label for="categoryName">ชื่อหมวด</label>
+      <input id="categoryName" maxlength="120" required placeholder="เช่น Trading Card" />
+      <label for="categorySlug">Slug ภาษาอังกฤษ</label>
+      <input id="categorySlug" maxlength="120" required placeholder="เช่น trading-card" />
+      <small>ใช้ตัวอักษรอังกฤษ ตัวเลข และขีดกลางเท่านั้น</small>
+      <label for="categoryDescription">คำอธิบาย</label>
+      <textarea id="categoryDescription" rows="4" maxlength="500" placeholder="คำอธิบายสั้น ๆ ของหมวด"></textarea>
+      <div class="form-grid"><div><label for="categorySortOrder">ลำดับ</label><input id="categorySortOrder" type="number" value="0" /></div><label class="check-label"><input id="categoryActive" type="checkbox" checked /> เปิดใช้งาน</label></div>
+      <div id="formMessage" class="status hidden"></div>
+      <div class="dialog-actions"><button id="cancelDialogButton" class="secondary-button" type="button">ยกเลิก</button><button class="primary-button" type="submit">บันทึกหมวด</button></div>
+    </form>
+  </dialog>
+
+  <script src="./admin.js?v=3"></script>
 </body>
 </html>
