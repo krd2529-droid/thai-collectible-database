@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>RG Blank Template · TOYSKUB</title>
+  <link rel="stylesheet" href="/style.css?v=template1">
+  <link rel="stylesheet" href="./template.css?v=1">
+</head>
+<body>
+<div class="blueprint-bg"></div>
+<header class="template-header">
+  <a class="template-brand" href="/admin/"><span class="logo-mark">TK</span><span class="logo-text">TOYSKUB<br><small>RG INLINE TEMPLATE</small></span></a>
+  <div class="top-actions">
+    <span id="saveState" class="save-state">เทมเพลตเปล่า</span>
+    <button id="previewButton" class="tool-button" type="button">Preview</button>
+    <button id="saveAllButton" class="tool-button primary" type="button">Save ทั้งหน้า</button>
+    <a class="tool-button" href="/admin/catalog/">กลับรายการ</a>
+  </div>
+</header>
+
+<main id="builderMain">
+  <section class="identity-panel">
+    <div><label>รหัสรายการ</label><input id="itemId" placeholder="เช่น rg-044" autocomplete="off"></div>
+    <div><label>SKU</label><input id="itemSku" placeholder="เช่น RG-044" autocomplete="off"></div>
+    <div><label>กลุ่มในหน้า RG</label><input id="seriesGroup" value="Gundam" list="rgGroups"><datalist id="rgGroups"><option>Gundam</option><option>Evangelion</option><option>Gaogaigar</option><option>Patlabor</option><option>Special Version</option></datalist></div>
+    <div><label>สถานะ</label><select id="status"><option value="draft">ฉบับร่าง</option><option value="published">เผยแพร่</option><option value="hidden">ซ่อน</option></select></div>
+  </section>
+
+  <div class="spec-plate template-block" data-sku="RG-TEMPLATE">
+    <div class="block-toolbar"><span>ข้อมูลหลัก + รูปภาพ</span><div><button class="edit-block" type="button">Edit</button><button class="save-block" type="button">Save</button></div></div>
+    <div class="detail-grid">
+      <div class="gallery">
+        <div class="gallery-main upload-drop" id="galleryDrop">
+          <img id="mainProductImg" hidden alt="รูปปก">
+          <div id="coverPlaceholder" class="upload-placeholder"><b>รูปแรก = รูปปกหน้าหลัก</b><span>กดอัปโหลดหรือลากรูปมาวาง</span><button id="uploadGalleryButton" type="button">+ อัปโหลดรูป</button></div>
+          <input id="galleryInput" type="file" accept="image/*" multiple hidden>
+        </div>
+        <div id="galleryThumbs" class="gallery-thumbs editable-gallery"></div>
+        <p class="image-rule">ลากรูปเพื่อจัดลำดับ · รูปแรกจะเป็นรูปปกในหน้าหลักและหน้าหมวดอัตโนมัติ</p>
+        <div class="video-embed empty-video"><div class="inline-input"><label>วิดีโอ YouTube Embed URL</label><input id="videoEmbedUrl" placeholder="https://www.youtube.com/embed/..."></div></div>
+      </div>
+
+      <div class="info">
+        <span class="product-grade-badge">RG GRADE</span>
+        <h1 class="product-title editable-text" id="name" contenteditable="false" data-placeholder="ชื่อรุ่น"></h1>
+        <button class="share-button" type="button" disabled><span class="share-icon">↗</span><span>แชร์หน้านี้</span></button>
+        <p class="product-summary editable-text" id="summary" contenteditable="false" data-placeholder="สรุปข้อมูลรุ่น"></p>
+
+        <table class="spec-table">
+          <tr><td>ลำดับ RG</td><td><input id="rgNumber" type="number" placeholder="ลำดับ RG"></td></tr>
+          <tr><td>รหัสโมบิลสูท</td><td><input id="modelCode" placeholder="รหัสโมบิลสูท"></td></tr>
+          <tr><td>ผู้ผลิต</td><td><input id="manufacturer" value="Bandai Spirits" placeholder="ผู้ผลิต"></td></tr>
+          <tr><td>ซีรีส์</td><td><input id="series" placeholder="ชื่อซีรีส์"></td></tr>
+          <tr><td>เกรด / สเกล</td><td><span>RG · </span><input id="scale" value="1/144" placeholder="สเกล"></td></tr>
+          <tr><td>วันวางจำหน่าย</td><td><input id="releaseDate" type="date"></td></tr>
+          <tr><td>ราคาเปิดตัวญี่ปุ่น (ไม่รวมภาษี)</td><td><input id="launchPriceJPY" type="number" placeholder="ราคาเยน"></td></tr>
+          <tr><td>ความสูงเมื่อประกอบ</td><td><input id="heightCm" type="number" step="0.1" placeholder="ซม."></td></tr>
+          <tr><td>อายุที่แนะนำ</td><td><input id="recommendedAge" placeholder="อายุที่แนะนำ"></td></tr>
+          <tr><td>ประเภทสินค้า</td><td><input id="productType" value="โมเดลพลาสติกประกอบ (Gunpla Real Grade)" placeholder="ประเภทสินค้า"></td></tr>
+          <tr><td>วัสดุ</td><td><input id="material" placeholder="วัสดุ"></td></tr>
+        </table>
+
+        <div class="inline-list" id="referencesEditor"><div class="inline-list-title">แหล่งอ้างอิง</div><div id="referencesList"></div><button class="add-row" data-add="reference" type="button">+ เพิ่มแหล่งอ้างอิง</button></div>
+        <div class="buy-links-editor">
+          <label>Shopee Affiliate<input id="shopee" placeholder="ลิงก์ Shopee"></label>
+          <label>Lazada Affiliate<input id="lazada" placeholder="ลิงก์ Lazada"></label>
+          <label>TikTok<input id="tiktok" placeholder="ลิงก์ TikTok"></label>
+          <label>ร้าน / Page<input id="pageLink" placeholder="ลิงก์ร้านหรือเพจ"></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="detail-section template-block" data-section="highlights">
+    <div class="section-head"><span class="section-no">01</span><h2>จุดเด่น</h2><div class="section-line"></div><div class="block-actions"><button class="edit-block">Edit</button><button class="save-block">Save</button></div></div>
+    <ul class="highlight-list repeat-list" id="highlightsList"></ul><button class="add-row" data-add="highlight" type="button">+ เพิ่มจุดเด่น</button>
+  </section>
+
+  <section class="detail-section template-block" data-section="differences">
+    <div class="section-head"><span class="section-no">02</span><h2>รุ่นใหม่ต่างจากเดิมอย่างไร</h2><div class="section-line"></div><div class="block-actions"><button class="edit-block">Edit</button><button class="save-block">Save</button></div></div>
+    <div id="differencesList"></div><button class="add-row" data-add="difference" type="button">+ เพิ่มหัวข้อ</button>
+  </section>
+
+  <section class="detail-section template-block" data-section="box">
+    <div class="section-head"><span class="section-no">03</span><h2>อุปกรณ์ในกล่อง</h2><div class="section-line"></div><div class="block-actions"><button class="edit-block">Edit</button><button class="save-block">Save</button></div></div>
+    <div class="sub-editor-label">มีในกล่อง</div><div class="box-tag-list repeat-list" id="boxContentsList"></div><button class="add-row" data-add="box" type="button">+ เพิ่มอุปกรณ์</button>
+    <div class="sub-editor-label not-label">ไม่มีในกล่อง / จำหน่ายแยก</div><div class="box-tag-list repeat-list" id="notIncludedList"></div><button class="add-row" data-add="notIncluded" type="button">+ เพิ่มรายการไม่มีในกล่อง</button>
+  </section>
+
+  <section class="detail-section template-block" data-section="pros">
+    <div class="section-head"><span class="section-no">04</span><h2>ข้อดี / ข้อควรพิจารณา</h2><div class="section-line"></div><div class="block-actions"><button class="edit-block">Edit</button><button class="save-block">Save</button></div></div>
+    <div class="two-col"><div><strong class="pros-title">ข้อดี</strong><ul class="pro-con-list repeat-list" id="prosList"></ul><button class="add-row" data-add="pro" type="button">+ เพิ่มข้อดี</button></div><div><strong class="cons-title">ข้อควรพิจารณา</strong><ul class="pro-con-list repeat-list" id="considerationsList"></ul><button class="add-row" data-add="consideration" type="button">+ เพิ่มข้อควรพิจารณา</button></div></div>
+  </section>
+
+  <section class="detail-section template-block" data-section="faq">
+    <div class="section-head"><span class="section-no">05</span><h2>คำถามที่พบบ่อย</h2><div class="section-line"></div><div class="block-actions"><button class="edit-block">Edit</button><button class="save-block">Save</button></div></div>
+    <div id="faqList"></div><button class="add-row" data-add="faq" type="button">+ เพิ่มคำถาม</button>
+  </section>
+
+  <section class="detail-section template-block" data-section="manual">
+    <div class="section-head"><span class="section-no">06</span><h2>คู่มือประกอบ</h2><div class="section-line"></div><div class="block-actions"><button class="edit-block">Edit</button><button class="save-block">Save</button></div></div>
+    <div class="manual-album">
+      <p class="manual-note">อัปโหลดรูปคู่มือหลายหน้า — แยกจาก Gallery สินค้า</p>
+      <div class="manual-gallery-main upload-drop" id="manualDrop"><img id="mainManualImg" hidden alt="คู่มือ"><div id="manualPlaceholder" class="upload-placeholder"><b>รูปคู่มือ</b><span>กดอัปโหลดหรือลากหลายรูปมาวาง</span><button id="uploadManualButton" type="button">+ อัปโหลดรูปคู่มือ</button></div><input id="manualInput" type="file" accept="image/*" multiple hidden></div>
+      <div id="manualThumbs" class="gallery-thumbs manual-thumbs editable-gallery"></div>
+    </div>
+  </section>
+</main>
+
+<dialog id="messageDialog"><div class="dialog-box"><h3 id="dialogTitle">แจ้งเตือน</h3><p id="dialogMessage"></p><button id="dialogClose" class="tool-button primary">ตกลง</button></div></dialog>
+<script src="./template.js?v=1"></script>
+</body>
+</html>
