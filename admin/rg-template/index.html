@@ -28,10 +28,10 @@
     <div><label>สถานะ</label><select id="status"><option value="draft">ฉบับร่าง</option><option value="published">เผยแพร่</option><option value="hidden">ซ่อน</option></select></div>
   </section>
 
-  <div class="spec-plate template-block" data-sku="RG-TEMPLATE">
-    <div class="block-toolbar"><span>ข้อมูลหลัก + รูปภาพ</span><div><button class="edit-block" type="button">Edit</button><button class="save-block" type="button">Save</button></div></div>
+  <div class="spec-plate" data-sku="RG-TEMPLATE">
     <div class="detail-grid">
-      <div class="gallery">
+      <div class="gallery template-block image-block">
+        <div class="block-toolbar"><span>รูปภาพ</span><div><button class="edit-block" type="button">Edit</button><button class="save-block" type="button">Save</button></div></div>
         <div class="gallery-main upload-drop" id="galleryDrop">
           <img id="mainProductImg" hidden alt="รูปปก">
           <div id="coverPlaceholder" class="upload-placeholder"><b>รูปแรก = รูปปกหน้าหลัก</b><span>กดอัปโหลดหรือลากรูปมาวาง</span><button id="uploadGalleryButton" type="button">+ อัปโหลดรูป</button></div>
@@ -42,9 +42,11 @@
         <div class="video-embed empty-video"><div class="inline-input"><label>วิดีโอ YouTube Embed URL</label><input id="videoEmbedUrl" placeholder="https://www.youtube.com/embed/..."></div></div>
       </div>
 
-      <div class="info">
+      <div class="info template-block info-block">
+        <div class="block-toolbar"><span>ข้อมูลหลัก</span><div><button class="edit-block" type="button">Edit</button><button class="save-block" type="button">Save</button></div></div>
         <span class="product-grade-badge">RG GRADE</span>
-        <h1 class="product-title editable-text" id="name" contenteditable="false" data-placeholder="ชื่อรุ่น"></h1>
+        <label class="title-field-label" for="name">ชื่อรุ่น</label>
+        <input class="product-title title-input" id="name" placeholder="กรอกชื่อรุ่น (เว้นว่างได้เมื่อบันทึกฉบับร่าง)">
         <button class="share-button" type="button" disabled><span class="share-icon">↗</span><span>แชร์หน้านี้</span></button>
         <p class="product-summary editable-text" id="summary" contenteditable="false" data-placeholder="สรุปข้อมูลรุ่น"></p>
 
