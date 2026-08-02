@@ -1,18 +1,147 @@
-<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Catalog Manager · TOYSKUB</title><link rel="stylesheet" href="../admin.css?v=4"><link rel="stylesheet" href="./catalog.css?v=3"></head><body>
-<header class="admin-header"><a class="brand" href="/admin/"><span class="brand-mark">TK</span><span>TOYSKUB<br><small>CATALOG MANAGER</small></span></a><a class="back-link" href="/admin/">กลับ Dashboard</a></header>
-<main class="admin-main catalog-main"><section class="welcome"><p class="eyebrow">// PART 3.2 · SERIES GROUPS</p><h1>จัดการรายการแคตตาล็อก</h1><p>รองรับการแบ่งกลุ่มซีรีส์ภายในหน้าไลน์เดียว เช่นหน้า RG เดียวแบ่ง Gundam / Evangelion / Gaogaigar / Patlabor โดยไม่แยกคนละหน้า</p><button id="newBtn" class="primary-button">+ เพิ่มรายการแบบครบ</button><div id="message" class="status hidden"></div></section>
-<section class="admin-section"><div class="section-heading"><div><p class="eyebrow">// CATALOG LIST</p><h2>รายการจาก D1</h2></div><input id="search" type="search" placeholder="ค้นหารหัส ชื่อ ไลน์ หรือซีรีส์"></div><div class="table-wrap"><table><thead><tr><th>รูป</th><th>รหัส / ชื่อ</th><th>ไลน์ / ซีรีส์</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="rows"></tbody></table></div></section>
-<section id="editor" class="admin-section hidden"><div class="section-heading"><div><p class="eyebrow">// EDITOR</p><h2 id="editorTitle">เพิ่มรายการแคตตาล็อก</h2></div><button id="closeBtn" class="secondary-button">ปิด</button></div><form id="form"><div class="catalog-grid">
-<label>รหัสรายการ<input id="id" required placeholder="rg-044 หรือ hguc-001"></label><label>SKU<input id="sku" placeholder="RG-044"></label><label class="wide">ชื่อรุ่น<input id="name" required placeholder="ชื่อรุ่นเต็ม"></label>
-<label>หมวดหลัก<input id="categoryLabel" value="Gundam"></label><label>รหัสหมวด<input id="categoryCode" value="gd" maxlength="12" placeholder="gd"></label>
-<label>ประเภท<input id="productType" value="Gunpla"></label><label>รหัสประเภท<input id="productTypeCode" value="gp" maxlength="12" placeholder="gp"></label>
-<label>ไลน์ / เกรด<select id="line"><option value="RG">RG</option><option value="MG">MG</option><option value="HG">HG</option><option value="PG">PG</option><option value="EG">EG</option><option value="SD">SD</option><option value="FM">FM</option><option value="MGEX">MGEX</option><option value="OTHER">อื่น ๆ</option></select></label>
-<label>รหัสไลน์<input id="lineCode" value="rg" maxlength="16" placeholder="rg"></label>
-<label id="seriesGroupWrap">กลุ่มในหน้าแคตตาล็อก <small>(ใช้แบ่งหัวข้อภายในหน้าเดียว)</small><input id="seriesGroup" list="seriesGroupSuggestions" placeholder="Gundam, Evangelion, Gaogaigar, Patlabor"><datalist id="seriesGroupSuggestions"><option value="Gundam"><option value="Evangelion"><option value="Gaogaigar"><option value="Patlabor"><option value="Special Version"><option value="HGUC"><option value="HGCE"><option value="HGIBO"><option value="HGBF"><option value="HGBD"></datalist></label><label>ลำดับกลุ่ม<input id="seriesGroupOrder" type="number" value="0" min="0" placeholder="0"></label><label id="seriesWrap">ชื่อซีรีส์ / เรื่องต้นฉบับ <small>(ข้อมูลรายละเอียดของรุ่น)</small><input id="series" placeholder="Mobile Suit Gundam, Evangelion..."></label><label>หมายเลขลำดับ<input id="rgNumber" type="number"></label>
-<label>สเกล<input id="scale" value="1/144"></label><label>ผู้ผลิต<input id="manufacturer" value="Bandai Spirits"></label><label>วันวางจำหน่าย<input id="releaseDate" type="date"></label><label>ราคาเปิดตัว (เยน)<input id="launchPriceJPY" type="number"></label><label>อายุแนะนำ<input id="recommendedAge"></label><label>รหัสโมเดล<input id="modelCode"></label>
-<label class="wide">รูปหน้าปก (URL/Path)<input id="catalogImage" placeholder="images/..."></label><label class="wide">รูปทั้งหมด หนึ่งบรรทัดต่อรูป<textarea id="images" rows="4"></textarea></label><label class="wide">สรุป<textarea id="summary" rows="5"></textarea></label><label class="wide">01 จุดเด่น หนึ่งบรรทัดต่อข้อ<textarea id="highlights" rows="5"></textarea></label>
-<label class="wide">02 รุ่นใหม่ต่างจากเดิมอย่างไร <small>หนึ่งบรรทัดต่อหัวข้อ ใช้รูปแบบ หัวข้อ | รายละเอียด</small><textarea id="whatsDifferent" rows="5" placeholder="โครงสร้าง Ver. 2.0 | ปรับโครงสร้างใหม่เพื่อเพิ่มการเคลื่อนไหว"></textarea></label>
-<label class="wide">03 อุปกรณ์ในกล่อง หนึ่งบรรทัดต่อข้อ<textarea id="boxContents" rows="5"></textarea></label><label class="wide">04 ข้อดี หนึ่งบรรทัดต่อข้อ<textarea id="pros" rows="4"></textarea></label><label class="wide">04 ข้อควรพิจารณา หนึ่งบรรทัดต่อข้อ<textarea id="considerations" rows="4"></textarea></label>
-<label class="wide">05 คำถามที่พบบ่อย <small>หนึ่งบรรทัดต่อข้อ ใช้รูปแบบ คำถาม | คำตอบ</small><textarea id="faq" rows="6" placeholder="ราคาเปิดตัวเท่าไร | 3,100 เยน ไม่รวมภาษี"></textarea></label>
-<label class="wide">06 รูปคู่มือประกอบ <small>หนึ่ง URL/Path ต่อหนึ่งบรรทัด</small><textarea id="manualImages" rows="6" placeholder="images/.../manual-01.jpg"></textarea></label>
-<label class="wide">YouTube URL <small>รองรับลิงก์ watch, youtu.be, embed หรือโค้ด iframe</small><input id="videoEmbedUrl" placeholder="https://www.youtube.com/watch?v=..."></label><label>ชื่อแหล่งอ้างอิง<input id="sourceName"></label><label>URL แหล่งอ้างอิง<input id="sourceUrl"></label><label>Shopee Affiliate<input id="shopee"></label><label>Lazada Affiliate<input id="lazada"></label><label>สถานะ<select id="status"><option value="draft">ฉบับร่าง</option><option value="published">เผยแพร่</option><option value="hidden">ซ่อน</option></select></label><label>ลำดับ<input id="sortOrder" type="number" value="0"></label></div><p class="hint">กลุ่มในหน้าแคตตาล็อกใช้แบ่งหัวข้อภายในหน้าเดียวเท่านั้น ไม่สร้างหน้าแยก เช่น RG หน้าเดียวมี Gundam / Evangelion / Gaogaigar / Patlabor ส่วน URL รายการเดิม #/product/รหัสรายการ ยังใช้ได้</p><div class="dialog-actions"><button type="button" id="previewBtn" class="secondary-button">ดูตัวอย่าง</button><button type="submit" class="primary-button">บันทึก</button></div></form></section></main><script src="./catalog.js?v=5"></script></body></html>
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Catalog Manager · TOYSKUB</title>
+  <link rel="stylesheet" href="../admin.css?v=4">
+  <link rel="stylesheet" href="./catalog.css?v=20260802-1">
+</head>
+<body>
+<header class="admin-header">
+  <a class="brand" href="/admin/"><span class="brand-mark">TK</span><span>TOYSKUB<br><small>CATALOG MANAGER</small></span></a>
+  <a class="back-link" href="/admin/">กลับ Dashboard</a>
+</header>
+<main class="admin-main catalog-main">
+  <section class="welcome">
+    <p class="eyebrow">// CATALOG MANAGER</p>
+    <h1>จัดการรายการแคตตาล็อก</h1>
+    <p>ฟอร์มนี้เรียงหัวข้อและใช้ชื่อเดียวกับหน้าสินค้า Frontend</p>
+    <button id="newBtn" class="primary-button">+ เพิ่มรายการ</button>
+    <div id="message" class="status hidden"></div>
+  </section>
+
+  <section class="admin-section">
+    <div class="section-heading">
+      <div><p class="eyebrow">// CATALOG LIST</p><h2>รายการจาก D1</h2></div>
+      <input id="search" type="search" placeholder="ค้นหารหัส ชื่อ ไลน์ หรือซีรีส์">
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>รูป</th><th>รหัส / ชื่อ</th><th>ไลน์ / ซีรีส์</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="rows"></tbody></table></div>
+  </section>
+
+  <section id="editor" class="admin-section hidden">
+    <div class="section-heading">
+      <div><p class="eyebrow">// PRODUCT EDITOR</p><h2 id="editorTitle">เพิ่มรายการแคตตาล็อก</h2></div>
+      <button id="closeBtn" class="secondary-button" type="button">ปิด</button>
+    </div>
+
+    <form id="form">
+      <section class="form-block">
+        <div class="form-block-title"><span>SYS</span><h3>ข้อมูลระบบและรูปภาพ</h3></div>
+        <div class="catalog-grid">
+          <label>รหัสรายการ<input id="id" required placeholder="rg-044"></label>
+          <label>SKU<input id="sku" placeholder="RG-044"></label>
+          <label>กลุ่มในหน้าแคตตาล็อก<input id="seriesGroup" list="seriesGroupSuggestions" placeholder="Gundam"></label>
+          <label>ลำดับกลุ่ม<input id="seriesGroupOrder" type="number" value="0"></label>
+          <datalist id="seriesGroupSuggestions"><option value="Gundam"><option value="Evangelion"><option value="Gaogaigar"><option value="Patlabor"><option value="Special Version"><option value="HGUC"><option value="HGCE"><option value="HGIBO"><option value="HGBF"><option value="HGBD"></datalist>
+          <label class="wide">รูปหน้าปก (URL/Path)<input id="catalogImage" placeholder="images/gundam/gunpla/rg/rg-044/cover.jpg"></label>
+          <label class="wide">รูปสินค้า (หนึ่งบรรทัดต่อรูป)<textarea id="images" rows="5"></textarea></label>
+          <label class="wide">YouTube Embed URL<input id="videoEmbedUrl" placeholder="https://www.youtube.com/embed/VIDEO_ID"></label>
+        </div>
+      </section>
+
+      <section class="form-block">
+        <div class="form-block-title"><span>TOP</span><h3>ข้อมูลบนหน้าสินค้า</h3></div>
+        <div class="catalog-grid">
+          <label class="wide">ชื่อรุ่น<input id="name" placeholder="ชื่อรุ่นเต็ม"></label>
+          <label class="wide">คำอธิบายสินค้า<textarea id="summary" rows="6"></textarea></label>
+          <label>ลำดับ RG<input id="rgNumber" type="number"></label>
+          <label>รหัสโมบิลสูท<input id="modelCode"></label>
+          <label>ผู้ผลิต<input id="manufacturer" value="Bandai Spirits"></label>
+          <label>ซีรีส์<input id="series"></label>
+          <label>เกรด<select id="line"><option value="RG">RG</option><option value="MG">MG</option><option value="HG">HG</option><option value="PG">PG</option><option value="EG">EG</option><option value="SD">SD</option><option value="FM">FM</option><option value="MGEX">MGEX</option><option value="OTHER">อื่น ๆ</option></select></label>
+          <label>สเกล<input id="scale" value="1/144"></label>
+          <label>วันวางจำหน่าย<input id="releaseDate" type="date"></label>
+          <label>ราคาเปิดตัวญี่ปุ่น (ไม่รวมภาษี)<input id="launchPriceJPY" type="number"></label>
+          <label>ความสูงเมื่อประกอบ (ซม.)<input id="heightCm" type="number" step="0.1"></label>
+          <label>อายุที่แนะนำ<input id="recommendedAge"></label>
+          <label>ประเภทสินค้า<input id="productType" value="Gunpla"></label>
+          <label>วัสดุ<input id="material"></label>
+        </div>
+      </section>
+
+      <section class="form-block">
+        <div class="form-block-title"><span>REF</span><h3>แหล่งอ้างอิง</h3></div>
+        <div class="catalog-grid">
+          <label>ชื่อแหล่งอ้างอิงหลัก<input id="sourceName" placeholder="Bandai Hobby Site"></label>
+          <label>เปิดแหล่งอ้างอิง ↗ (URL)<input id="sourceUrl" type="url"></label>
+          <label class="wide">Bandai Hobby Site / Dalong.net และแหล่งอื่น (รูปแบบ: ชื่อ | URL)<textarea id="references" rows="5" placeholder="Bandai Hobby Site | https://...&#10;Dalong.net | https://..."></textarea></label>
+        </div>
+      </section>
+
+      <section class="form-block">
+        <div class="form-block-title"><span>BUY</span><h3>ลิงก์ร้านค้า</h3></div>
+        <div class="catalog-grid">
+          <label>SHOPEE<input id="shopee" type="url"></label>
+          <label>LAZADA<input id="lazada" type="url"></label>
+          <label>TIKTOK<input id="tiktok" type="url"></label>
+          <label>เว็บ<input id="page" type="url"></label>
+        </div>
+      </section>
+
+      <section class="form-block numbered-block">
+        <div class="form-block-title"><span>01</span><h3>จุดเด่น</h3></div>
+        <label class="single-field">หนึ่งบรรทัดต่อหนึ่งข้อ<textarea id="highlights" rows="9"></textarea></label>
+      </section>
+
+      <section class="form-block numbered-block">
+        <div class="form-block-title"><span>02</span><h3>รุ่นใหม่ต่างจากเดิมอย่างไร</h3></div>
+        <label class="single-field">หนึ่งบรรทัดต่อหนึ่งหัวข้อ รูปแบบ: หัวข้อ | รายละเอียด<textarea id="whatsDifferent" rows="8" placeholder="หัวข้อที่ 1 | รายละเอียด&#10;หัวข้อที่ 2 | รายละเอียด&#10;หัวข้อที่ 3 | รายละเอียด"></textarea></label>
+      </section>
+
+      <section class="form-block numbered-block">
+        <div class="form-block-title"><span>03</span><h3>อุปกรณ์ในกล่อง</h3></div>
+        <label class="single-field">หนึ่งบรรทัดต่อหนึ่งรายการ<textarea id="boxContents" rows="11"></textarea></label>
+      </section>
+
+      <section class="form-block numbered-block">
+        <div class="form-block-title"><span>04</span><h3>ข้อดี / ข้อควรพิจารณา</h3></div>
+        <div class="catalog-grid">
+          <label>ข้อดี (หนึ่งบรรทัดต่อข้อ)<textarea id="pros" rows="7"></textarea></label>
+          <label>ข้อควรพิจารณา (หนึ่งบรรทัดต่อข้อ)<textarea id="considerations" rows="7"></textarea></label>
+        </div>
+      </section>
+
+      <section class="form-block numbered-block">
+        <div class="form-block-title"><span>05</span><h3>คำถามที่พบบ่อย</h3></div>
+        <label class="single-field">หนึ่งบรรทัดต่อหนึ่งข้อ รูปแบบ: คำถาม | คำตอบ<textarea id="faq" rows="9" placeholder="คำถามที่ 1 | คำตอบ&#10;คำถามที่ 2 | คำตอบ"></textarea></label>
+      </section>
+
+      <section class="form-block numbered-block">
+        <div class="form-block-title"><span>06</span><h3>คู่มือประกอบ</h3></div>
+        <label class="single-field">รูปคู่มือประกอบ หนึ่งบรรทัดต่อหนึ่งหน้า<textarea id="manualImages" rows="10" placeholder="images/.../manual/page-01.jpg"></textarea></label>
+      </section>
+
+      <section class="form-block">
+        <div class="form-block-title"><span>END</span><h3>สถานะรายการ</h3></div>
+        <div class="catalog-grid">
+          <label>สถานะ<select id="status"><option value="draft">ฉบับร่าง</option><option value="published">เผยแพร่</option><option value="hidden">ซ่อน</option></select></label>
+          <label>ลำดับ<input id="sortOrder" type="number" value="0"></label>
+          <input id="categoryLabel" type="hidden" value="Gundam">
+          <input id="categoryCode" type="hidden" value="gd">
+          <input id="productTypeCode" type="hidden" value="gp">
+          <input id="lineCode" type="hidden" value="rg">
+        </div>
+      </section>
+
+      <div class="dialog-actions sticky-actions">
+        <button type="button" id="previewBtn" class="secondary-button">ดูตัวอย่าง</button>
+        <button type="submit" class="primary-button">บันทึก</button>
+      </div>
+    </form>
+  </section>
+</main>
+<script src="./catalog.js?v=20260802-1"></script>
+</body>
+</html>
