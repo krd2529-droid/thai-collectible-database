@@ -6,62 +6,36 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Catalog Manager · TOYSKUB</title>
   <link rel="stylesheet" href="../admin.css?v=4">
-  <link rel="stylesheet" href="./catalog.css?v=20260802-0715">
+  <link rel="stylesheet" href="./catalog.css?v=full-editor-20260802">
 </head>
 <body>
-<header class="admin-header"><a class="brand" href="/admin/"><span class="brand-mark">TK</span><span>TOYSKUB<br><small>CATALOG MANAGER</small></span></a><a class="back-link" href="/admin/">กลับ Dashboard</a></header>
+<header class="admin-header">
+  <a class="brand" href="/admin/"><span class="brand-mark">TK</span><span>TOYSKUB<br><small>CATALOG MANAGER</small></span></a>
+  <a class="back-link" href="/admin/">กลับ Dashboard</a>
+</header>
+
 <main class="admin-main catalog-main">
-<section class="welcome"><p class="eyebrow">// CATALOG MANAGER</p><h1>จัดการรายการแคตตาล็อก</h1><p>ชื่อหัวข้อและลำดับตรงกับหน้า Frontend</p><button id="newBtn" class="primary-button">+ เพิ่มรายการ</button><div id="message" class="status hidden"></div></section>
-<section class="admin-section"><div class="section-heading"><div><p class="eyebrow">// CATALOG LIST</p><h2>รายการจาก D1</h2></div><input id="search" type="search" placeholder="ค้นหารหัส ชื่อ ไลน์ หรือซีรีส์"></div><div class="table-wrap"><table><thead><tr><th>รูป</th><th>รหัส / ชื่อ</th><th>ไลน์ / ซีรีส์</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="rows"></tbody></table></div></section>
-<section id="editor" class="admin-section hidden">
-  <div class="section-heading"><div><p class="eyebrow">// EDITOR</p><h2 id="editorTitle">เพิ่มรายการแคตตาล็อก</h2></div><button id="closeBtn" class="secondary-button">ปิด</button></div>
-  <form id="form">
-    <div class="catalog-grid">
-      <label>รหัสรายการ<input id="id" required placeholder="rg-044"></label><label>SKU<input id="sku" placeholder="RG-044"></label>
-      <label class="wide">ชื่อรุ่น<input id="name" placeholder="ชื่อรุ่นเต็ม"></label>
-      <label class="wide">คำอธิบายสินค้า<textarea id="summary" rows="5"></textarea></label>
+  <section class="welcome">
+    <p class="eyebrow">// CATALOG MANAGER</p>
+    <h1>จัดการรายการแคตตาล็อก</h1>
+    <p>หน้านี้ใช้เลือกรายการเท่านั้น การเพิ่มและแก้ไขจะเปิดฟอร์มเต็มเดียวกับหน้า RG Template เพื่อป้องกันข้อมูลหัวข้อ 01–06 รูปภาพ คู่มือ แหล่งอ้างอิง และลิงก์ต่าง ๆ หายจากการบันทึก</p>
+    <a id="newBtn" class="primary-button" href="/admin/rg-template/">+ เพิ่มรายการด้วยฟอร์มเต็ม</a>
+    <div id="message" class="status hidden"></div>
+  </section>
 
-      <label>ลำดับ RG<input id="rgNumber" type="number"></label><label>รหัสโมบิลสูท<input id="modelCode"></label>
-      <label>ผู้ผลิต<input id="manufacturer" value="Bandai Spirits"></label><label>ซีรีส์<input id="series"></label>
-      <label>เกรด / สเกล<input id="gradeScale" value="RG · 1/144"></label><label>วันวางจำหน่าย<input id="releaseDate" type="date"></label>
-      <label>ราคาเปิดตัวญี่ปุ่น (ไม่รวมภาษี)<input id="launchPriceJPY" type="number"></label><label>ความสูงเมื่อประกอบ<input id="heightCm" type="number" step="0.1"></label>
-      <label>อายุที่แนะนำ<input id="recommendedAge"></label><label>ประเภทสินค้า<input id="productType" value="โมเดลพลาสติกประกอบ (Gunpla Real Grade)"></label>
-      <label class="wide">วัสดุ<input id="material"></label>
-
-      <fieldset class="wide media-fieldset"><legend>รูปสินค้า</legend>
-        <div class="media-actions"><button type="button" id="uploadGalleryButton" class="secondary-button">+ อัปโหลดรูปสินค้า</button><input id="galleryInput" type="file" accept="image/*" multiple hidden><span id="galleryStatus"></span></div>
-        <div id="galleryPreview" class="media-preview"></div>
-        <label>รูปหน้าปก (URL/Path)<input id="catalogImage" placeholder="รูปแรกจะเป็นรูปปก"></label>
-        <label>รูปทั้งหมด หนึ่งบรรทัดต่อรูป<textarea id="images" rows="5"></textarea></label>
-      </fieldset>
-
-      <fieldset class="wide"><legend>เปิดแหล่งอ้างอิง ↗</legend>
-        <label>Bandai Hobby Site<input id="bandaiUrl" type="url"></label>
-        <label>Dalong.net<input id="dalongUrl" type="url"></label>
-      </fieldset>
-
-      <label>SHOPEE<input id="shopee"></label><label>LAZADA<input id="lazada"></label>
-      <label>TIKTOK<input id="tiktok"></label><label>เว็บ<input id="pageLink"></label>
-
-      <fieldset class="wide numbered-section"><legend><b>01</b> จุดเด่น</legend><textarea id="highlights" rows="8" placeholder="หนึ่งบรรทัดต่อข้อ"></textarea></fieldset>
-      <fieldset class="wide numbered-section"><legend><b>02</b> รุ่นใหม่ต่างจากเดิมอย่างไร</legend><textarea id="whatsDifferent" rows="8" placeholder="หัวข้อ | รายละเอียด&#10;หัวข้อ | รายละเอียด"></textarea></fieldset>
-      <fieldset class="wide numbered-section"><legend><b>03</b> อุปกรณ์ในกล่อง</legend><textarea id="boxContents" rows="8" placeholder="หนึ่งบรรทัดต่อข้อ"></textarea></fieldset>
-      <fieldset class="wide numbered-section"><legend><b>04</b> ข้อดี / ข้อควรพิจารณา</legend><div class="split-fields"><label>ข้อดี<textarea id="pros" rows="6"></textarea></label><label>ข้อควรพิจารณา<textarea id="considerations" rows="6"></textarea></label></div></fieldset>
-      <fieldset class="wide numbered-section"><legend><b>05</b> คำถามที่พบบ่อย</legend><textarea id="faq" rows="8" placeholder="คำถาม | คำตอบ&#10;คำถาม | คำตอบ"></textarea></fieldset>
-      <fieldset class="wide numbered-section"><legend><b>06</b> คู่มือประกอบ</legend>
-        <div class="media-actions"><button type="button" id="uploadManualButton" class="secondary-button">+ อัปโหลดรูปคู่มือ</button><input id="manualInput" type="file" accept="image/*" multiple hidden><span id="manualStatus"></span></div>
-        <div id="manualPreview" class="media-preview"></div>
-        <textarea id="manualImages" rows="8" placeholder="URL/Path รูปคู่มือ หนึ่งบรรทัดต่อรูป"></textarea>
-      </fieldset>
-
-      <label class="wide">YouTube Embed URL<input id="videoEmbedUrl" placeholder="https://www.youtube.com/embed/VIDEO_ID"></label>
-      <label>สถานะ<select id="status"><option value="draft">ฉบับร่าง</option><option value="published">เผยแพร่</option><option value="hidden">ซ่อน</option></select></label><label>ลำดับ<input id="sortOrder" type="number" value="0"></label>
-
-      <input id="categoryLabel" type="hidden" value="Gundam"><input id="categoryCode" type="hidden" value="gd"><input id="productTypeCode" type="hidden" value="gp"><input id="line" type="hidden" value="RG"><input id="lineCode" type="hidden" value="rg"><input id="seriesGroup" type="hidden" value="Gundam"><input id="seriesGroupOrder" type="hidden" value="0">
+  <section class="admin-section">
+    <div class="section-heading">
+      <div><p class="eyebrow">// CATALOG LIST</p><h2>รายการจาก D1</h2></div>
+      <input id="search" type="search" placeholder="ค้นหารหัส ชื่อ ไลน์ หรือซีรีส์">
     </div>
-    <div class="dialog-actions"><button type="button" id="previewBtn" class="secondary-button">ดูตัวอย่าง</button><button type="submit" class="primary-button">บันทึก</button></div>
-  </form>
-</section>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>รูป</th><th>รหัส / ชื่อ</th><th>ไลน์ / ซีรีส์</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
 </main>
-<script src="./catalog.js?v=20260802-0715"></script>
-</body></html>
+<script src="./catalog.js?v=full-editor-20260802"></script>
+</body>
+</html>
