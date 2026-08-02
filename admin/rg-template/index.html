@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <title>RG Blank Template · TOYSKUB</title>
   <link rel="stylesheet" href="/style.css?v=template1">
-  <link rel="stylesheet" href="./template.css?v=toyskub-template-fix-20260802-2">
+  <link rel="stylesheet" href="./template.css?v=toyskub-jarvis-ai-20260802-1">
 </head>
 <body>
 <div class="blueprint-bg"></div>
@@ -24,6 +24,33 @@
 </header>
 
 <main id="builderMain">
+
+  <section class="jarvis-panel" aria-labelledby="jarvisTitle">
+    <div class="jarvis-panel-head">
+      <div>
+        <span class="jarvis-eyebrow">// JARVIS AI ASSIST</span>
+        <h2 id="jarvisTitle">ให้จาวิสค้นหาและช่วยกรอกข้อมูล</h2>
+        <p>พิมพ์ชื่อรุ่นหรือรหัส เช่น <b>RG 039 Hi-ν Gundam</b> แล้วตรวจข้อมูลก่อนกด Save Draft หรือ Publish</p>
+      </div>
+      <span class="jarvis-badge">AI + WEB SEARCH</span>
+    </div>
+    <div class="jarvis-controls">
+      <label class="jarvis-query-label">ชื่อรุ่นที่ต้องการค้นหา
+        <input id="jarvisQuery" autocomplete="off" placeholder="เช่น RG 1/144 Hi-ν Gundam หรือ RG-039">
+      </label>
+      <div class="jarvis-buttons">
+        <button id="jarvisFillEmpty" class="tool-button primary" type="button">🤖 เติมเฉพาะช่องว่าง</button>
+        <button id="jarvisReplaceAll" class="tool-button" type="button">เขียนทับข้อมูลในฟอร์ม</button>
+      </div>
+    </div>
+    <div class="jarvis-options">
+      <label><input id="jarvisIncludeEditorial" type="checkbox" checked> เติมจุดเด่น ข้อดี ข้อควรพิจารณา และ FAQ</label>
+      <label><input id="jarvisIncludeBox" type="checkbox" checked> เติมอุปกรณ์ในกล่อง</label>
+      <span>จาวิสจะไม่ใส่รูป คู่มือ YouTube หรือ Affiliate ให้เอง</span>
+    </div>
+    <div id="jarvisStatus" class="jarvis-status" role="status">พร้อมค้นหา</div>
+  </section>
+
   <section class="identity-panel">
     <div><label>รหัสรายการ</label><input id="itemId" placeholder="เช่น rg-044" autocomplete="off"></div>
     <div><label>SKU</label><input id="itemSku" placeholder="เช่น RG-044" autocomplete="off"></div>
@@ -117,6 +144,6 @@
 <dialog id="mediaDialog" class="media-dialog"><div class="media-dialog-box"><div class="media-dialog-head"><div><h3>เลือกจากแคตตาล็อก</h3><p>เลือกรูปที่มีอยู่แล้ว ไม่ต้องอัปโหลดซ้ำ</p></div><button id="mediaClose" class="tool-button" type="button">ปิด</button></div><div class="media-search-row"><input id="mediaCatalogId" placeholder="รหัสรายการ เช่น rg-039"><button id="mediaLoad" class="tool-button primary" type="button">โหลดรูป</button></div><div id="mediaCatalogInfo" class="media-catalog-info"></div><div id="mediaGrid" class="media-grid"></div><div class="media-dialog-foot"><span id="mediaSelectedCount">เลือกแล้ว 0 รูป</span><button id="mediaUseSelected" class="tool-button primary" type="button">ใช้รูปที่เลือก</button></div></div></dialog>
 
 <dialog id="messageDialog"><div class="dialog-box"><h3 id="dialogTitle">แจ้งเตือน</h3><p id="dialogMessage"></p><button id="dialogClose" class="tool-button primary">ตกลง</button></div></dialog>
-<script src="./template.js?v=toyskub-template-fix-20260802-2"></script>
+<script src="./template.js?v=toyskub-jarvis-ai-20260802-1"></script>
 </body>
 </html>

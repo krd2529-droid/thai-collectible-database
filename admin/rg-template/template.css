@@ -23,3 +23,24 @@
 .repeat-row input,.pair-row input,.pair-row textarea,.reference-row input{display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;color:var(--ink)!important;min-height:40px}
 .pair-row textarea{min-height:82px;resize:vertical}
 .add-row{position:relative;z-index:2;pointer-events:auto!important}
+
+
+/* JARVIS AI ASSIST */
+.jarvis-panel{margin:0 0 20px;padding:18px;border:2px solid #101820;background:linear-gradient(135deg,#eef5ff,#f8f9fa);box-shadow:5px 5px 0 rgba(16,24,32,.12)}
+.jarvis-panel-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
+.jarvis-panel h2{margin:3px 0 4px;font-family:var(--font-display);font-size:23px}
+.jarvis-panel p{margin:0;color:var(--ink-soft)}
+.jarvis-eyebrow{font:700 11px var(--font-mono);letter-spacing:.12em;color:var(--blue)}
+.jarvis-badge{white-space:nowrap;padding:6px 10px;background:#101820;color:#fff;font:700 10px var(--font-mono);letter-spacing:.08em}
+.jarvis-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;margin-top:16px}
+.jarvis-query-label{display:grid;gap:6px;font:700 11px var(--font-mono);color:var(--ink-soft)}
+.jarvis-query-label input{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--ink);background:#fff;color:var(--ink);font:16px var(--font-body)}
+.jarvis-buttons{display:flex;gap:8px;flex-wrap:wrap}
+.jarvis-options{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:12px;color:var(--ink-soft);font-size:12px}
+.jarvis-options label{display:inline-flex;align-items:center;gap:6px}
+.jarvis-options span{margin-left:auto}
+.jarvis-status{margin-top:12px;padding:9px 11px;border:1px dashed var(--line);background:#fff;color:var(--ink-soft);font:12px var(--font-mono)}
+.jarvis-status.working{border-color:var(--blue);color:var(--blue)}
+.jarvis-status.success{border-style:solid;border-color:#167a45;color:#167a45;background:#effaf4}
+.jarvis-status.error{border-style:solid;border-color:var(--red);color:var(--red);background:#fff1f1}
+@media(max-width:760px){.jarvis-panel-head,.jarvis-controls{grid-template-columns:1fr;display:grid}.jarvis-badge{justify-self:start}.jarvis-buttons>*{flex:1}.jarvis-options span{margin-left:0;width:100%}}

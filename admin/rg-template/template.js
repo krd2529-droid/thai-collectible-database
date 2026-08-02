@@ -86,4 +86,88 @@ $('videoEmbedUrl').addEventListener('blur',()=>{
  if(fixed)$('videoEmbedUrl').value=fixed;
  else{ $('videoEmbedUrl').value=''; showMessage('ลิงก์วิดีโอไม่ถูกต้อง','ช่องนี้รับเฉพาะลิงก์ YouTube เท่านั้น เพื่อป้องกันหน้าเว็บซ้อนใน Embed'); }
 });
+
+
+function jarvisSetStatus(message,state=''){
+ const el=$('jarvisStatus');
+ if(!el)return;
+ el.textContent=message;
+ el.className=`jarvis-status ${state}`.trim();
+}
+function jarvisHasMeaningfulList(type){
+ const data=lists[type]||[];
+ return data.some(item=>typeof item==='string'?item.trim():Object.values(item||{}).some(v=>String(v||'').trim()));
+}
+function jarvisSetField(id,value,fillOnly){
+ const el=$(id);
+ if(!el||value===null||value===undefined||String(value).trim()==='')return;
+ if(fillOnly&&val(id))return;
+ el.value=value;
+}
+function jarvisReplaceList(type,data,fillOnly){
+ if(!Array.isArray(data)||!data.length)return;
+ if(fillOnly&&jarvisHasMeaningfulList(type))return;
+ lists[type]=data;
+ renderList(type);
+}
+function applyJarvisData(data,fillOnly=true){
+ const scalar={
+  itemId:data.id,itemSku:data.sku,name:data.name,summary:data.summary,rgNumber:data.rgNumber,
+  modelCode:data.modelCode,manufacturer:data.manufacturer,series:data.series,scale:data.scale,
+  releaseDate:data.releaseDate,launchPriceJPY:data.launchPriceJPY,heightCm:data.heightCm,
+  recommendedAge:data.recommendedAge,productType:data.productType,material:data.material,
+  seriesGroup:data.seriesGroup
+ };
+ Object.entries(scalar).forEach(([id,value])=>jarvisSetField(id,value,fillOnly));
+ jarvisReplaceList('highlights',data.highlights,fillOnly);
+ jarvisReplaceList('differences',data.whatsDifferent,fillOnly);
+ jarvisReplaceList('box',data.boxContents,fillOnly);
+ jarvisReplaceList('notIncluded',data.notIncluded,fillOnly);
+ jarvisReplaceList('pros',data.pros,fillOnly);
+ jarvisReplaceList('considerations',data.considerations,fillOnly);
+ jarvisReplaceList('faq',data.faq,fillOnly);
+ if(Array.isArray(data.references)&&data.references.length){
+  if(fillOnly&&jarvisHasMeaningfulList('references')){
+   const known=new Set(lists.references.map(x=>String(x.url||'').trim()).filter(Boolean));
+   data.references.forEach(ref=>{if(ref?.url&&!known.has(ref.url)){lists.references.push(ref);known.add(ref.url)}});
+   renderList('references');
+  }else{
+   lists.references=data.references;
+   renderList('references');
+  }
+ }
+ setDirty('จาวิสเติมข้อมูลแล้ว · กรุณาตรวจสอบก่อนบันทึก');
+}
+async function runJarvis(fillOnly){
+ const query=val('jarvisQuery')||val('name')||val('itemSku')||val('itemId');
+ if(!query){showMessage('ยังไม่มีชื่อรุ่น','กรอกชื่อรุ่นหรือรหัสที่ช่อง JARVIS AI ก่อน');$('jarvisQuery')?.focus();return}
+ const buttons=[$('jarvisFillEmpty'),$('jarvisReplaceAll')].filter(Boolean);
+ buttons.forEach(b=>b.disabled=true);
+ jarvisSetStatus(`กำลังค้นหาข้อมูล “${query}” และตรวจแหล่งอ้างอิง…`,'working');
+ try{
+  const response=await fetch('/api/admin/ai/catalog-fill',{
+   method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},
+   body:JSON.stringify({
+    query,
+    includeEditorial:$('jarvisIncludeEditorial')?.checked!==false,
+    includeBox:$('jarvisIncludeBox')?.checked!==false
+   })
+  });
+  const result=await response.json().catch(()=>({}));
+  if(response.status===401){location.href='/admin/';return}
+  if(!response.ok)throw Error(result.error||'จาวิสค้นหาข้อมูลไม่สำเร็จ');
+  applyJarvisData(result.item||{},fillOnly);
+  const sourceCount=(result.item?.references||[]).length;
+  jarvisSetStatus(`เติมข้อมูลแล้ว ${sourceCount?`พร้อมแหล่งอ้างอิง ${sourceCount} รายการ`:'แต่ยังไม่พบแหล่งอ้างอิง'} · กรุณาตรวจสอบก่อน Save`,'success');
+ }catch(error){
+  jarvisSetStatus(error.message||'เกิดข้อผิดพลาด','error');
+  showMessage('JARVIS ทำงานไม่สำเร็จ',error.message||'เกิดข้อผิดพลาด');
+ }finally{buttons.forEach(b=>b.disabled=false)}
+}
+$('jarvisFillEmpty')?.addEventListener('click',()=>runJarvis(true));
+$('jarvisReplaceAll')?.addEventListener('click',()=>{
+ if(confirm('ให้จาวิสเขียนทับข้อมูลที่กรอกอยู่ในฟอร์มหรือไม่? รูป คู่มือ YouTube และ Affiliate จะไม่ถูกแตะ'))runJarvis(false);
+});
+$('jarvisQuery')?.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();runJarvis(true)}});
+
 initializeRows();bindAddButtons();loadFromQuery();
