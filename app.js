@@ -4,9 +4,9 @@ const PRODUCT_COUNT_EL = document.getElementById("productCount");
 let PRODUCTS = [];
 let CATEGORY_MAP = {};
 const PRODUCT_CACHE = new Map();
-let activeFilter = "RG";
-let activeCategory = "model";
-let activeProductType = "gunpla";
+let activeFilter = "";
+let activeCategory = "";
+let activeProductType = "";
 let searchTerm = "";
 let INLINE_EDIT_MODE = false;
 let ADMIN_SESSION = { checked: false, authenticated: false, source: "none" };
@@ -213,19 +213,57 @@ function renderHome() {
   removeSchema();
   document.querySelector('.frontend-admin-toolbar')?.remove();
   document.querySelector('.frontend-admin-modal')?.remove();
-  const categoryProducts = PRODUCTS.filter((p) => p.category === activeCategory);
-  const typeProducts = categoryProducts.filter((p) => productTypeKey(p) === activeProductType);
+
+  const categoryProducts = activeCategory
+    ? PRODUCTS.filter((p) => p.category === activeCategory)
+    : [];
+  const typeOptions = activeCategory ? (PRODUCT_TYPES[activeCategory] || []) : [];
+  const typeProducts = activeProductType
+    ? categoryProducts.filter((p) => productTypeKey(p) === activeProductType)
+    : [];
   const grades = [...new Set(typeProducts.map((p) => p.grade).filter(Boolean))];
 
-  const filtered = typeProducts.filter((p) => {
-    const gradeMatches = !activeFilter || p.grade === activeFilter;
-    const haystack = `${p.name || ""} ${p.sku || ""} ${p.series || ""} ${p.manufacturer || ""}`.toLowerCase();
-    return gradeMatches && haystack.includes(searchTerm.toLowerCase());
-  });
+  const filtered = activeFilter
+    ? typeProducts.filter((p) => {
+        const gradeMatches = p.grade === activeFilter;
+        const haystack = `${p.name || ""} ${p.sku || ""} ${p.series || ""} ${p.manufacturer || ""}`.toLowerCase();
+        return gradeMatches && haystack.includes(searchTerm.toLowerCase());
+      })
+    : [];
 
   const selectedCategory = CATEGORIES.find((category) => category.key === activeCategory);
-  const typeOptions = PRODUCT_TYPES[activeCategory] || [];
   const selectedType = typeOptions.find((type) => type.key === activeProductType);
+  const breadcrumbParts = [
+    '<span>หน้าหลัก</span>',
+    selectedCategory ? `<b>›</b><span>${esc(selectedCategory.label)}</span>` : '',
+    selectedType ? `<b>›</b><span>${esc(selectedType.label)}</span>` : '',
+    activeFilter ? `<b>›</b><strong>${esc(activeFilter)}</strong>` : '',
+  ].join('');
+
+  const typeStepContent = activeCategory
+    ? typeOptions.map(
+        (type) =>
+          `<button class="catalog-choice type-chip ${type.key === activeProductType ? "active" : ""}" data-type="${type.key}">
+            <strong>${esc(type.label)}</strong><small>${esc(type.description)}</small>
+          </button>`
+      ).join("")
+    : `<p class="catalog-step-waiting">เลือกหมวดหลักก่อน</p>`;
+
+  const gradeStepContent = activeProductType
+    ? grades.map(
+        (grade) =>
+          `<button class="grade-choice filter-chip ${grade === activeFilter ? "active" : ""}" data-grade="${esc(grade)}">
+            <strong>${esc(grade)}</strong><small>${typeProducts.filter((p) => p.grade === grade).length} รายการ</small>
+          </button>`
+      ).join("") || `<p class="catalog-step-waiting">ยังไม่มีเกรดในประเภทนี้</p>`
+    : `<p class="catalog-step-waiting">เลือกประเภทสินค้าก่อน</p>`;
+
+  const catalogContent = activeFilter
+    ? catalogGroupedGridHTML(filtered, activeFilter)
+    : `<section class="catalog-selection-empty">
+         <strong>ยังไม่ได้เลือกเกรด</strong>
+         <span>เลือกหมวดหลัก → ประเภทสินค้า → เกรด แล้วระบบจะแสดงแคตตาล็อก</span>
+       </section>`;
 
   APP.innerHTML = `
     ${sponsorSectionHTML()}
@@ -233,17 +271,14 @@ function renderHome() {
     <section class="hero">
       <div class="hero-eyebrow">// TOYS DATA BASE</div>
       <h1 class="hero-title">TOYSKUB</h1>
-      <p class="hero-sub">ฐานข้อมูลและแคตตาล็อกของสะสม สำหรับนักสะสมชาวไทย · เลือกหมวด Gundam → Gunpla → เกรด เพื่อเปิดดูแคตตาล็อกสินค้า</p>
+      <p class="hero-sub">ฐานข้อมูลและแคตตาล็อกของสะสม สำหรับนักสะสมชาวไทย · เลือกหมวด → ประเภทสินค้า → เกรด เพื่อเปิดดูแคตตาล็อก</p>
       <label class="search-box">
         <span>SEARCH</span>
-        <input id="productSearch" type="search" value="${esc(searchTerm)}" placeholder="ค้นหาชื่อสินค้า รุ่น รหัส หรือผู้ผลิต" />
+        <input id="productSearch" type="search" value="${esc(searchTerm)}" placeholder="ค้นหาชื่อสินค้า รุ่น รหัส หรือผู้ผลิต" ${activeFilter ? "" : "disabled"} />
       </label>
     </section>
 
-    <nav class="catalog-breadcrumb" aria-label="หมวดสินค้า">
-      <span>หน้าหลัก</span><b>›</b><span>${esc(selectedCategory?.label || "")}</span><b>›</b>
-      <span>${esc(selectedType?.label || "")}</span><b>›</b><strong>${esc(activeFilter || "")}</strong>
-    </nav>
+    <nav class="catalog-breadcrumb" aria-label="หมวดสินค้า">${breadcrumbParts}</nav>
 
     ${catalogStepHTML(
       "01",
@@ -256,52 +291,26 @@ function renderHome() {
       ).join("")
     )}
 
-    ${catalogStepHTML(
-      "02",
-      "เลือกประเภทสินค้า",
-      typeOptions
-        .map(
-          (type) =>
-            `<button class="catalog-choice type-chip ${type.key === activeProductType ? "active" : ""}" data-type="${type.key}">
-              <strong>${esc(type.label)}</strong><small>${esc(type.description)}</small>
-            </button>`
-        )
-        .join("")
-    )}
+    ${catalogStepHTML("02", "เลือกประเภทสินค้า", typeStepContent)}
+    ${catalogStepHTML("03", "เลือกเกรด", gradeStepContent)}
 
-    ${catalogStepHTML(
-      "03",
-      "เลือกเกรด",
-      grades
-        .map(
-          (grade) =>
-            `<button class="grade-choice filter-chip ${grade === activeFilter ? "active" : ""}" data-grade="${esc(grade)}">
-              <strong>${esc(grade)}</strong><small>${typeProducts.filter((p) => p.grade === grade).length} รายการ</small>
-            </button>`
-        )
-        .join("")
-    )}
-
-    ${catalogGroupedGridHTML(filtered, activeFilter)}
-
+    ${catalogContent}
   `;
 
-  APP.querySelector("#productSearch").addEventListener("input", (event) => {
+  APP.querySelector("#productSearch")?.addEventListener("input", (event) => {
     searchTerm = event.target.value;
     renderHome();
     const input = APP.querySelector("#productSearch");
-    input.focus();
-    input.setSelectionRange(input.value.length, input.value.length);
+    input?.focus();
+    input?.setSelectionRange(input.value.length, input.value.length);
   });
 
   APP.querySelectorAll(".category-chip").forEach((btn) => {
     btn.addEventListener("click", () => {
       activeCategory = btn.dataset.category;
-      activeProductType = (PRODUCT_TYPES[activeCategory] || [])[0]?.key || "";
-      const availableProducts = PRODUCTS.filter(
-        (p) => p.category === activeCategory && productTypeKey(p) === activeProductType
-      );
-      activeFilter = availableProducts[0]?.grade || "";
+      activeProductType = "";
+      activeFilter = "";
+      searchTerm = "";
       renderHome();
     });
   });
@@ -309,10 +318,8 @@ function renderHome() {
   APP.querySelectorAll(".type-chip").forEach((btn) => {
     btn.addEventListener("click", () => {
       activeProductType = btn.dataset.type;
-      const availableProducts = PRODUCTS.filter(
-        (p) => p.category === activeCategory && productTypeKey(p) === activeProductType
-      );
-      activeFilter = availableProducts[0]?.grade || "";
+      activeFilter = "";
+      searchTerm = "";
       renderHome();
     });
   });
@@ -320,6 +327,7 @@ function renderHome() {
   APP.querySelectorAll(".filter-chip").forEach((btn) => {
     btn.addEventListener("click", () => {
       activeFilter = btn.dataset.grade;
+      searchTerm = "";
       renderHome();
     });
   });

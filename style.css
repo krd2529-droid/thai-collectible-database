@@ -867,3 +867,34 @@ a:focus-visible, button:focus-visible {
 .catalog-admin-login-note a{padding:7px 10px;border:1px solid var(--ink);background:var(--blue);color:#fff;font-weight:700}
 .admin-frontend-mode .header-admin-link{background:#167a45;border-color:#167a45}
 @media(max-width:680px){.catalog-admin-status{flex:1 1 100%}.catalog-admin-login-note{align-items:flex-start;flex-direction:column}}
+
+/* Initial catalog selection: do not preselect RG */
+.catalog-step-waiting {
+  width: 100%;
+  margin: 0;
+  padding: 16px;
+  border: 1px dashed var(--line);
+  background: rgba(248,249,250,.65);
+  color: var(--ink-soft);
+  font: 12px var(--font-mono);
+}
+.catalog-selection-empty {
+  display: grid;
+  gap: 5px;
+  margin-top: 28px;
+  padding: 32px 24px;
+  border: 1px dashed var(--line);
+  background: var(--paper-card);
+  text-align: center;
+}
+.catalog-selection-empty strong {
+  font: 700 18px var(--font-display);
+}
+.catalog-selection-empty span {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+.search-box input:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
