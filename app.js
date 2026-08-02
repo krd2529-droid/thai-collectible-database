@@ -214,25 +214,24 @@ function renderHome() {
   document.querySelector('.frontend-admin-toolbar')?.remove();
   document.querySelector('.frontend-admin-modal')?.remove();
 
-  const categoryProducts = activeCategory
-    ? PRODUCTS.filter((p) => p.category === activeCategory)
-    : [];
+  const selectedCategory = CATEGORIES.find((category) => category.key === activeCategory);
   const typeOptions = activeCategory ? (PRODUCT_TYPES[activeCategory] || []) : [];
+  const selectedType = typeOptions.find((type) => type.key === activeProductType);
+  const categoryProducts = activeCategory ? PRODUCTS.filter((p) => p.category === activeCategory) : [];
   const typeProducts = activeProductType
     ? categoryProducts.filter((p) => productTypeKey(p) === activeProductType)
     : [];
-  const grades = [...new Set(typeProducts.map((p) => p.grade).filter(Boolean))];
+  const grades = activeProductType
+    ? [...new Set(typeProducts.map((p) => p.grade).filter(Boolean))]
+    : [];
 
   const filtered = activeFilter
     ? typeProducts.filter((p) => {
-        const gradeMatches = p.grade === activeFilter;
         const haystack = `${p.name || ""} ${p.sku || ""} ${p.series || ""} ${p.manufacturer || ""}`.toLowerCase();
-        return gradeMatches && haystack.includes(searchTerm.toLowerCase());
+        return p.grade === activeFilter && haystack.includes(searchTerm.toLowerCase());
       })
     : [];
 
-  const selectedCategory = CATEGORIES.find((category) => category.key === activeCategory);
-  const selectedType = typeOptions.find((type) => type.key === activeProductType);
   const breadcrumbParts = [
     '<span>หน้าหลัก</span>',
     selectedCategory ? `<b>›</b><span>${esc(selectedCategory.label)}</span>` : '',
@@ -241,29 +240,22 @@ function renderHome() {
   ].join('');
 
   const typeStepContent = activeCategory
-    ? typeOptions.map(
-        (type) =>
-          `<button class="catalog-choice type-chip ${type.key === activeProductType ? "active" : ""}" data-type="${type.key}">
-            <strong>${esc(type.label)}</strong><small>${esc(type.description)}</small>
-          </button>`
-      ).join("")
-    : `<p class="catalog-step-waiting">เลือกหมวดหลักก่อน</p>`;
+    ? typeOptions.map((type) =>
+        `<button class="catalog-choice type-chip ${type.key === activeProductType ? "active" : ""}" data-type="${type.key}">
+          <strong>${esc(type.label)}</strong><small>${esc(type.description)}</small>
+        </button>`).join('')
+    : '<p class="catalog-waiting">กรุณาเลือกหมวดหลักก่อน</p>';
 
   const gradeStepContent = activeProductType
-    ? grades.map(
-        (grade) =>
-          `<button class="grade-choice filter-chip ${grade === activeFilter ? "active" : ""}" data-grade="${esc(grade)}">
-            <strong>${esc(grade)}</strong><small>${typeProducts.filter((p) => p.grade === grade).length} รายการ</small>
-          </button>`
-      ).join("") || `<p class="catalog-step-waiting">ยังไม่มีเกรดในประเภทนี้</p>`
-    : `<p class="catalog-step-waiting">เลือกประเภทสินค้าก่อน</p>`;
+    ? grades.map((grade) =>
+        `<button class="grade-choice filter-chip ${grade === activeFilter ? "active" : ""}" data-grade="${esc(grade)}">
+          <strong>${esc(grade)}</strong><small>${typeProducts.filter((p) => p.grade === grade).length} รายการ</small>
+        </button>`).join('')
+    : '<p class="catalog-waiting">กรุณาเลือกประเภทสินค้าก่อน</p>';
 
   const catalogContent = activeFilter
     ? catalogGroupedGridHTML(filtered, activeFilter)
-    : `<section class="catalog-selection-empty">
-         <strong>ยังไม่ได้เลือกเกรด</strong>
-         <span>เลือกหมวดหลัก → ประเภทสินค้า → เกรด แล้วระบบจะแสดงแคตตาล็อก</span>
-       </section>`;
+    : '<section class="catalog-selection-empty"><strong>ยังไม่ได้เลือกเกรด</strong><span>เลือกหมวดหลัก → ประเภทสินค้า → เกรด เพื่อแสดงแคตตาล็อก</span></section>';
 
   APP.innerHTML = `
     ${sponsorSectionHTML()}
@@ -271,10 +263,10 @@ function renderHome() {
     <section class="hero">
       <div class="hero-eyebrow">// TOYS DATA BASE</div>
       <h1 class="hero-title">TOYSKUB</h1>
-      <p class="hero-sub">ฐานข้อมูลและแคตตาล็อกของสะสม สำหรับนักสะสมชาวไทย · เลือกหมวด → ประเภทสินค้า → เกรด เพื่อเปิดดูแคตตาล็อก</p>
-      <label class="search-box">
+      <p class="hero-sub">ฐานข้อมูลและแคตตาล็อกของสะสม สำหรับนักสะสมชาวไทย · เลือกหมวด Gundam → Gunpla → เกรด เพื่อเปิดดูแคตตาล็อกสินค้า</p>
+      <label class="search-box ${activeFilter ? '' : 'disabled'}">
         <span>SEARCH</span>
-        <input id="productSearch" type="search" value="${esc(searchTerm)}" placeholder="ค้นหาชื่อสินค้า รุ่น รหัส หรือผู้ผลิต" ${activeFilter ? "" : "disabled"} />
+        <input id="productSearch" type="search" value="${esc(searchTerm)}" placeholder="${activeFilter ? 'ค้นหาชื่อสินค้า รุ่น รหัส หรือผู้ผลิต' : 'เลือกเกรดก่อนค้นหาสินค้า'}" ${activeFilter ? '' : 'disabled'} />
       </label>
     </section>
 
@@ -283,21 +275,19 @@ function renderHome() {
     ${catalogStepHTML(
       "01",
       "เลือกหมวดหลัก",
-      CATEGORIES.map(
-        (category) =>
-          `<button class="catalog-choice category-chip ${category.key === activeCategory ? "active" : ""}" data-category="${category.key}">
-            <strong>${esc(category.label)}</strong><small>${esc(category.description)}</small>
-          </button>`
-      ).join("")
+      CATEGORIES.map((category) =>
+        `<button class="catalog-choice category-chip ${category.key === activeCategory ? "active" : ""}" data-category="${category.key}">
+          <strong>${esc(category.label)}</strong><small>${esc(category.description)}</small>
+        </button>`).join("")
     )}
 
     ${catalogStepHTML("02", "เลือกประเภทสินค้า", typeStepContent)}
     ${catalogStepHTML("03", "เลือกเกรด", gradeStepContent)}
-
     ${catalogContent}
   `;
 
-  APP.querySelector("#productSearch")?.addEventListener("input", (event) => {
+  const searchInput = APP.querySelector("#productSearch");
+  searchInput?.addEventListener("input", (event) => {
     searchTerm = event.target.value;
     renderHome();
     const input = APP.querySelector("#productSearch");
