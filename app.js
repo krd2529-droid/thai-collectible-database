@@ -8,6 +8,7 @@ let activeFilter = "RG";
 let activeCategory = "model";
 let activeProductType = "gunpla";
 let searchTerm = "";
+let INLINE_EDIT_MODE = false;
 
 const CATEGORIES = [
   { key: "model", label: "Gundam", description: "รวมสินค้าของสะสม Gundam" },
@@ -409,6 +410,7 @@ function cardHTML(p) {
 
 // ---------------- Detail Page ----------------
 function renderDetail(p) {
+  if (INLINE_EDIT_MODE) return renderInlineEditor(p);
   const img0 = (p.images && p.images[0]) || "";
 
   APP.innerHTML = `
@@ -416,7 +418,7 @@ function renderDetail(p) {
 
     <div class="catalog-admin-actions" aria-label="เครื่องมือจัดการหน้าแคตตาล็อก">
       <a class="catalog-admin-action" href="/admin/rg-template/">+ เพิ่มหน้าใหม่</a>
-      <a class="catalog-admin-action primary" href="/admin/rg-template/?id=${encodeURIComponent(p.id)}">แก้ไข / เพิ่มข้อมูล</a>
+      <button class="catalog-admin-action primary" id="catalogInlineEditButton" type="button">แก้ไขหน้านี้</button>
       <button class="catalog-admin-action" id="catalogMoveButton" type="button">ย้าย / จัดลำดับ</button>
       <button class="catalog-admin-action danger" id="catalogTrashButton" type="button">ลบ / ถังขยะ</button>
     </div>
@@ -643,6 +645,11 @@ function renderDetail(p) {
     });
   });
 
+  document.getElementById("catalogInlineEditButton")?.addEventListener("click", () => {
+    INLINE_EDIT_MODE = true;
+    renderDetail(p);
+  });
+
   document.getElementById("catalogMoveButton")?.addEventListener("click", () => openFrontendMoveDialog(p));
   document.getElementById("catalogTrashButton")?.addEventListener("click", async (event) => {
     if (!confirm(`ย้าย ${p.id} ไปถังขยะหรือไม่? หน้าเว็บจะถูกซ่อน แต่ยังกู้คืนได้`)) return;
@@ -671,8 +678,219 @@ function renderDetail(p) {
   });
 
   injectSchema(p);
-  void setupFrontendAdminToolbar(p);
   window.scrollTo(0, 0);
+}
+
+
+function renderInlineEditor(product) {
+  const lineText = (items, mapper = value => value) => (items || []).map(mapper).join("\n");
+  const refByLabel = label => (product.references || []).find(ref => String(ref.label || "").toLowerCase().includes(label))?.url || "";
+
+  APP.innerHTML = `
+    <a href="#/product/${esc(product.id)}" class="back-link" id="cancelInlineEditTop">← ยกเลิกการแก้ไข</a>
+
+    <section class="inline-editor-shell">
+      <div class="inline-editor-head">
+        <div>
+          <span class="hero-eyebrow">// FRONTEND INLINE EDITOR</span>
+          <h1>แก้ไขหน้า ${esc(product.id)}</h1>
+          <p>หน้าตาและลำดับหัวข้อตรงกับหน้า Frontend บันทึกทั้งชุดโดยใช้ข้อมูลเดิมที่โหลดมา จึงไม่ตัดหัวข้อที่ไม่ได้แก้</p>
+        </div>
+        <div class="inline-editor-actions">
+          <button type="button" class="catalog-admin-action" id="cancelInlineEdit">ยกเลิก</button>
+          <button type="button" class="catalog-admin-action primary" id="saveInlineEdit">บันทึกการแก้ไข</button>
+        </div>
+      </div>
+
+      <div class="spec-plate inline-editor-main">
+        <div class="detail-grid">
+          <div class="gallery inline-editor-gallery">
+            <label class="inline-field-label">รูปสินค้า / รูปปก (URL หรือ Path รูปละ 1 บรรทัด)</label>
+            <textarea id="editImages" class="inline-editor-textarea tall">${esc(lineText(product.images))}</textarea>
+            <p class="inline-editor-note">รูปบรรทัดแรกเป็นรูปปก การอัปโหลดไฟล์จริงจะเชื่อมในชุด Media/API ถัดไป</p>
+          </div>
+          <div class="info inline-editor-info">
+            <label class="inline-field-label">ชื่อสินค้า</label>
+            <input id="editName" class="inline-editor-input title-input" value="${esc(product.name || "")}" />
+
+            <label class="inline-field-label">คำอธิบายสินค้า</label>
+            <textarea id="editSummary" class="inline-editor-textarea">${esc(product.summary || "")}</textarea>
+
+            <div class="inline-spec-grid">
+              ${inlineInput("editRgNumber", "ลำดับ RG", product.rgNumber || "", "number")}
+              ${inlineInput("editModelCode", "รหัสโมบิลสูท", product.modelCode || "")}
+              ${inlineInput("editManufacturer", "ผู้ผลิต", product.manufacturer || "")}
+              ${inlineInput("editSeries", "ซีรีส์", product.series || "")}
+              ${inlineInput("editGrade", "เกรด", product.grade || "")}
+              ${inlineInput("editScale", "สเกล", product.scale || "")}
+              ${inlineInput("editReleaseDate", "วันวางจำหน่าย", product.releaseDate || "")}
+              ${inlineInput("editLaunchPrice", "ราคาเปิดตัวญี่ปุ่น (ไม่รวมภาษี)", product.launchPriceJPY || "", "number")}
+              ${inlineInput("editHeight", "ความสูงเมื่อประกอบ (ซม.)", product.heightCm || "", "number")}
+              ${inlineInput("editAge", "อายุที่แนะนำ", product.recommendedAge || "")}
+              ${inlineInput("editProductType", "ประเภทสินค้า", product.productType || "")}
+              ${inlineInput("editMaterial", "วัสดุ", product.material || "")}
+            </div>
+
+            <div class="inline-editor-subsection">
+              <h3>แหล่งอ้างอิง</h3>
+              ${inlineInput("editSourceUrl", "เปิดแหล่งอ้างอิง ↗", product.sourceUrl || "", "url")}
+              ${inlineInput("editBandai", "Bandai Hobby Site", refByLabel("bandai"), "url")}
+              ${inlineInput("editDalong", "Dalong.net", refByLabel("dalong"), "url")}
+            </div>
+
+            <div class="inline-editor-subsection">
+              <h3>Affiliate</h3>
+              ${inlineInput("editShopee", "SHOPEE", product.affiliateLinks?.shopee || "", "url")}
+              ${inlineInput("editLazada", "LAZADA", product.affiliateLinks?.lazada || "", "url")}
+              ${inlineInput("editTiktok", "TIKTOK", product.affiliateLinks?.tiktok || "", "url")}
+              ${inlineInput("editPage", "เว็บ", product.affiliateLinks?.page || "", "url")}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      ${inlineSectionEditor("01", "จุดเด่น", "editHighlights", lineText(product.highlights), "หนึ่งข้อ ต่อหนึ่งบรรทัด")}
+      ${inlineSectionEditor("02", "รุ่นใหม่ต่างจากเดิมอย่างไร", "editDifferences", lineText(product.whatsDifferent, item => `${item.title || ""} | ${item.detail || ""}`), "หัวข้อ | รายละเอียด — หนึ่งรายการต่อหนึ่งบรรทัด")}
+      ${inlineSectionEditor("03", "อุปกรณ์ในกล่อง", "editBoxContents", lineText(product.boxContents), "หนึ่งรายการต่อหนึ่งบรรทัด")}
+
+      <section class="manual-section inline-edit-section">
+        <div class="manual-heading"><span class="manual-number">04</span><span class="manual-title">ข้อดี / ข้อควรพิจารณา</span></div>
+        <div class="two-col">
+          <label><strong>ข้อดี</strong><textarea id="editPros" class="inline-editor-textarea tall">${esc(lineText(product.pros))}</textarea><small>หนึ่งข้อ ต่อหนึ่งบรรทัด</small></label>
+          <label><strong>ข้อควรพิจารณา</strong><textarea id="editConsiderations" class="inline-editor-textarea tall">${esc(lineText(product.considerations))}</textarea><small>หนึ่งข้อ ต่อหนึ่งบรรทัด</small></label>
+        </div>
+      </section>
+
+      ${inlineSectionEditor("05", "คำถามที่พบบ่อย", "editFaq", lineText(product.faq, item => `${item.q || ""} | ${item.a || ""}`), "คำถาม | คำตอบ — หนึ่งข้อต่อหนึ่งบรรทัด")}
+      ${inlineSectionEditor("06", "คู่มือประกอบ", "editManualImages", lineText(product.manualImages), "URL หรือ Path รูปคู่มือ หนึ่งรูปต่อหนึ่งบรรทัด")}
+
+      <section class="manual-section inline-edit-section">
+        <div class="manual-heading"><span class="manual-number">VIDEO</span><span class="manual-title">YouTube Embed</span></div>
+        <label class="inline-field-label">ใส่ YouTube URL หรือ Embed URL</label>
+        <input id="editVideo" class="inline-editor-input" value="${esc(product.videoEmbedUrl || "")}" />
+      </section>
+
+      <div class="inline-editor-footer">
+        <button type="button" class="catalog-admin-action" id="cancelInlineEditBottom">ยกเลิก</button>
+        <button type="button" class="catalog-admin-action primary" id="saveInlineEditBottom">บันทึกการแก้ไข</button>
+        <span id="inlineSaveStatus" class="inline-save-status"></span>
+      </div>
+    </section>`;
+
+  const cancel = () => { INLINE_EDIT_MODE = false; renderDetail(product); };
+  ["cancelInlineEditTop", "cancelInlineEdit", "cancelInlineEditBottom"].forEach(id => document.getElementById(id)?.addEventListener("click", event => { event.preventDefault(); cancel(); }));
+  ["saveInlineEdit", "saveInlineEditBottom"].forEach(id => document.getElementById(id)?.addEventListener("click", () => saveInlineProduct(product)));
+  window.scrollTo(0, 0);
+}
+
+function inlineInput(id, label, value, type = "text") {
+  return `<label class="inline-input-group"><span>${esc(label)}</span><input id="${id}" class="inline-editor-input" type="${type}" value="${esc(value)}" /></label>`;
+}
+
+function inlineSectionEditor(number, title, id, value, hint) {
+  return `<section class="manual-section inline-edit-section">
+    <div class="manual-heading"><span class="manual-number">${number}</span><span class="manual-title">${esc(title)}</span></div>
+    <textarea id="${id}" class="inline-editor-textarea tall">${esc(value)}</textarea>
+    <p class="inline-editor-note">${esc(hint)}</p>
+  </section>`;
+}
+
+function editorValue(id) { return document.getElementById(id)?.value.trim() || ""; }
+function editorLines(id) { return editorValue(id).split(/\r?\n/).map(v => v.trim()).filter(Boolean); }
+function editorPairs(id, leftKey, rightKey) {
+  return editorLines(id).map(line => {
+    const splitAt = line.indexOf("|");
+    return splitAt < 0
+      ? { [leftKey]: line.trim(), [rightKey]: "" }
+      : { [leftKey]: line.slice(0, splitAt).trim(), [rightKey]: line.slice(splitAt + 1).trim() };
+  }).filter(item => item[leftKey] || item[rightKey]);
+}
+
+function normalizeYoutubeEmbed(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const embed = raw.match(/youtube\.com\/embed\/([A-Za-z0-9_-]{6,})/i);
+  const watch = raw.match(/[?&]v=([A-Za-z0-9_-]{6,})/i);
+  const short = raw.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/i);
+  const shorts = raw.match(/youtube\.com\/shorts\/([A-Za-z0-9_-]{6,})/i);
+  const id = embed?.[1] || watch?.[1] || short?.[1] || shorts?.[1];
+  return id ? `https://www.youtube.com/embed/${id}` : raw;
+}
+
+async function saveInlineProduct(product) {
+  const status = document.getElementById("inlineSaveStatus");
+  const buttons = [document.getElementById("saveInlineEdit"), document.getElementById("saveInlineEditBottom")].filter(Boolean);
+  buttons.forEach(button => { button.disabled = true; button.textContent = "กำลังบันทึก…"; });
+  if (status) status.textContent = "กำลังบันทึกข้อมูลครบทุกหัวข้อ…";
+
+  const bandai = editorValue("editBandai");
+  const dalong = editorValue("editDalong");
+  const otherRefs = (product.references || []).filter(ref => {
+    const label = String(ref.label || "").toLowerCase();
+    return !label.includes("bandai") && !label.includes("dalong");
+  });
+
+  const patch = {
+    name: editorValue("editName"),
+    summary: editorValue("editSummary"),
+    images: editorLines("editImages"),
+    rgNumber: Number(editorValue("editRgNumber")) || null,
+    modelCode: editorValue("editModelCode"),
+    manufacturer: editorValue("editManufacturer"),
+    series: editorValue("editSeries"),
+    grade: editorValue("editGrade"),
+    line: editorValue("editGrade"),
+    scale: editorValue("editScale"),
+    releaseDate: editorValue("editReleaseDate"),
+    launchPriceJPY: Number(editorValue("editLaunchPrice")) || null,
+    heightCm: Number(editorValue("editHeight")) || null,
+    recommendedAge: editorValue("editAge"),
+    productType: editorValue("editProductType"),
+    material: editorValue("editMaterial"),
+    sourceUrl: editorValue("editSourceUrl"),
+    references: [
+      ...(bandai ? [{ label: "Bandai Hobby Site", url: bandai }] : []),
+      ...(dalong ? [{ label: "Dalong.net", url: dalong }] : []),
+      ...otherRefs,
+    ],
+    affiliateLinks: {
+      shopee: editorValue("editShopee"),
+      lazada: editorValue("editLazada"),
+      tiktok: editorValue("editTiktok"),
+      page: editorValue("editPage"),
+    },
+    highlights: editorLines("editHighlights"),
+    whatsDifferent: editorPairs("editDifferences", "title", "detail"),
+    boxContents: editorLines("editBoxContents"),
+    pros: editorLines("editPros"),
+    considerations: editorLines("editConsiderations"),
+    faq: editorPairs("editFaq", "q", "a"),
+    manualImages: editorLines("editManualImages"),
+    videoEmbedUrl: normalizeYoutubeEmbed(editorValue("editVideo")),
+  };
+
+  try {
+    const response = await fetch(`/api/admin/catalog/${encodeURIComponent(product.id)}`, {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify(patch),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (response.status === 401) { location.href = "/admin/"; return; }
+    if (!response.ok) throw new Error(data.error || "บันทึกไม่สำเร็จ");
+
+    Object.assign(product, patch, data.item || data.product || {});
+    PRODUCT_CACHE.set(product.id, product);
+    PRODUCTS = PRODUCTS.map(item => item.id === product.id ? { ...item, ...product } : item).sort(sortCatalogItems);
+    INLINE_EDIT_MODE = false;
+    renderDetail(product);
+    alert("บันทึกข้อมูลครบทุกหัวข้อเรียบร้อย");
+  } catch (error) {
+    if (status) status.textContent = error.message || "บันทึกไม่สำเร็จ";
+    alert(error.message || "บันทึกไม่สำเร็จ");
+    buttons.forEach(button => { button.disabled = false; button.textContent = "บันทึกการแก้ไข"; });
+  }
 }
 
 async function setupFrontendAdminToolbar(product) {

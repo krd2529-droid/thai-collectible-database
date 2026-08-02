@@ -836,3 +836,26 @@ a:focus-visible, button:focus-visible {
 .catalog-admin-action.danger{margin-left:auto;background:#fff0f0;color:#a52020;border-color:#a52020}
 .catalog-admin-action:disabled{opacity:.55;cursor:wait}
 @media(max-width:680px){.catalog-admin-actions>*{flex:1 1 calc(50% - 8px)}.catalog-admin-action.danger{margin-left:0}}
+
+
+/* ---------------- Frontend inline editor ---------------- */
+.inline-editor-shell{margin-top:8px}
+.inline-editor-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:22px;padding:18px;border:2px solid var(--ink);background:var(--paper-card)}
+.inline-editor-head h1{margin:4px 0;font-family:var(--font-display);font-size:26px}
+.inline-editor-head p{max-width:680px;margin:0;color:var(--ink-soft)}
+.inline-editor-actions,.inline-editor-footer{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.inline-editor-main{margin-top:0}
+.inline-field-label,.inline-input-group{display:grid;gap:6px;margin-bottom:12px;font:700 11px var(--font-mono);color:var(--ink-soft)}
+.inline-editor-input,.inline-editor-textarea{width:100%;border:1px solid var(--ink);background:#fff;color:var(--ink);padding:10px 12px;font:14px var(--font-body);outline:none}
+.inline-editor-input:focus,.inline-editor-textarea:focus{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-soft)}
+.inline-editor-textarea{min-height:110px;resize:vertical;line-height:1.55}
+.inline-editor-textarea.tall{min-height:190px}
+.title-input{font:700 21px var(--font-display)}
+.inline-spec-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
+.inline-editor-subsection{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+.inline-editor-subsection h3{margin:0 0 12px;font:700 15px var(--font-display)}
+.inline-editor-note,.inline-edit-section small{display:block;margin:7px 0 0;color:var(--ink-soft);font-size:12px}
+.inline-edit-section{padding:18px;border:1px solid var(--line);background:var(--paper-card)}
+.inline-editor-footer{position:sticky;bottom:10px;z-index:20;justify-content:flex-end;margin-top:28px;padding:12px;border:1px solid var(--ink);background:rgba(248,249,250,.96);box-shadow:0 8px 28px rgba(0,0,0,.12);backdrop-filter:blur(8px)}
+.inline-save-status{margin-right:auto;color:var(--ink-soft);font-size:12px}
+@media(max-width:800px){.inline-editor-head{flex-direction:column}.inline-editor-actions{width:100%}.inline-editor-actions>*{flex:1}.inline-spec-grid{grid-template-columns:1fr}.inline-editor-footer>*{flex:1}.inline-save-status{flex-basis:100%;order:3}}
