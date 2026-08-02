@@ -206,12 +206,15 @@ async function loadVisitorStats(pageId = "") {
 }
 
 function visitorStatsHTML(id, compact = false) {
-  return `<section class="visitor-stats ${compact ? "compact" : ""}" id="${id}" aria-label="สถิติผู้เข้าชม">
+  return `<div class="visitor-stats-block ${compact ? "compact" : ""}">
+    <h2 class="visitor-stats-title">จำนวนผู้เข้าชม</h2>
+    <section class="visitor-stats ${compact ? "compact" : ""}" id="${id}" aria-label="สถิติผู้เข้าชม">
     <div><span>วันนี้</span><strong data-stat="today">—</strong></div>
     <div><span>7 วัน</span><strong data-stat="sevenDays">—</strong></div>
     <div><span>30 วัน</span><strong data-stat="thirtyDays">—</strong></div>
     <div><span>${compact ? "หน้าสินค้านี้" : "ทั้งหมด"}</span><strong data-stat="${compact ? "pageViews" : "total"}">—</strong></div>
-  </section>`;
+    </section>
+  </div>`;
 }
 
 async function hydrateVisitorStats(containerId, pageId = "") {
@@ -317,6 +320,8 @@ function renderHome() {
     : '<section class="catalog-selection-empty"><strong>ยังไม่ได้เลือกเกรด</strong><span>เลือกหมวดหลัก → ประเภทสินค้า → เกรด เพื่อแสดงแคตตาล็อก</span></section>';
 
   APP.innerHTML = `
+    ${visitorStatsHTML("homeVisitorStats")}
+
     ${sponsorSectionHTML()}
 
     <section class="hero">
@@ -328,8 +333,6 @@ function renderHome() {
         <input id="productSearch" type="search" value="${esc(searchTerm)}" placeholder="${activeFilter ? 'ค้นหาชื่อสินค้า รุ่น รหัส หรือผู้ผลิต' : 'เลือกเกรดก่อนค้นหาสินค้า'}" ${activeFilter ? '' : 'disabled'} />
       </label>
     </section>
-
-    ${visitorStatsHTML("homeVisitorStats")}
 
     <nav class="catalog-breadcrumb" aria-label="หมวดสินค้า">${breadcrumbParts}</nav>
 
