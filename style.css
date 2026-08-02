@@ -859,3 +859,11 @@ a:focus-visible, button:focus-visible {
 .inline-editor-footer{position:sticky;bottom:10px;z-index:20;justify-content:flex-end;margin-top:28px;padding:12px;border:1px solid var(--ink);background:rgba(248,249,250,.96);box-shadow:0 8px 28px rgba(0,0,0,.12);backdrop-filter:blur(8px)}
 .inline-save-status{margin-right:auto;color:var(--ink-soft);font-size:12px}
 @media(max-width:800px){.inline-editor-head{flex-direction:column}.inline-editor-actions{width:100%}.inline-editor-actions>*{flex:1}.inline-spec-grid{grid-template-columns:1fr}.inline-editor-footer>*{flex:1}.inline-save-status{flex-basis:100%;order:3}}
+
+
+/* Frontend admin-session awareness */
+.catalog-admin-status{display:inline-flex;align-items:center;min-height:38px;padding:7px 10px;background:#101820;color:#fff;font:700 11px var(--font-mono);letter-spacing:.05em}
+.catalog-admin-login-note{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 16px;padding:10px 12px;border:1px dashed var(--line);background:var(--paper-card);color:var(--ink-soft);font:12px var(--font-mono)}
+.catalog-admin-login-note a{padding:7px 10px;border:1px solid var(--ink);background:var(--blue);color:#fff;font-weight:700}
+.admin-frontend-mode .header-admin-link{background:#167a45;border-color:#167a45}
+@media(max-width:680px){.catalog-admin-status{flex:1 1 100%}.catalog-admin-login-note{align-items:flex-start;flex-direction:column}}

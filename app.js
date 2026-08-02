@@ -9,6 +9,7 @@ let activeCategory = "model";
 let activeProductType = "gunpla";
 let searchTerm = "";
 let INLINE_EDIT_MODE = false;
+let ADMIN_SESSION = { checked: false, authenticated: false, source: "none" };
 
 const CATEGORIES = [
   { key: "model", label: "Gundam", description: "รวมสินค้าของสะสม Gundam" },
@@ -33,6 +34,45 @@ const SPONSORS = [
   null,
 ];
 
+
+async function detectAdminSession() {
+  const localFlag = localStorage.getItem("toyskub_admin_ui") === "1";
+  let serverAuthenticated = false;
+
+  try {
+    const response = await fetch("/api/admin/session", {
+      cache: "no-store",
+      credentials: "same-origin",
+      headers: { "accept": "application/json" },
+    });
+    const data = await response.json().catch(() => ({}));
+    serverAuthenticated = Boolean(
+      response.ok && (
+        data.authenticated === true ||
+        data.loggedIn === true ||
+        data.isAdmin === true ||
+        data.role === "admin" ||
+        data.role === "super_admin" ||
+        data.user?.role === "admin" ||
+        data.user?.role === "super_admin"
+      )
+    );
+  } catch (error) {
+    console.warn("ตรวจสอบสถานะแอดมินไม่สำเร็จ", error);
+  }
+
+  // localStorage ใช้เพื่อให้หน้าบ้านจำว่าเคยล็อกอินแล้ว ส่วน API ยังตรวจสิทธิ์ซ้ำทุกครั้งที่ Save/Move/Delete
+  ADMIN_SESSION = {
+    checked: true,
+    authenticated: serverAuthenticated || localFlag,
+    source: serverAuthenticated ? "server" : (localFlag ? "local" : "none"),
+  };
+
+  if (serverAuthenticated) localStorage.setItem("toyskub_admin_ui", "1");
+  document.documentElement.classList.toggle("admin-frontend-mode", ADMIN_SESSION.authenticated);
+  return ADMIN_SESSION.authenticated;
+}
+
 function catalogOrderValue(item) {
   const explicit = Number(item?.sortOrder);
   if (Number.isFinite(explicit) && explicit > 0) return explicit;
@@ -47,6 +87,7 @@ function sortCatalogItems(a, b) {
 }
 
 async function loadProducts() {
+  await detectAdminSession();
   setupHeaderContact();
   try {
     const categoriesRes = await fetch(
@@ -99,7 +140,7 @@ function setupHeaderContact() {
 
   headerNav.classList.add("contact-ready");
   headerNav.innerHTML = `
-    <a class="header-admin-link" href="/admin/" rel="nofollow">ADMIN</a>
+    <a class="header-admin-link" href="/admin/" rel="nofollow">${ADMIN_SESSION.authenticated ? "ADMIN ✓" : "ADMIN"}</a>
     <a
       class="header-line-contact"
       href="https://lin.ee/rU7lTLb6"
@@ -416,12 +457,18 @@ function renderDetail(p) {
   APP.innerHTML = `
     <a href="#/" class="back-link">← กลับหน้ารวมสินค้า</a>
 
-    <div class="catalog-admin-actions" aria-label="เครื่องมือจัดการหน้าแคตตาล็อก">
+    ${ADMIN_SESSION.authenticated ? `
+    <div class="catalog-admin-actions admin-session-confirmed" aria-label="เครื่องมือจัดการหน้าแคตตาล็อก">
+      <span class="catalog-admin-status">ADMIN MODE · ${esc(p.id)}</span>
       <a class="catalog-admin-action" href="/admin/rg-template/">+ เพิ่มหน้าใหม่</a>
       <button class="catalog-admin-action primary" id="catalogInlineEditButton" type="button">แก้ไขหน้านี้</button>
       <button class="catalog-admin-action" id="catalogMoveButton" type="button">ย้าย / จัดลำดับ</button>
       <button class="catalog-admin-action danger" id="catalogTrashButton" type="button">ลบ / ถังขยะ</button>
-    </div>
+    </div>` : `
+    <div class="catalog-admin-login-note">
+      <span>หน้าบ้านยังไม่พบสถานะแอดมิน</span>
+      <a href="/admin/">เข้าสู่ระบบแอดมิน</a>
+    </div>`}
 
     <div class="spec-plate" data-sku="${esc(p.sku)}">
       <div class="detail-grid">
