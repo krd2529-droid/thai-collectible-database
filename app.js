@@ -169,6 +169,65 @@ function trackMetaEvent(method, eventName, parameters = {}) {
   window.fbq(method, eventName, parameters);
 }
 
+function getVisitorId() {
+  let id = localStorage.getItem("toyskub_visitor_id");
+  if (!id) {
+    id = (crypto.randomUUID ? crypto.randomUUID() : `v-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    localStorage.setItem("toyskub_visitor_id", id);
+  }
+  return id;
+}
+
+async function recordPageView(pageId = "home") {
+  const key = `toyskub_viewed_${pageId}`;
+  if (sessionStorage.getItem(key) === "1") return;
+  sessionStorage.setItem(key, "1");
+  try {
+    await fetch("/api/analytics/view", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ pageId, visitorId: getVisitorId() }),
+      keepalive: true,
+    });
+  } catch (error) {
+    console.warn("บันทึกยอดเข้าชมไม่สำเร็จ", error);
+  }
+}
+
+async function loadVisitorStats(pageId = "") {
+  try {
+    const query = pageId ? `?pageId=${encodeURIComponent(pageId)}` : "";
+    const response = await fetch(`/api/analytics/stats${query}`, { cache: "no-store" });
+    if (!response.ok) return null;
+    return response.json();
+  } catch {
+    return null;
+  }
+}
+
+function visitorStatsHTML(id, compact = false) {
+  return `<section class="visitor-stats ${compact ? "compact" : ""}" id="${id}" aria-label="สถิติผู้เข้าชม">
+    <div><span>วันนี้</span><strong data-stat="today">—</strong></div>
+    <div><span>7 วัน</span><strong data-stat="sevenDays">—</strong></div>
+    <div><span>30 วัน</span><strong data-stat="thirtyDays">—</strong></div>
+    <div><span>${compact ? "หน้าสินค้านี้" : "ทั้งหมด"}</span><strong data-stat="${compact ? "pageViews" : "total"}">—</strong></div>
+  </section>`;
+}
+
+async function hydrateVisitorStats(containerId, pageId = "") {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const data = await loadVisitorStats(pageId);
+  if (!data) {
+    container.querySelectorAll("strong").forEach(node => node.textContent = "0");
+    return;
+  }
+  container.querySelectorAll("[data-stat]").forEach(node => {
+    const value = Number(data[node.dataset.stat] || 0);
+    node.textContent = value.toLocaleString("th-TH");
+  });
+}
+
 // ---------------- Router ----------------
 async function router() {
   const hash = window.location.hash || "#/";
@@ -270,6 +329,8 @@ function renderHome() {
       </label>
     </section>
 
+    ${visitorStatsHTML("homeVisitorStats")}
+
     <nav class="catalog-breadcrumb" aria-label="หมวดสินค้า">${breadcrumbParts}</nav>
 
     ${catalogStepHTML(
@@ -321,6 +382,9 @@ function renderHome() {
       renderHome();
     });
   });
+
+  void recordPageView("home");
+  void hydrateVisitorStats("homeVisitorStats");
 }
 
 function catalogGroupName(product, activeLine) {
@@ -498,6 +562,7 @@ function renderDetail(p) {
             <span class="share-icon" aria-hidden="true">↗</span>
             <span class="share-label">แชร์หน้านี้</span>
           </button>
+          ${visitorStatsHTML("productVisitorStats", true)}
           <p class="product-summary">${esc(p.summary)}</p>
 
           <table class="spec-table">
@@ -722,6 +787,8 @@ function renderDetail(p) {
     }
   });
 
+  void recordPageView(p.id || "product");
+  void hydrateVisitorStats("productVisitorStats", p.id || "");
   injectSchema(p);
   window.scrollTo(0, 0);
 }
@@ -750,9 +817,15 @@ function renderInlineEditor(product) {
       <div class="spec-plate inline-editor-main">
         <div class="detail-grid">
           <div class="gallery inline-editor-gallery">
-            <label class="inline-field-label">รูปสินค้า / รูปปก (URL หรือ Path รูปละ 1 บรรทัด)</label>
-            <textarea id="editImages" class="inline-editor-textarea tall">${esc(lineText(product.images))}</textarea>
-            <p class="inline-editor-note">รูปบรรทัดแรกเป็นรูปปก การอัปโหลดไฟล์จริงจะเชื่อมในชุด Media/API ถัดไป</p>
+            <label class="inline-field-label">รูปสินค้า / รูปปก</label>
+            <textarea id="editImages" class="media-value-store" aria-hidden="true">${esc(lineText(product.images))}</textarea>
+            <div class="media-upload-box">
+              <input id="galleryUploadInput" class="media-upload-input" type="file" accept="image/*" multiple />
+              <button id="galleryUploadButton" class="catalog-admin-action primary" type="button">+ อัปโหลดรูปสินค้า</button>
+              <span id="galleryUploadStatus" class="media-upload-status"></span>
+            </div>
+            <p class="inline-editor-note">เลือกรูปได้หลายรูป รูปแรกจะเป็นรูปปก ใช้ปุ่มลูกศรเพื่อเรียง และลบรูปที่ไม่ต้องการได้</p>
+            <div id="galleryPreview" class="media-preview-grid"></div>
           </div>
           <div class="info inline-editor-info">
             <label class="inline-field-label">ชื่อสินค้า</label>
@@ -807,7 +880,17 @@ function renderInlineEditor(product) {
       </section>
 
       ${inlineSectionEditor("05", "คำถามที่พบบ่อย", "editFaq", lineText(product.faq, item => `${item.q || ""} | ${item.a || ""}`), "คำถาม | คำตอบ — หนึ่งข้อต่อหนึ่งบรรทัด")}
-      ${inlineSectionEditor("06", "คู่มือประกอบ", "editManualImages", lineText(product.manualImages), "URL หรือ Path รูปคู่มือ หนึ่งรูปต่อหนึ่งบรรทัด")}
+      <section class="manual-section inline-edit-section">
+        <div class="manual-heading"><span class="manual-number">06</span><span class="manual-title">คู่มือประกอบ</span></div>
+        <textarea id="editManualImages" class="media-value-store" aria-hidden="true">${esc(lineText(product.manualImages))}</textarea>
+        <div class="media-upload-box">
+          <input id="manualUploadInput" class="media-upload-input" type="file" accept="image/*" multiple />
+          <button id="manualUploadButton" class="catalog-admin-action primary" type="button">+ อัปโหลดรูปคู่มือ</button>
+          <span id="manualUploadStatus" class="media-upload-status"></span>
+        </div>
+        <p class="inline-editor-note">เลือกหลายหน้าได้ ใช้ปุ่มลูกศรเพื่อเรียงลำดับหน้า และลบรูปที่ไม่ต้องการได้</p>
+        <div id="manualPreview" class="media-preview-grid manual-media-preview"></div>
+      </section>
 
       <section class="manual-section inline-edit-section">
         <div class="manual-heading"><span class="manual-number">VIDEO</span><span class="manual-title">YouTube Embed</span></div>
@@ -825,7 +908,126 @@ function renderInlineEditor(product) {
   const cancel = () => { INLINE_EDIT_MODE = false; renderDetail(product); };
   ["cancelInlineEditTop", "cancelInlineEdit", "cancelInlineEditBottom"].forEach(id => document.getElementById(id)?.addEventListener("click", event => { event.preventDefault(); cancel(); }));
   ["saveInlineEdit", "saveInlineEditBottom"].forEach(id => document.getElementById(id)?.addEventListener("click", () => saveInlineProduct(product)));
+  bindMediaUploader(product, {
+    kind: "gallery",
+    inputId: "galleryUploadInput",
+    buttonId: "galleryUploadButton",
+    statusId: "galleryUploadStatus",
+    valueId: "editImages",
+    previewId: "galleryPreview",
+  });
+  bindMediaUploader(product, {
+    kind: "manual",
+    inputId: "manualUploadInput",
+    buttonId: "manualUploadButton",
+    statusId: "manualUploadStatus",
+    valueId: "editManualImages",
+    previewId: "manualPreview",
+  });
   window.scrollTo(0, 0);
+}
+
+
+function mediaList(valueId) {
+  const field = document.getElementById(valueId);
+  return String(field?.value || "").split(/\r?\n/).map(value => value.trim()).filter(Boolean);
+}
+
+function setMediaList(valueId, items) {
+  const field = document.getElementById(valueId);
+  if (field) field.value = items.join("\n");
+}
+
+function renderMediaPreview(config) {
+  const container = document.getElementById(config.previewId);
+  if (!container) return;
+  const items = mediaList(config.valueId);
+  if (!items.length) {
+    container.innerHTML = `<p class="media-preview-empty">ยังไม่มีรูป</p>`;
+    return;
+  }
+  container.innerHTML = items.map((url, index) => `
+    <figure class="media-preview-card">
+      <img src="${esc(url)}" alt="${config.kind === "gallery" ? "รูปสินค้า" : "คู่มือ"} ${index + 1}" loading="lazy" />
+      <figcaption>
+        <strong>${config.kind === "gallery" && index === 0 ? "รูปปก" : `ลำดับ ${index + 1}`}</strong>
+        <span class="media-preview-actions">
+          <button type="button" data-media-up="${index}" title="เลื่อนขึ้น" ${index === 0 ? "disabled" : ""}>↑</button>
+          <button type="button" data-media-down="${index}" title="เลื่อนลง" ${index === items.length - 1 ? "disabled" : ""}>↓</button>
+          <button type="button" class="danger" data-media-remove="${index}" title="ลบรูป">ลบ</button>
+        </span>
+      </figcaption>
+    </figure>`).join("");
+
+  container.querySelectorAll("[data-media-up]").forEach(button => button.addEventListener("click", () => {
+    const index = Number(button.dataset.mediaUp);
+    const next = mediaList(config.valueId);
+    [next[index - 1], next[index]] = [next[index], next[index - 1]];
+    setMediaList(config.valueId, next);
+    renderMediaPreview(config);
+  }));
+  container.querySelectorAll("[data-media-down]").forEach(button => button.addEventListener("click", () => {
+    const index = Number(button.dataset.mediaDown);
+    const next = mediaList(config.valueId);
+    [next[index], next[index + 1]] = [next[index + 1], next[index]];
+    setMediaList(config.valueId, next);
+    renderMediaPreview(config);
+  }));
+  container.querySelectorAll("[data-media-remove]").forEach(button => button.addEventListener("click", () => {
+    const index = Number(button.dataset.mediaRemove);
+    const next = mediaList(config.valueId);
+    next.splice(index, 1);
+    setMediaList(config.valueId, next);
+    renderMediaPreview(config);
+  }));
+}
+
+function bindMediaUploader(product, config) {
+  const input = document.getElementById(config.inputId);
+  const button = document.getElementById(config.buttonId);
+  const status = document.getElementById(config.statusId);
+  if (!input || !button) return;
+
+  renderMediaPreview(config);
+  button.addEventListener("click", () => input.click());
+  input.addEventListener("change", async () => {
+    const files = [...(input.files || [])];
+    if (!files.length) return;
+    button.disabled = true;
+    const existing = mediaList(config.valueId);
+    let completed = 0;
+    try {
+      for (const file of files) {
+        if (status) status.textContent = `กำลังอัปโหลด ${completed + 1}/${files.length}…`;
+        const form = new FormData();
+        form.append("file", file);
+        form.append("id", product.id);
+        form.append("kind", config.kind);
+        const response = await fetch("/api/admin/media/upload", {
+          method: "POST",
+          credentials: "same-origin",
+          body: form,
+        });
+        const data = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+          location.href = "/admin/";
+          return;
+        }
+        if (!response.ok || !data.url) throw new Error(data.error || `อัปโหลด ${file.name} ไม่สำเร็จ`);
+        existing.push(data.url);
+        completed += 1;
+        setMediaList(config.valueId, existing);
+        renderMediaPreview(config);
+      }
+      if (status) status.textContent = `อัปโหลดสำเร็จ ${completed} รูป`;
+    } catch (error) {
+      if (status) status.textContent = error.message || "อัปโหลดไม่สำเร็จ";
+      alert(error.message || "อัปโหลดไม่สำเร็จ");
+    } finally {
+      input.value = "";
+      button.disabled = false;
+    }
+  });
 }
 
 function inlineInput(id, label, value, type = "text") {
