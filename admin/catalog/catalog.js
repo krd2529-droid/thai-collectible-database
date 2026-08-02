@@ -1,266 +1,35 @@
 const $ = id => document.getElementById(id);
-let items = [];
-let editing = null;
+let items = [], editing = null;
+const listFields = ['images','highlights','boxContents','pros','considerations','manualImages'];
 
-const fields = [
-  'id','sku','name','rgNumber','seriesGroup','seriesGroupOrder','series','line','scale','manufacturer',
-  'releaseDate','launchPriceJPY','heightCm','recommendedAge','productType','modelCode','material','catalogImage',
-  'images','summary','highlights','whatsDifferent','boxContents','pros','considerations','faq','manualImages',
-  'videoEmbedUrl','sourceName','sourceUrl','references','status','sortOrder'
-];
+function msg(t='',type='success'){const e=$('message');e.textContent=t;e.className=t?`status ${type}`:'status hidden'}
+function esc(v){return String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+async function api(u,o={}){const r=await fetch(u,{cache:'no-store',...o,headers:{...(o.body instanceof FormData?{}:{'content-type':'application/json'}),...(o.headers||{})}});const d=await r.json().catch(()=>({}));if(r.status===401){location.href='/admin/';throw Error('กรุณาเข้าสู่ระบบใหม่')}if(!r.ok)throw Error(d.error||'เกิดข้อผิดพลาด');return d}
+function lines(v){return Array.isArray(v)?v.join('\n'):String(v||'')}
+function parseLines(v){return String(v||'').split('\n').map(x=>x.trim()).filter(Boolean)}
+function parsePairs(v,a,b){return parseLines(v).map(line=>{const i=line.indexOf('|');return i<0?{[a]:line,[b]:''}:{[a]:line.slice(0,i).trim(),[b]:line.slice(i+1).trim()}}).filter(x=>x[a]||x[b])}
+function pairLines(arr,a,b){return Array.isArray(arr)?arr.map(x=>`${x?.[a]||''} | ${x?.[b]||''}`.trim()).join('\n'):''}
+function normalizeYoutube(value){const raw=String(value||'').trim();if(!raw)return'';const srcMatch=raw.match(/src=["']([^"']+)["']/i);const u=srcMatch?srcMatch[1]:raw;let id='';try{const url=new URL(u,location.origin);if(/youtu\.be$/i.test(url.hostname))id=url.pathname.split('/').filter(Boolean)[0]||'';else if(/youtube\.com$/i.test(url.hostname)||/www\.youtube\.com$/i.test(url.hostname)){if(url.pathname.startsWith('/embed/'))id=url.pathname.split('/embed/')[1]?.split(/[?&/]/)[0]||'';else id=url.searchParams.get('v')||url.pathname.split('/shorts/')[1]?.split(/[?&/]/)[0]||''}}catch{}if(!id)throw Error('YouTube Embed URL ต้องเป็นลิงก์ YouTube เท่านั้น');return `https://www.youtube.com/embed/${id}`}
 
-function msg(text = '', type = 'success') {
-  const el = $('message');
-  el.textContent = text;
-  el.className = text ? `status ${type}` : 'status hidden';
-}
+async function load(){const d=await api('/api/admin/catalog');items=d.items||[];render()}
+function render(){const q=$('search').value.toLowerCase();const list=items.filter(x=>`${x.id} ${x.name} ${x.line||x.grade||''} ${x.series||''}`.toLowerCase().includes(q));$('rows').innerHTML=list.length?list.map(x=>`<tr><td>${x.catalogImage?`<img class="thumb" src="${esc(x.catalogImage)}" onerror="this.style.visibility='hidden'">`:'—'}</td><td><b>${esc(x.id)}</b><br>${esc(x.name)}</td><td><b>${esc(x.line||x.grade||'—')}</b>${x.series?`<br><small>${esc(x.series)}</small>`:''}</td><td><span class="status-pill ${esc(x.status)}">${x.status==='published'?'เผยแพร่':x.status==='hidden'?'ซ่อน':'ฉบับร่าง'}</span></td><td><div class="row-actions"><button data-edit="${esc(x.id)}">แก้ไข</button><button data-preview="${esc(x.id)}">ดูหน้าเว็บ</button><button class="danger" data-delete="${esc(x.id)}">ลบ</button></div></td></tr>`).join(''):'<tr><td colspan="5">ยังไม่มีรายการ กด “เพิ่มรายการ” เพื่อสร้างรายการแรก</td></tr>'}
 
-function esc(value) {
-  return String(value ?? '').replace(/[&<>\"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
-}
+function renderMediaPreview(textareaId,previewId){const urls=parseLines($(textareaId).value);$(previewId).innerHTML=urls.map((src,i)=>`<div class="media-thumb"><img src="${esc(src)}" alt="รูป ${i+1}" onerror="this.parentElement.classList.add('broken')"><button type="button" data-remove-media="${textareaId}" data-index="${i}">×</button></div>`).join('')}
+function setMedia(textareaId,urls){$(textareaId).value=[...new Set(urls.filter(Boolean))].join('\n');if(textareaId==='images')$('catalogImage').value=parseLines($(textareaId).value)[0]||'';renderMediaPreview(textareaId,textareaId==='images'?'galleryPreview':'manualPreview')}
+async function uploadFiles(files,kind,textareaId,statusId){const accepted=[...files].filter(f=>f.type.startsWith('image/'));if(!accepted.length)return;const current=parseLines($(textareaId).value);$(statusId).textContent=`กำลังอัปโหลด 0/${accepted.length}`;let done=0;try{for(const file of accepted){const id=$('id').value.trim().toLowerCase();if(!id)throw Error('กรุณากรอกรหัสรายการก่อนอัปโหลดรูป');const form=new FormData();form.append('file',file);form.append('id',id);form.append('kind',kind);const d=await api('/api/admin/media/upload',{method:'POST',body:form});current.push(d.url);done++;$(statusId).textContent=`กำลังอัปโหลด ${done}/${accepted.length}`}setMedia(textareaId,current);$(statusId).textContent=`อัปโหลดสำเร็จ ${done} รูป`}catch(e){$(statusId).textContent=e.message;throw e}}
 
-function code(value) {
-  return String(value || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-}
+function openEditor(p=null){editing=p?.id||null;$('form').reset();$('manufacturer').value='Bandai Spirits';$('productType').value='โมเดลพลาสติกประกอบ (Gunpla Real Grade)';$('gradeScale').value='RG · 1/144';$('status').value='draft';$('sortOrder').value='0';if(p){$('id').value=p.id||'';$('sku').value=p.sku||'';$('name').value=p.name||'';$('summary').value=p.summary||'';$('rgNumber').value=p.rgNumber??'';$('modelCode').value=p.modelCode||'';$('manufacturer').value=p.manufacturer||'';$('series').value=p.series||'';$('gradeScale').value=`${p.grade||p.line||'RG'} · ${p.scale||'1/144'}`;$('releaseDate').value=p.releaseDate||'';$('launchPriceJPY').value=p.launchPriceJPY??'';$('heightCm').value=p.heightCm??'';$('recommendedAge').value=p.recommendedAge||'';$('productType').value=p.productType||'';$('material').value=p.material||'';$('catalogImage').value=p.catalogImage||p.images?.[0]||'';$('images').value=lines(p.images);$('bandaiUrl').value=(p.references||[]).find(x=>/bandai/i.test(x.label||''))?.url||'';$('dalongUrl').value=(p.references||[]).find(x=>/dalong/i.test(x.label||''))?.url||'';$('shopee').value=p.affiliateLinks?.shopee||'';$('lazada').value=p.affiliateLinks?.lazada||'';$('tiktok').value=p.affiliateLinks?.tiktok||'';$('pageLink').value=p.affiliateLinks?.page||'';$('highlights').value=lines(p.highlights);$('whatsDifferent').value=pairLines(p.whatsDifferent,'title','detail');$('boxContents').value=lines(p.boxContents);$('pros').value=lines(p.pros);$('considerations').value=lines(p.considerations);$('faq').value=pairLines(p.faq,'q','a');$('manualImages').value=lines(p.manualImages);$('videoEmbedUrl').value=p.videoEmbedUrl||'';$('status').value=p.status||'draft';$('sortOrder').value=p.sortOrder??p.rgNumber??0}
+  $('id').disabled=Boolean(editing);$('editorTitle').textContent=editing?'แก้ไขรายการ':'เพิ่มรายการแคตตาล็อก';renderMediaPreview('images','galleryPreview');renderMediaPreview('manualImages','manualPreview');$('editor').classList.remove('hidden');$('editor').scrollIntoView({behavior:'smooth'})}
 
-async function api(url, options = {}) {
-  const response = await fetch(url, {
-    cache: 'no-store',
-    ...options,
-    headers: {'content-type':'application/json', ...(options.headers || {})}
-  });
-  const data = await response.json().catch(() => ({}));
-  if (response.status === 401) {
-    location.href = '/admin/';
-    throw new Error('กรุณาเข้าสู่ระบบใหม่');
-  }
-  if (!response.ok) throw new Error(data.error || 'เกิดข้อผิดพลาด');
-  return data;
-}
+function payload(){const gradeScale=$('gradeScale').value.split('·').map(x=>x.trim());const refs=[];if($('bandaiUrl').value.trim())refs.push({label:'Bandai Hobby Site',url:$('bandaiUrl').value.trim()});if($('dalongUrl').value.trim())refs.push({label:'Dalong.net',url:$('dalongUrl').value.trim()});const p={id:$('id').value.trim().toLowerCase(),sku:$('sku').value.trim()||$('id').value.trim().toUpperCase(),name:$('name').value.trim(),summary:$('summary').value.trim(),rgNumber:$('rgNumber').value?Number($('rgNumber').value):null,modelCode:$('modelCode').value.trim(),manufacturer:$('manufacturer').value.trim(),series:$('series').value.trim(),grade:gradeScale[0]||'RG',line:gradeScale[0]||'RG',scale:gradeScale[1]||'1/144',releaseDate:$('releaseDate').value,launchPriceJPY:$('launchPriceJPY').value?Number($('launchPriceJPY').value):null,heightCm:$('heightCm').value?Number($('heightCm').value):null,recommendedAge:$('recommendedAge').value.trim(),productType:$('productType').value.trim(),material:$('material').value.trim(),catalogImage:$('catalogImage').value.trim()||parseLines($('images').value)[0]||'',images:parseLines($('images').value),references:refs,sourceName:refs[0]?.label||'',sourceUrl:refs[0]?.url||'',affiliateLinks:{shopee:$('shopee').value.trim(),lazada:$('lazada').value.trim(),tiktok:$('tiktok').value.trim(),page:$('pageLink').value.trim()},highlights:parseLines($('highlights').value),whatsDifferent:parsePairs($('whatsDifferent').value,'title','detail'),boxContents:parseLines($('boxContents').value),pros:parseLines($('pros').value),considerations:parseLines($('considerations').value),faq:parsePairs($('faq').value,'q','a'),manualImages:parseLines($('manualImages').value),videoEmbedUrl:normalizeYoutube($('videoEmbedUrl').value),status:$('status').value,catalogStatus:$('status').value==='published'?'published':'draft',sortOrder:Number($('sortOrder').value)||Number($('rgNumber').value)||0,category:'model',categoryLabel:'Gundam',categoryCode:'gd',productTypeCode:'gp',lineCode:'rg',seriesGroup:'Gundam',seriesGroupOrder:0,mergeMode:'preserve-existing'};return p}
 
-async function load() {
-  const data = await api('/api/admin/catalog');
-  items = data.items || [];
-  render();
-}
-
-function render() {
-  const query = $('search').value.toLowerCase();
-  const list = items.filter(item => `${item.id} ${item.name} ${item.line || item.grade || ''} ${item.series || ''}`.toLowerCase().includes(query));
-  $('rows').innerHTML = list.length ? list.map(item => `
-    <tr>
-      <td>${item.catalogImage ? `<img class="thumb" src="/${esc(item.catalogImage).replace(/^\//,'')}" onerror="this.style.visibility='hidden'">` : '—'}</td>
-      <td><b>${esc(item.id)}</b><br>${esc(item.name)}</td>
-      <td><b>${esc(item.line || item.grade || '—')}</b>${item.series ? `<br><small>${esc(item.series)}</small>` : ''}</td>
-      <td><span class="status-pill ${esc(item.status)}">${item.status === 'published' ? 'เผยแพร่' : item.status === 'hidden' ? 'ซ่อน' : 'ฉบับร่าง'}</span></td>
-      <td><div class="row-actions">
-        <button data-edit="${esc(item.id)}">แก้ไข</button>
-        <button data-preview="${esc(item.id)}">ดูหน้าเว็บ</button>
-        <button data-copy="${esc(item.id)}">คัดลอก</button>
-        <button class="danger" data-delete="${esc(item.id)}">ลบ</button>
-      </div></td>
-    </tr>`).join('') : '<tr><td colspan="5">ยังไม่มีรายการจาก D1 กด “เพิ่มรายการ” เพื่อสร้างรายการแรก</td></tr>';
-}
-
-function listToText(value) {
-  return Array.isArray(value) ? value.join('\n') : '';
-}
-
-function pairsToText(value, leftKey, rightKey) {
-  return Array.isArray(value) ? value.map(item => `${item?.[leftKey] || ''} | ${item?.[rightKey] || ''}`.trim()).filter(line => line !== '|').join('\n') : '';
-}
-
-function textToList(value) {
-  return String(value || '').split('\n').map(line => line.trim()).filter(Boolean);
-}
-
-function textToPairs(value, leftKey, rightKey) {
-  return textToList(value).map(line => {
-    const pipeIndex = line.indexOf('|');
-    if (pipeIndex < 0) return {[leftKey]: line.trim(), [rightKey]: ''};
-    return {
-      [leftKey]: line.slice(0, pipeIndex).trim(),
-      [rightKey]: line.slice(pipeIndex + 1).trim()
-    };
-  }).filter(item => item[leftKey] || item[rightKey]);
-}
-
-function normalizeYouTube(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return '';
-  const iframeMatch = raw.match(/src=["']([^"']+)["']/i);
-  const candidate = iframeMatch ? iframeMatch[1] : raw;
-  try {
-    const url = new URL(candidate, location.origin);
-    let videoId = '';
-    if (url.hostname.includes('youtu.be')) videoId = url.pathname.split('/').filter(Boolean)[0] || '';
-    else if (url.hostname.includes('youtube.com')) {
-      if (url.pathname.startsWith('/embed/')) videoId = url.pathname.split('/embed/')[1]?.split('/')[0] || '';
-      else if (url.pathname.startsWith('/shorts/')) videoId = url.pathname.split('/shorts/')[1]?.split('/')[0] || '';
-      else videoId = url.searchParams.get('v') || '';
-    }
-    if (!videoId) throw new Error('invalid');
-    return `https://www.youtube.com/embed/${videoId}`;
-  } catch {
-    throw new Error('YouTube Embed URL ต้องเป็นลิงก์ YouTube หรือโค้ด iframe ของ YouTube เท่านั้น');
-  }
-}
-
-function updateLineCode() {
-  const line = $('line').value;
-  const map = {RG:'rg',MG:'mg',HG:'hg',PG:'pg',EG:'eg',SD:'sd',FM:'fm',MGEX:'mgex'};
-  $('lineCode').value = map[line] || code(line);
-  if (!$('seriesGroup').value) $('seriesGroup').value = line === 'RG' ? 'Gundam' : line === 'HG' ? 'HGUC' : '';
-}
-
-function openEditor(item = null, copy = false) {
-  editing = copy ? null : item?.id || null;
-  $('form').reset();
-  $('categoryLabel').value = 'Gundam';
-  $('categoryCode').value = 'gd';
-  $('productType').value = 'Gunpla';
-  $('productTypeCode').value = 'gp';
-  $('line').value = 'RG';
-  $('lineCode').value = 'rg';
-  $('scale').value = '1/144';
-  $('manufacturer').value = 'Bandai Spirits';
-  $('status').value = 'draft';
-  $('sortOrder').value = '0';
-
-  if (item) {
-    const normalized = {...item, line: item.line || item.grade || 'RG'};
-    for (const key of fields) {
-      if (!$(key)) continue;
-      if (['images','highlights','boxContents','pros','considerations','manualImages'].includes(key)) $(key).value = listToText(normalized[key]);
-      else if (key === 'whatsDifferent') $(key).value = pairsToText(normalized.whatsDifferent, 'title', 'detail');
-      else if (key === 'faq') $(key).value = pairsToText(normalized.faq, 'q', 'a');
-      else if (key === 'references') $(key).value = pairsToText(normalized.references, 'label', 'url');
-      else $(key).value = normalized[key] ?? '';
-    }
-    $('shopee').value = item.affiliateLinks?.shopee || '';
-    $('lazada').value = item.affiliateLinks?.lazada || '';
-    $('tiktok').value = item.affiliateLinks?.tiktok || '';
-    $('page').value = item.affiliateLinks?.page || '';
-    if (copy) {
-      $('id').value = '';
-      $('sku').value = '';
-      $('name').value = `${item.name || ''} (คัดลอก)`;
-    }
-  }
-
-  $('id').disabled = Boolean(editing);
-  $('editorTitle').textContent = editing ? 'แก้ไขรายการ' : copy ? 'คัดลอกรายการ' : 'เพิ่มรายการแคตตาล็อก';
-  updateLineCode();
-  $('editor').classList.remove('hidden');
-  $('editor').scrollIntoView({behavior:'smooth'});
-}
-
-function payload() {
-  const id = $('id').value.trim();
-  if (!id) throw new Error('กรุณากรอกรหัสรายการ');
-
-  const data = {
-    id,
-    sku: $('sku').value,
-    name: $('name').value,
-    rgNumber: $('rgNumber').value ? Number($('rgNumber').value) : null,
-    category: 'model',
-    categoryLabel: $('categoryLabel').value,
-    categoryCode: code($('categoryCode').value),
-    productType: $('productType').value,
-    productTypeCode: code($('productTypeCode').value),
-    line: $('line').value,
-    grade: $('line').value,
-    lineCode: code($('lineCode').value),
-    seriesGroup: $('seriesGroup').value,
-    seriesGroupOrder: Number($('seriesGroupOrder').value) || 0,
-    series: $('series').value,
-    scale: $('scale').value,
-    manufacturer: $('manufacturer').value,
-    releaseDate: $('releaseDate').value,
-    launchPriceJPY: $('launchPriceJPY').value ? Number($('launchPriceJPY').value) : null,
-    heightCm: $('heightCm').value ? Number($('heightCm').value) : null,
-    recommendedAge: $('recommendedAge').value,
-    modelCode: $('modelCode').value,
-    material: $('material').value,
-    catalogImage: $('catalogImage').value,
-    images: textToList($('images').value),
-    videoEmbedUrl: normalizeYouTube($('videoEmbedUrl').value),
-    summary: $('summary').value,
-    highlights: textToList($('highlights').value),
-    whatsDifferent: textToPairs($('whatsDifferent').value, 'title', 'detail'),
-    boxContents: textToList($('boxContents').value),
-    pros: textToList($('pros').value),
-    considerations: textToList($('considerations').value),
-    faq: textToPairs($('faq').value, 'q', 'a'),
-    manualImages: textToList($('manualImages').value),
-    sourceName: $('sourceName').value,
-    sourceUrl: $('sourceUrl').value,
-    references: textToPairs($('references').value, 'label', 'url'),
-    affiliateLinks: {
-      shopee: $('shopee').value.trim(),
-      lazada: $('lazada').value.trim(),
-      tiktok: $('tiktok').value.trim(),
-      page: $('page').value.trim()
-    },
-    status: $('status').value,
-    catalogStatus: $('status').value === 'published' ? 'published' : 'draft',
-    sortOrder: Number($('sortOrder').value) || 0
-  };
-
-  if (!data.catalogImage && data.images.length) data.catalogImage = data.images[0];
-  return data;
-}
-
-$('line').onchange = updateLineCode;
-$('newBtn').onclick = () => openEditor();
-$('closeBtn').onclick = () => $('editor').classList.add('hidden');
-$('search').oninput = render;
-
-$('rows').onclick = async event => {
-  const id = event.target.dataset.edit || event.target.dataset.copy || event.target.dataset.preview || event.target.dataset.delete;
-  if (!id) return;
-  if (event.target.dataset.preview) {
-    window.open(`/#/product/${id}`, '_blank');
-    return;
-  }
-  if (event.target.dataset.delete) {
-    if (confirm(`ลบ ${id} หรือไม่?`)) {
-      await api(`/api/admin/catalog/${encodeURIComponent(id)}`, {method:'DELETE'});
-      await load();
-    }
-    return;
-  }
-  const data = await api(`/api/admin/catalog/${encodeURIComponent(id)}`);
-  openEditor(data.item, Boolean(event.target.dataset.copy));
-};
-
-$('form').onsubmit = async event => {
-  event.preventDefault();
-  msg('กำลังบันทึก…', 'loading');
-  try {
-    const data = payload();
-    await api(editing ? `/api/admin/catalog/${encodeURIComponent(editing)}` : '/api/admin/catalog', {
-      method: editing ? 'PUT' : 'POST',
-      body: JSON.stringify(data)
-    });
-    msg('บันทึกเรียบร้อย');
-    $('editor').classList.add('hidden');
-    await load();
-  } catch (error) {
-    msg(error.message, 'error');
-  }
-};
-
-$('previewBtn').onclick = () => {
-  try {
-    const data = payload();
-    localStorage.setItem('toyskub_catalog_preview', JSON.stringify(data));
-    window.open('/#/product-preview', '_blank');
-  } catch (error) {
-    msg(error.message, 'error');
-  }
-};
-
-updateLineCode();
-load().catch(error => msg(error.message, 'error'));
+$('newBtn').onclick=()=>openEditor();$('closeBtn').onclick=()=>$('editor').classList.add('hidden');$('search').oninput=render;
+$('rows').onclick=async e=>{const id=e.target.dataset.edit||e.target.dataset.preview||e.target.dataset.delete;if(!id)return;if(e.target.dataset.preview){window.open(`/#/product/${id}`,'_blank');return}if(e.target.dataset.delete){if(confirm(`ลบ ${id} หรือไม่?`)){await api(`/api/admin/catalog/${id}`,{method:'DELETE'});await load()}return}const d=await api(`/api/admin/catalog/${id}`);openEditor(d.item)};
+$('uploadGalleryButton').onclick=()=>$('galleryInput').click();$('uploadManualButton').onclick=()=>$('manualInput').click();
+$('galleryInput').onchange=e=>uploadFiles(e.target.files,'gallery','images','galleryStatus').catch(err=>msg(err.message,'error'));
+$('manualInput').onchange=e=>uploadFiles(e.target.files,'manual','manualImages','manualStatus').catch(err=>msg(err.message,'error'));
+$('images').oninput=()=>renderMediaPreview('images','galleryPreview');$('manualImages').oninput=()=>renderMediaPreview('manualImages','manualPreview');
+document.addEventListener('click',e=>{const b=e.target.closest('[data-remove-media]');if(!b)return;const id=b.dataset.removeMedia;const arr=parseLines($(id).value);arr.splice(Number(b.dataset.index),1);setMedia(id,arr)});
+$('form').onsubmit=async e=>{e.preventDefault();msg('กำลังบันทึก…','loading');try{const p=payload();if(!p.id)throw Error('กรุณากรอกรหัสรายการ');await api(editing?`/api/admin/catalog/${editing}`:'/api/admin/catalog',{method:editing?'PUT':'POST',body:JSON.stringify(p)});msg('บันทึกเรียบร้อย');$('editor').classList.add('hidden');await load()}catch(err){msg(err.message,'error')}};
+$('previewBtn').onclick=()=>{try{const p=payload();localStorage.setItem('toyskub_catalog_preview',JSON.stringify(p));window.open('/#/product-preview','_blank')}catch(err){msg(err.message,'error')}};
+load().catch(e=>msg(e.message,'error'));
