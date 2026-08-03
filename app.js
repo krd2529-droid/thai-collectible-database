@@ -164,6 +164,12 @@ function esc(str) {
   return div.innerHTML;
 }
 
+function imageSizeAttrs(dimensions) {
+  const width = Number(dimensions?.width);
+  const height = Number(dimensions?.height);
+  return width > 0 && height > 0 ? ` width="${width}" height="${height}"` : "";
+}
+
 function trackMetaEvent(method, eventName, parameters = {}) {
   if (typeof window.fbq !== "function") return;
   window.fbq(method, eventName, parameters);
@@ -233,11 +239,14 @@ async function hydrateVisitorStats(containerId, pageId = "") {
 
 // ---------------- Router ----------------
 async function router() {
-  const hash = window.location.hash || "#/";
-  if (hash === "#/product-preview") {
+  const legacyMatch = window.location.hash.match(/^#\/product\/(.+)$/);
+  if (legacyMatch) {
+    history.replaceState(null, "", `/product/${encodeURIComponent(decodeURIComponent(legacyMatch[1]))}`);
+  }
+  if (window.location.hash === "#/product-preview") {
     try { const preview = JSON.parse(localStorage.getItem("toyskub_catalog_preview") || "null"); if (preview) return renderDetail(preview); } catch {}
   }
-  const match = hash.match(/^#\/product\/(.+)$/);
+  const match = window.location.pathname.match(/^\/product\/([^/]+)\/?$/);
   if (match) {
     const summary = PRODUCTS.find((product) => product.id === match[1]);
     if (summary) {
@@ -266,13 +275,14 @@ async function router() {
   }
   renderHome();
 }
-window.addEventListener("hashchange", () => {
+window.addEventListener("popstate", () => {
   void router();
 });
 
 // ---------------- Home / Grid ----------------
 function renderHome() {
   removeSchema();
+  updatePageMetadata();
   document.querySelector('.frontend-admin-toolbar')?.remove();
   document.querySelector('.frontend-admin-modal')?.remove();
 
@@ -491,9 +501,9 @@ function sponsorCardHTML(shop, index) {
 }
 
 function cardHTML(p) {
-  const img = p.images && p.images[0];
+  const img = p.catalogImage || (p.imageThumbnails && p.imageThumbnails[0]) || (p.images && p.images[0]);
   return `
-    <a class="product-card" href="#/product/${esc(p.id)}">
+    <a class="product-card" href="/product/${encodeURIComponent(p.id)}">
       <span class="card-tag">${esc(p.grade)} · ${esc(p.scale)}</span>
       <span class="card-stock ${p.inStock === true ? "in" : "out"}">${p.inStock === true ? "มีสินค้า" : "ข้อมูลแคตตาล็อก"}</span>
       <div class="card-image">
@@ -517,10 +527,11 @@ function cardHTML(p) {
 // ---------------- Detail Page ----------------
 function renderDetail(p) {
   if (INLINE_EDIT_MODE) return renderInlineEditor(p);
+  updatePageMetadata(p);
   const img0 = (p.images && p.images[0]) || "";
 
   APP.innerHTML = `
-    <a href="#/" class="back-link">← กลับหน้ารวมสินค้า</a>
+    <a href="/" class="back-link">← กลับหน้ารวมสินค้า</a>
 
     ${ADMIN_SESSION.authenticated ? `
     <div class="catalog-admin-actions admin-session-confirmed" aria-label="เครื่องมือจัดการหน้าแคตตาล็อก">
@@ -539,13 +550,13 @@ function renderDetail(p) {
       <div class="detail-grid">
         <div class="gallery">
           <div class="gallery-main">
-            ${img0 ? `<img id="mainProductImg" src="${esc(img0)}" alt="${esc(p.name)}" />` : `<span class="placeholder" style="font-family:var(--font-mono);color:var(--ink-soft)">ยังไม่มีรูปภาพ — เพิ่มได้ที่ data/products.json</span>`}
+            ${img0 ? `<img id="mainProductImg" src="${esc(img0)}" alt="${esc(p.name)}"${imageSizeAttrs(p.imageDimensions?.[0])} />` : `<span class="placeholder" style="font-family:var(--font-mono);color:var(--ink-soft)">ยังไม่มีรูปภาพ — เพิ่มได้ที่ data/products.json</span>`}
           </div>
           <div class="gallery-thumbs">
             ${(p.images || [])
               .map(
                 (src, i) =>
-                  `<img src="${esc(src)}" data-src="${esc(src)}" data-target="mainProductImg" class="${i === 0 ? "active" : ""}" alt="รูปสินค้า ${i + 1}" />`
+                  `<img src="${esc(p.imageThumbnails?.[i] || src)}" data-src="${esc(src)}" data-target="mainProductImg" class="${i === 0 ? "active" : ""}" alt="รูปสินค้า ${i + 1}" loading="lazy"${imageSizeAttrs(p.imageDimensions?.[i])} />`
               )
               .join("")}
           </div>
@@ -675,13 +686,13 @@ function renderDetail(p) {
             `<div class="manual-album">
               <p class="manual-note">คู่มือประกอบ ${p.manualImages.length} หน้า — เลือกรูปย่อเพื่อเปิดอ่านทีละหน้า</p>
               <div class="manual-gallery-main">
-                <img id="mainManualImg" src="${esc(p.manualImages[0])}" alt="คู่มือประกอบ ${esc(p.name)} หน้า 1" />
+                <img id="mainManualImg" src="${esc(p.manualImages[0])}" alt="คู่มือประกอบ ${esc(p.name)} หน้า 1"${imageSizeAttrs(p.manualImageDimensions?.[0])} />
               </div>
               <div class="gallery-thumbs manual-thumbs">
                 ${p.manualImages
                   .map(
                     (src, i) =>
-                      `<img src="${esc(src)}" data-src="${esc(src)}" data-target="mainManualImg" class="${i === 0 ? "active" : ""}" alt="คู่มือประกอบ หน้า ${i + 1}" loading="lazy" />`
+                      `<img src="${esc(p.manualThumbnails?.[i] || src)}" data-src="${esc(src)}" data-target="mainManualImg" class="${i === 0 ? "active" : ""}" alt="คู่มือประกอบ หน้า ${i + 1}" loading="lazy"${imageSizeAttrs(p.manualImageDimensions?.[i])} />`
                   )
                   .join("")}
               </div>
@@ -782,7 +793,7 @@ function renderDetail(p) {
       if (!result.ok) throw new Error(data.error || "ย้ายไปถังขยะไม่สำเร็จ");
       PRODUCT_CACHE.delete(p.id);
       PRODUCTS = PRODUCTS.filter((item) => item.id !== p.id);
-      location.hash = "#/";
+      location.href = "/";
     } catch (error) {
       alert(error.message || "ย้ายไปถังขยะไม่สำเร็จ");
       button.disabled = false;
@@ -802,7 +813,7 @@ function renderInlineEditor(product) {
   const refByLabel = label => (product.references || []).find(ref => String(ref.label || "").toLowerCase().includes(label))?.url || "";
 
   APP.innerHTML = `
-    <a href="#/product/${esc(product.id)}" class="back-link" id="cancelInlineEditTop">← ยกเลิกการแก้ไข</a>
+    <a href="/product/${encodeURIComponent(product.id)}" class="back-link" id="cancelInlineEditTop">← ยกเลิกการแก้ไข</a>
 
     <section class="inline-editor-shell">
       <div class="inline-editor-head">
@@ -1178,8 +1189,7 @@ async function setupFrontendAdminToolbar(product) {
         if (!result.ok) throw new Error(data.error || 'ย้ายไปถังขยะไม่สำเร็จ');
         PRODUCT_CACHE.delete(product.id);
         PRODUCTS = PRODUCTS.filter(item => item.id !== product.id);
-        location.hash = '#/';
-        renderHome();
+        location.href = '/';
       } catch (error) {
         alert(error.message || 'ย้ายไปถังขยะไม่สำเร็จ');
         button.disabled = false;
@@ -1266,7 +1276,7 @@ function openFrontendMoveDialog(product) {
       PRODUCTS = PRODUCTS.map(item => item.id === product.id ? {...item,...patch} : item).sort(sortCatalogItems);
       close();
       alert('ย้ายและบันทึกลำดับเรียบร้อย');
-      if(location.hash.startsWith('#/product/')) renderDetail(product); else renderHome();
+      if(window.location.pathname.startsWith('/product/')) renderDetail(product); else renderHome();
     } catch (error) {
       alert(error.message || 'บันทึกการย้ายไม่สำเร็จ');
       button.disabled = false;
@@ -1384,6 +1394,27 @@ function injectSchema(p) {
     scriptFaq.textContent = JSON.stringify(faqSchema);
     document.head.appendChild(scriptFaq);
   }
+}
+
+function updatePageMetadata(product = null) {
+  const description = product?.summary || "TOYSKUB ฐานข้อมูลและแคตตาล็อกของสะสม สำหรับนักสะสมชาวไทย พร้อมข้อมูลรุ่นและแหล่งอ้างอิง";
+  const url = product ? `https://toyskub.com/product/${encodeURIComponent(product.id)}` : "https://toyskub.com/";
+  document.title = product ? `${product.name} | TOYSKUB` : "Toyskub — Toys Data Base";
+  let meta = document.querySelector('meta[name="description"]');
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.name = "description";
+    document.head.appendChild(meta);
+  }
+  meta.content = description;
+  let canonical = document.getElementById("canonicalUrl");
+  if (!canonical) {
+    canonical = document.createElement("link");
+    canonical.id = "canonicalUrl";
+    canonical.rel = "canonical";
+    document.head.appendChild(canonical);
+  }
+  canonical.href = url;
 }
 
 function buildOffers(p) {

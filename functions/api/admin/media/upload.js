@@ -21,6 +21,7 @@ export async function onRequestPost(context) {
 
   const form = await context.request.formData();
   const file = form.get('file');
+  const thumbnail = form.get('thumbnail');
   const id = clean(form.get('id'));
   const kind = clean(form.get('kind') || 'gallery');
 
@@ -34,21 +35,36 @@ export async function onRequestPost(context) {
   if (file.size > 8 * 1024 * 1024) {
     return json({ ok: false, error: 'ไฟล์ใหญ่เกิน 8 MB' }, 400);
   }
+  if (thumbnail && (!String(thumbnail.type || '').startsWith('image/') || thumbnail.size > 3 * 1024 * 1024)) {
+    return json({ ok: false, error: 'ไฟล์รูปย่อไม่ถูกต้องหรือใหญ่เกิน 3 MB' }, 400);
+  }
 
   const name = clean(file.name) || `${Date.now()}.webp`;
-  const key = `catalog/${id}/${kind}/${Date.now()}-${name}`;
+  const stamp = Date.now();
+  const key = `catalog/${id}/${kind}/${stamp}-${name}`;
+  const thumbnailName = clean(thumbnail?.name) || name.replace(/\.webp$/i, '-thumb.webp');
+  const thumbnailKey = thumbnail ? `catalog/${id}/${kind}/${stamp}-${thumbnailName}` : '';
 
-  await context.env.TOYSKUB_MEDIA.put(key, await file.arrayBuffer(), {
-    httpMetadata: {
-      contentType: file.type || 'image/webp',
-      cacheControl: 'public, max-age=31536000, immutable',
+  const save = async (storageKey, mediaFile, variant) => context.env.TOYSKUB_MEDIA.put(
+    storageKey,
+    await mediaFile.arrayBuffer(),
+    {
+      httpMetadata: {
+        contentType: mediaFile.type || 'image/webp',
+        cacheControl: 'public, max-age=31536000, immutable',
+      },
+      customMetadata: { catalogId: id, kind, variant },
     },
-    customMetadata: { catalogId: id, kind },
-  });
+  );
+  await Promise.all([
+    save(key, file, 'display'),
+    ...(thumbnail ? [save(thumbnailKey, thumbnail, 'thumbnail')] : []),
+  ]);
 
   return json({
     ok: true,
     url: `/media/${key}`,
+    thumbnailUrl: thumbnailKey ? `/media/${thumbnailKey}` : `/media/${key}`,
     name,
     fileName: key.split('/').pop(),
   });

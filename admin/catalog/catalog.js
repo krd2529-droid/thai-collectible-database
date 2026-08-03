@@ -75,7 +75,7 @@ function render() {
           <td><span class="status-pill ${esc(status)}">${statusLabel}</span></td>
           <td><div class="row-actions">
             <a class="table-action primary" href="/admin/rg-template/?id=${encodeURIComponent(item.id)}">แก้ไขข้อมูลครบ</a>
-            <a class="table-action" href="/#/product/${encodeURIComponent(item.id)}" target="_blank" rel="noopener">ดูหน้าเว็บ</a>
+            <a class="table-action" href="/product/${encodeURIComponent(item.id)}" target="_blank" rel="noopener">ดูหน้าเว็บ</a>
             <button class="danger" data-delete="${id}" type="button">ย้ายไปถังขยะ</button>
           </div></td>
         </tr>`;
