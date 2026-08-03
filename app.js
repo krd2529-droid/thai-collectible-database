@@ -546,6 +546,10 @@ function renderDetail(p) {
       <a href="/admin/">เข้าสู่ระบบแอดมิน</a>
     </div>`}
 
+    <div class="product-visitor-strip">
+      ${visitorStatsHTML("productVisitorStats", true)}
+    </div>
+
     <div class="spec-plate" data-sku="${esc(p.sku)}">
       <div class="detail-grid">
         <div class="gallery">
@@ -576,7 +580,6 @@ function renderDetail(p) {
             <span class="share-icon" aria-hidden="true">↗</span>
             <span class="share-label">แชร์หน้านี้</span>
           </button>
-          ${visitorStatsHTML("productVisitorStats", true)}
           <p class="product-summary">${esc(p.summary)}</p>
 
           <table class="spec-table">

@@ -930,4 +930,10 @@ a:focus-visible, button:focus-visible {
 .visitor-stats-block.compact .visitor-stats{margin:0}
 .visitor-stats.compact>div{padding:8px 9px}
 .visitor-stats.compact strong{font-size:15px}
+.product-visitor-strip{margin:14px 0}
+.product-visitor-strip .visitor-stats-block.compact{margin:0;padding:14px 16px;border:1px solid var(--line);background:var(--paper-card)}
+.product-visitor-strip .visitor-stats-block.compact .visitor-stats-title{margin:0 0 10px;font-size:18px}
+.product-visitor-strip .visitor-stats.compact{margin:0;gap:10px}
+.product-visitor-strip .visitor-stats.compact>div{padding:10px 12px;background:#fff}
+.product-visitor-strip .visitor-stats.compact strong{font-size:18px}
 @media(max-width:620px){.visitor-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.media-preview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
