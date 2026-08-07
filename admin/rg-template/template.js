@@ -29,6 +29,33 @@ async function uploadMediaFile(file,target){const id=val('itemId').toLowerCase()
 async function addFiles(files,target){const accepted=[...files].filter(x=>x.type.startsWith('image/'));if(!accepted.length)return;try{$('saveState').textContent=`กำลังอัปโหลด 0/${accepted.length}…`;$('saveState').style.color='var(--blue)';let done=0;for(const f of accepted){const uploaded=await uploadMediaFile(f,target);(target==='manual'?manual:gallery).push(uploaded);done++;$('saveState').textContent=`กำลังอัปโหลด ${done}/${accepted.length}…`;renderImages(target)}setDirty('อัปโหลดรูปสำเร็จ · กด Save Draft เพื่อผูกกับรายการ');showMessage('อัปโหลดรูปสำเร็จ',`อัปโหลดแล้ว ${done} รูป`)}catch(e){showMessage('อัปโหลดรูปไม่สำเร็จ',e.message);$('saveState').textContent='อัปโหลดรูปไม่สำเร็จ';$('saveState').style.color='var(--red)'}}
 function renderImages(target){const arr=target==='manual'?manual:gallery,thumbs=$(target==='manual'?'manualThumbs':'galleryThumbs'),main=$(target==='manual'?'mainManualImg':'mainProductImg'),placeholder=$(target==='manual'?'manualPlaceholder':'coverPlaceholder');if(arr.length){main.src=arr[0].src;main.hidden=false;placeholder.hidden=true}else{main.hidden=true;placeholder.hidden=false}thumbs.innerHTML=arr.map((x,i)=>`<span class="thumb-wrap" draggable="true" data-target="${target}" data-i="${i}"><img src="${x.thumbSrc||x.src}" data-index="${i}" loading="lazy" class="${i===0&&target==='gallery'?'cover-thumb':''}" alt="${esc(x.name)}">${i===0&&target==='gallery'?'<span class="cover-chip">COVER</span>':''}<button class="thumb-delete" data-image-remove="${target}" data-i="${i}">×</button></span>`).join('');thumbs.querySelectorAll('img').forEach(img=>img.onclick=()=>{main.src=arr[Number(img.dataset.index)].src;thumbs.querySelectorAll('img').forEach(x=>x.classList.remove('active'));img.classList.add('active')})}
 $('uploadGalleryButton').onclick=()=>$('galleryInput').click();$('uploadManualButton').onclick=()=>$('manualInput').click();$('galleryInput').onchange=e=>addFiles(e.target.files,'gallery');$('manualInput').onchange=e=>addFiles(e.target.files,'manual');
+async function importManualFromDalong(){
+ const id=val('itemId').toLowerCase();
+ if(!id){showMessage('ยังไม่มีรหัสรายการ','กรุณากรอกรหัสรายการก่อนดึงรูปคู่มือ');$('itemId')?.focus();return}
+ const pageUrl=prompt('วางลิงก์หน้าข้อมูลของ Dalong\nตัวอย่าง https://www.dalong.net/reviews/rg/rg32/rg32_i.htm');
+ if(!pageUrl)return;
+ const button=$('importManualUrlButton');
+ button.disabled=true;
+ $('saveState').textContent='กำลังดึงและอัปโหลดรูปคู่มือจาก Dalong…';
+ $('saveState').style.color='var(--blue)';
+ try{
+  const response=await fetch('/api/admin/media/import-dalong-manual',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({id,pageUrl})});
+  const result=await response.json().catch(()=>({}));
+  if(response.status===401){location.href='/admin/';return}
+  if(!response.ok)throw Error(result.error||'ดึงรูปคู่มือไม่สำเร็จ');
+  const existing=new Set(manual.map(x=>x.src));
+  let added=0;
+  for(const image of result.images||[]){if(image?.src&&!existing.has(image.src)){manual.push(image);existing.add(image.src);added++}}
+  renderImages('manual');
+  setDirty(`ดึงรูปคู่มือสำเร็จ ${added} รูป · กด Save Draft เพื่อผูกกับรายการ`);
+  showMessage('ดึงรูปคู่มือสำเร็จ',`นำเข้ารูปจาก Dalong แล้ว ${added} รูป${result.skipped?` · ข้าม ${result.skipped} รูปที่โหลดไม่ได้`:''}`);
+ }catch(error){
+  $('saveState').textContent='ดึงรูปคู่มือไม่สำเร็จ';
+  $('saveState').style.color='var(--red)';
+  showMessage('ดึงรูปคู่มือไม่สำเร็จ',error.message||'เกิดข้อผิดพลาด');
+ }finally{button.disabled=false}
+}
+$('importManualUrlButton')?.addEventListener('click',importManualFromDalong);
 for(const [drop,target] of [[$('galleryDrop'),'gallery'],[$('manualDrop'),'manual']]){drop.ondragover=e=>{e.preventDefault();drop.classList.add('dragover')};drop.ondragleave=()=>drop.classList.remove('dragover');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('dragover');addFiles(e.dataTransfer.files,target)}}
 document.addEventListener('click',e=>{const target=e.target.dataset.imageRemove;if(!target)return;(target==='manual'?manual:gallery).splice(Number(e.target.dataset.i),1);renderImages(target);setDirty()});
 document.addEventListener('dragstart',e=>{const w=e.target.closest('.thumb-wrap');if(w)dragSource={target:w.dataset.target,index:Number(w.dataset.i)}});document.addEventListener('dragover',e=>{if(e.target.closest('.thumb-wrap'))e.preventDefault()});document.addEventListener('drop',e=>{const w=e.target.closest('.thumb-wrap');if(!w||!dragSource||w.dataset.target!==dragSource.target)return;e.preventDefault();const arr=w.dataset.target==='manual'?manual:gallery;const [m]=arr.splice(dragSource.index,1);arr.splice(Number(w.dataset.i),0,m);renderImages(w.dataset.target);dragSource=null;setDirty()});
