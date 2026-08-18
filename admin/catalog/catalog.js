@@ -86,6 +86,27 @@ function render() {
 
 $("search").addEventListener("input", render);
 
+$("hideAllGalleryBtn").addEventListener("click", async () => {
+  const button = $("hideAllGalleryBtn");
+  if (!confirm("ปิดรูปสินค้าทุกแคตตาล็อกให้เหลือเฉพาะรูปปกหรือไม่?\nรูปคู่มือจะไม่ถูกปิด")) return;
+  button.disabled = true;
+  button.textContent = "กำลังปิดทุกรายการ…";
+  try {
+    const data = await api("/api/admin/catalog", {
+      method: "PUT",
+      body: JSON.stringify({ showGalleryImages: false, scope: "all" }),
+    });
+    items.forEach((item) => { item.showGalleryImages = false; });
+    render();
+    msg(`ปิดรูปสินค้าแล้ว ${Number(data.updated) || items.length} แคตตาล็อก เหลือเฉพาะรูปปก (รูปคู่มือไม่เปลี่ยน)`);
+  } catch (error) {
+    msg(error.message, "error");
+  } finally {
+    button.disabled = false;
+    button.textContent = "ปิดรูปสินค้าทุกแคตตาล็อก";
+  }
+});
+
 $("rows").addEventListener("click", async (event) => {
   const toggle = event.target.closest("[data-gallery-toggle]");
   if (toggle) {
