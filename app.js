@@ -501,7 +501,7 @@ function sponsorCardHTML(shop, index) {
 }
 
 function cardHTML(p) {
-  const img = p.catalogImage || (p.imageThumbnails && p.imageThumbnails[0]) || (p.images && p.images[0]);
+  const img = (p.images && p.images[0]) || (p.imageThumbnails && p.imageThumbnails[0]) || p.catalogImage;
   return `
     <a class="product-card" href="/product/${encodeURIComponent(p.id)}">
       <span class="card-tag">${esc(p.grade)} · ${esc(p.scale)}</span>
