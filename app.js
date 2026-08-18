@@ -528,7 +528,7 @@ function cardHTML(p) {
 function renderDetail(p) {
   if (INLINE_EDIT_MODE) return renderInlineEditor(p);
   updatePageMetadata(p);
-  const img0 = p.catalogImage || (p.images && p.images[0]) || "";
+  const img0 = (p.images && p.images[0]) || p.catalogImage || "";
   const visibleProductImages = p.showGalleryImages === false ? (img0 ? [img0] : []) : (p.images || (img0 ? [img0] : []));
 
   APP.innerHTML = `
