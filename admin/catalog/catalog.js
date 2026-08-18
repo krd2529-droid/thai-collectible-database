@@ -74,6 +74,7 @@ function render() {
           </td>
           <td><span class="status-pill ${esc(status)}">${statusLabel}</span></td>
           <td><div class="row-actions">
+            <button class="gallery-toggle ${item.showGalleryImages === false ? "is-off" : "is-on"}" data-gallery-toggle="${id}" data-gallery-visible="${item.showGalleryImages !== false}" type="button">${item.showGalleryImages === false ? "รูปสินค้า: ปิด (เหลือรูปปก)" : "รูปสินค้า: เปิด"}</button>
             <a class="table-action primary" href="/admin/rg-template/?id=${encodeURIComponent(item.id)}">แก้ไขข้อมูลครบ</a>
             <a class="table-action" href="/product/${encodeURIComponent(item.id)}" target="_blank" rel="noopener">ดูหน้าเว็บ</a>
             <button class="danger" data-delete="${id}" type="button">ย้ายไปถังขยะ</button>
@@ -86,6 +87,27 @@ function render() {
 $("search").addEventListener("input", render);
 
 $("rows").addEventListener("click", async (event) => {
+  const toggle = event.target.closest("[data-gallery-toggle]");
+  if (toggle) {
+    const id = toggle.dataset.galleryToggle;
+    const nextValue = toggle.dataset.galleryVisible !== "true";
+    toggle.disabled = true;
+    toggle.textContent = "กำลังบันทึก…";
+    try {
+      await api(`/api/admin/catalog/${encodeURIComponent(id)}`, {
+        method: "PUT",
+        body: JSON.stringify({ showGalleryImages: nextValue }),
+      });
+      const item = items.find((entry) => entry.id === id);
+      if (item) item.showGalleryImages = nextValue;
+      render();
+      msg(`${id}: ${nextValue ? "เปิดรูปสินค้าทั้งหมดแล้ว" : "ปิดรูปสินค้าแล้ว เหลือเฉพาะรูปปก"} (รูปคู่มือไม่เปลี่ยน)`);
+    } catch (error) {
+      msg(error.message, "error");
+      render();
+    }
+    return;
+  }
   const button = event.target.closest("[data-delete]");
   if (!button) return;
   const id = button.dataset.delete;

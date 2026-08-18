@@ -5,3 +5,4 @@
 .table-action{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:5px 9px;border:1px solid #18202a;background:#fff;color:#18202a;font-weight:700;text-decoration:none;white-space:nowrap}
 .table-action.primary{background:#2b4c7e;color:#fff;border-color:#2b4c7e}
 .table-action:hover{filter:brightness(.96)}
+.gallery-toggle{border:1px solid #178454;background:#e7f8ef;color:#12643f;font-weight:800}.gallery-toggle.is-off{border-color:#b45a18;background:#fff1e5;color:#8a3f0a}

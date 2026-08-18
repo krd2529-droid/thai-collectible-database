@@ -528,7 +528,8 @@ function cardHTML(p) {
 function renderDetail(p) {
   if (INLINE_EDIT_MODE) return renderInlineEditor(p);
   updatePageMetadata(p);
-  const img0 = (p.images && p.images[0]) || "";
+  const img0 = p.catalogImage || (p.images && p.images[0]) || "";
+  const visibleProductImages = p.showGalleryImages === false ? (img0 ? [img0] : []) : (p.images || (img0 ? [img0] : []));
 
   APP.innerHTML = `
     <a href="/" class="back-link">← กลับหน้ารวมสินค้า</a>
@@ -556,14 +557,14 @@ function renderDetail(p) {
           <div class="gallery-main">
             ${img0 ? `<img id="mainProductImg" src="${esc(img0)}" alt="${esc(p.name)}"${imageSizeAttrs(p.imageDimensions?.[0])} />` : `<span class="placeholder" style="font-family:var(--font-mono);color:var(--ink-soft)">ยังไม่มีรูปภาพ — เพิ่มได้ที่ data/products.json</span>`}
           </div>
-          <div class="gallery-thumbs">
-            ${(p.images || [])
+          ${visibleProductImages.length > 1 ? `<div class="gallery-thumbs">
+            ${visibleProductImages
               .map(
                 (src, i) =>
                   `<img src="${esc(p.imageThumbnails?.[i] || src)}" data-src="${esc(src)}" data-target="mainProductImg" class="${i === 0 ? "active" : ""}" alt="รูปสินค้า ${i + 1}" loading="lazy"${imageSizeAttrs(p.imageDimensions?.[i])} />`
               )
               .join("")}
-          </div>
+          </div>` : ""}
           ${
             p.videoEmbedUrl
               ? `<div class="video-embed"><iframe src="${esc(p.videoEmbedUrl)}" title="วิดีโอรีวิว ${esc(
@@ -835,6 +836,7 @@ function renderInlineEditor(product) {
         <div class="detail-grid">
           <div class="gallery inline-editor-gallery">
             <label class="inline-field-label">รูปสินค้า / รูปปก</label>
+            <label class="inline-gallery-visibility"><input id="editShowGalleryImages" type="checkbox" ${product.showGalleryImages !== false ? "checked" : ""} /> <strong>เปิดแสดงรูปสินค้าทั้งหมด</strong> <span>ปิดแล้วหน้าเว็บจะเหลือเฉพาะรูปปก — ไม่กระทบรูปคู่มือ</span></label>
             <textarea id="editImages" class="media-value-store" aria-hidden="true">${esc(lineText(product.images))}</textarea>
             <div class="media-upload-box">
               <input id="galleryUploadInput" class="media-upload-input" type="file" accept="image/*" multiple />
@@ -1098,6 +1100,7 @@ async function saveInlineProduct(product) {
     name: editorValue("editName"),
     summary: editorValue("editSummary"),
     images: editorLines("editImages"),
+    showGalleryImages: document.getElementById("editShowGalleryImages")?.checked !== false,
     rgNumber: Number(editorValue("editRgNumber")) || null,
     modelCode: editorValue("editModelCode"),
     manufacturer: editorValue("editManufacturer"),

@@ -60,6 +60,7 @@ export function normalizeCatalogInput(raw = {}) {
     recommendedAge: String(raw.recommendedAge || '').trim(),
     heightCm: raw.heightCm === '' || raw.heightCm == null ? null : Number(raw.heightCm),
     images: cleanList(raw.images),
+    showGalleryImages: raw.showGalleryImages !== false,
     videoEmbedUrl: String(raw.videoEmbedUrl || '').trim(),
     summary: String(raw.summary || '').trim(),
     highlights: cleanList(raw.highlights),
@@ -97,7 +98,7 @@ export function summaryFromPayload(p) {
     productType:p.productType, productTypeCode:p.productTypeCode, line:p.line, lineCode:p.lineCode,
     sku:p.sku, rgNumber:p.rgNumber, name:p.name, grade:p.grade, scale:p.scale,
     seriesGroup:p.seriesGroup, seriesGroupOrder:p.seriesGroupOrder, series:p.series, manufacturer:p.manufacturer, catalogImage:p.catalogImage,
-    images:p.images?.length ? p.images : (p.catalogImage ? [p.catalogImage] : []),
+    images:p.images?.length ? p.images : (p.catalogImage ? [p.catalogImage] : []), showGalleryImages:p.showGalleryImages !== false,
     catalogPath:p.catalogPath, sortOrder:Number(p.sortOrder)||Number(p.rgNumber)||0, status:p.status, inStock:null, source:'d1'
   };
 }
