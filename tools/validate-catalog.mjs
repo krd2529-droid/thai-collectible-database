@@ -10,10 +10,14 @@ const indexPath = path.join(
 const errors = [];
 const warnings = [];
 let index = [];
+let checkedDetails = 0;
 
 try {
   index = JSON.parse(fs.readFileSync(indexPath, "utf8"));
-  if (!Array.isArray(index)) errors.push("RG index.json ต้องเป็น Array");
+  if (!Array.isArray(index)) {
+    errors.push("RG index.json ต้องเป็น Array");
+    index = [];
+  }
 } catch (error) {
   errors.push(`เปิด RG index.json ไม่สำเร็จ: ${error.message}`);
 }
@@ -33,6 +37,7 @@ for (const summary of index) {
   let detail;
   try {
     detail = JSON.parse(fs.readFileSync(detailPath, "utf8"));
+    checkedDetails += 1;
   } catch (error) {
     errors.push(`JSON เสีย ${summary.dataFile}: ${error.message}`);
     continue;
@@ -55,7 +60,7 @@ for (const summary of index) {
 }
 
 console.log(`สินค้าใน RG index: ${index.length} รายการ`);
-console.log(`JSON รายสินค้าที่ตรวจ: ${ids.size} ไฟล์`);
+console.log(`JSON รายสินค้าที่ตรวจ: ${checkedDetails} ไฟล์`);
 console.log(`ข้อผิดพลาด: ${errors.length}`);
 console.log(`คำเตือนเรื่องรูป: ${warnings.length}`);
 
