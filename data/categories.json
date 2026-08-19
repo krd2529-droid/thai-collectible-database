@@ -6,6 +6,7 @@
         "label": "Gunpla",
         "grades": {
           "RG": "data/catalog/gundam/gunpla/rg/index.json",
+          "MGSD": "data/catalog/gundam/gunpla/mgsd/index.json",
           "MG": "data/catalog/gundam/gunpla/mg/index.json",
           "HG": "data/catalog/gundam/gunpla/hg/index.json"
         }

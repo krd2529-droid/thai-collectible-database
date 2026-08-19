@@ -105,6 +105,13 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - ตัดสินการจัดการ warning รูปหาย 70 path โดยไม่สร้าง/ลบไฟล์จากการเดา
 - ทำ sitemap generation รองรับ published D1 items
 
+### TOY-EC-013: MGSD catalog foundation (Completed in TOY-PATCH-002)
+
+- เพิ่ม MGSD เป็นเกรดภายใต้ Gundam → Gunpla
+- กำหนดเลขภายใน MGSD-001 ถึง MGSD-005 ตามวันวางจำหน่ายรุ่นปกติ
+- เพิ่ม index/detail JSON และ sitemap routes
+- เปลี่ยน public loader และ validator จาก RG-only เป็น multi-grade
+
 ## Phase 4 — Product growth (หลัง safety gates)
 
 เริ่มได้เมื่อ Phase 0-2 ผ่าน:

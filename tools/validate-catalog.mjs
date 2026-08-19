@@ -2,64 +2,88 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
-const indexPath = path.join(
-  root,
-  "data/catalog/gundam/gunpla/rg/index.json",
-);
+const categoriesPath = path.join(root, "data/categories.json");
 
 const errors = [];
 const warnings = [];
-let index = [];
+let categories = {};
+let indexEntries = [];
+let indexedProducts = 0;
 let checkedDetails = 0;
 
 try {
-  index = JSON.parse(fs.readFileSync(indexPath, "utf8"));
-  if (!Array.isArray(index)) {
-    errors.push("RG index.json ต้องเป็น Array");
-    index = [];
-  }
+  categories = JSON.parse(fs.readFileSync(categoriesPath, "utf8"));
+  indexEntries = Object.values(categories || {}).flatMap((category) =>
+    Object.values(category?.productTypes || {}).flatMap((productType) =>
+      Object.entries(productType?.grades || {}),
+    ),
+  );
+  if (!indexEntries.length) errors.push("ไม่พบเส้นทาง index ใน categories.json");
 } catch (error) {
-  errors.push(`เปิด RG index.json ไม่สำเร็จ: ${error.message}`);
+  errors.push(`เปิด categories.json ไม่สำเร็จ: ${error.message}`);
 }
 
 const ids = new Set();
 
-for (const summary of index) {
-  if (ids.has(summary.id)) errors.push(`รหัสสินค้าซ้ำ: ${summary.id}`);
-  ids.add(summary.id);
-
-  const detailPath = path.join(root, summary.dataFile || "");
-  if (!fs.existsSync(detailPath)) {
-    errors.push(`ไม่พบ JSON รายสินค้า: ${summary.dataFile}`);
-    continue;
-  }
-
-  let detail;
+for (const [grade, relativeIndexPath] of indexEntries) {
+  let index = [];
   try {
-    detail = JSON.parse(fs.readFileSync(detailPath, "utf8"));
-    checkedDetails += 1;
+    index = JSON.parse(fs.readFileSync(path.join(root, relativeIndexPath), "utf8"));
+    if (!Array.isArray(index)) {
+      errors.push(`${grade} index.json ต้องเป็น Array`);
+      continue;
+    }
   } catch (error) {
-    errors.push(`JSON เสีย ${summary.dataFile}: ${error.message}`);
+    errors.push(`เปิด ${grade} index.json ไม่สำเร็จ: ${error.message}`);
     continue;
   }
+  indexedProducts += index.length;
 
-  if (detail.id !== summary.id) {
-    errors.push(`รหัสไม่ตรงกัน: index=${summary.id}, detail=${detail.id}`);
-  }
+  for (const summary of index) {
+    if (ids.has(summary.id)) errors.push(`รหัสสินค้าซ้ำ: ${summary.id}`);
+    ids.add(summary.id);
+    if (summary.grade !== grade) {
+      errors.push(`เกรดไม่ตรงกัน: index=${grade}, item=${summary.id}:${summary.grade}`);
+    }
 
-  const imageFiles = [
-    ...(detail.images || []),
-    ...(detail.manualImages || []),
-  ];
+    const detailPath = path.join(root, summary.dataFile || "");
+    if (!summary.dataFile || !fs.existsSync(detailPath)) {
+      errors.push(`ไม่พบ JSON รายสินค้า: ${summary.dataFile || summary.id}`);
+      continue;
+    }
 
-  for (const imageFile of imageFiles) {
-    if (!fs.existsSync(path.join(root, imageFile))) {
-      warnings.push(`ไม่พบรูป ${detail.id}: ${imageFile}`);
+    let detail;
+    try {
+      detail = JSON.parse(fs.readFileSync(detailPath, "utf8"));
+      checkedDetails += 1;
+    } catch (error) {
+      errors.push(`JSON เสีย ${summary.dataFile}: ${error.message}`);
+      continue;
+    }
+
+    if (detail.id !== summary.id) {
+      errors.push(`รหัสไม่ตรงกัน: index=${summary.id}, detail=${detail.id}`);
+    }
+    if (detail.grade !== grade) {
+      errors.push(`เกรด detail ไม่ตรงกัน: index=${grade}, detail=${detail.id}:${detail.grade}`);
+    }
+
+    const imageFiles = [
+      ...(Array.isArray(detail.images) ? detail.images : []),
+      ...(Array.isArray(detail.manualImages) ? detail.manualImages : []),
+      ...(detail.catalogImage ? [detail.catalogImage] : []),
+    ];
+
+    for (const imageFile of new Set(imageFiles)) {
+      if (!fs.existsSync(path.join(root, imageFile))) {
+        warnings.push(`ไม่พบรูป ${detail.id}: ${imageFile}`);
+      }
     }
   }
 }
 
-console.log(`สินค้าใน RG index: ${index.length} รายการ`);
+console.log(`แคตตาล็อกที่ตรวจ: ${indexEntries.length} เกรด`);
+console.log(`สินค้าใน index รวม: ${indexedProducts} รายการ`);
 console.log(`JSON รายสินค้าที่ตรวจ: ${checkedDetails} ไฟล์`);
 console.log(`ข้อผิดพลาด: ${errors.length}`);
 console.log(`คำเตือนเรื่องรูป: ${warnings.length}`);

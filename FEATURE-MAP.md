@@ -16,8 +16,8 @@
 | TOY-F010 | Media upload/delivery | editors + `/media/:path` | upload API, media function | R2 `TOYSKUB_MEDIA` | image/form-data → immutable media URL | MIME อาศัย client metadata; ไม่มี delete/GC |
 | TOY-F011 | Dalong manual import | RG editor | `POST /api/admin/media/import-dalong-manual` | external dalong.net + R2 | approved page URL → up to 80 images | external fetch/cost/time; allowlist มีแล้วแต่ต้อง test redirect |
 | TOY-F012 | AI catalog fill | RG editor | `POST /api/admin/ai/catalog-fill` | OpenAI Responses API | query/options → schema-constrained draft | cost, upstream error, source verification, secret |
-| TOY-F013 | Static catalog validation | CLI tool | none | RG index/detail/image filesystem | repository data → errors/warnings/exit code | ยังไม่ครอบคลุม MG/HG/catalogImage/sitemap/full schema |
-| TOY-F014 | Search/SEO/public metadata | public HTML, `sitemap.xml`, `robots.txt`, `llms.txt` | none | static files | crawler request → metadata/routes | sitemap เป็น static 43 URLs; D1 published itemsไม่ถูกเพิ่มอัตโนมัติ |
+| TOY-F013 | Static catalog validation | CLI tool | none | grade indexes/detail/image filesystem | repository data → errors/warnings/exit code | ตรวจทุกเกรดที่ประกาศใน categories และ catalogImage แล้ว; ยังไม่ครอบคลุม sitemap/full schema/orphan files |
+| TOY-F014 | Search/SEO/public metadata | public HTML, `sitemap.xml`, `robots.txt`, `llms.txt` | none | static files | crawler request → metadata/routes | sitemap เป็น static 48 product URLs; D1 published itemsไม่ถูกเพิ่มอัตโนมัติ |
 
 ## API inventory
 

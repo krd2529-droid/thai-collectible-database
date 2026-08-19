@@ -133,7 +133,7 @@ R2 object ใช้ immutable URL และ timestamp key แต่ไม่พ�
 
 ### R-013 — Medium: catalog validator ครอบคลุมไม่ครบ
 
-ตรวจเฉพาะ RG index/detail ID และ `images`/`manualImages`; ยังไม่ตรวจ schema ทุก field, `catalogImage`, URL/path traversal, orphan JSON, sitemap consistency, MG/HG index และ duplicate path คำเตือนรูป 70 รายการยังค้าง
+เดิมตรวจเฉพาะ RG; ใน TOY-PATCH-002 ขยายให้ตรวจทุกเกรดที่ประกาศใน categories รวม `catalogImage` แล้ว แต่ยังไม่ตรวจ schema ทุก field, URL/path traversal, orphan JSON, sitemap consistency และ duplicate path คำเตือนรูปเดิม 70 รายการยังค้าง
 
 ### R-014 — Low/Medium: เอกสารและข้อความ UI ล้าสมัย
 

@@ -86,6 +86,12 @@ function sortCatalogItems(a, b) {
   return catalogOrderValue(a) - catalogOrderValue(b) || String(a?.id || '').localeCompare(String(b?.id || ''));
 }
 
+function catalogSequence(item) {
+  const gradeKey = `${String(item?.grade || '').toLowerCase()}Number`;
+  const value = Number(item?.[gradeKey] ?? item?.rgNumber ?? item?.sortOrder);
+  return Number.isFinite(value) && value > 0 ? value : null;
+}
+
 async function loadProducts() {
   await detectAdminSession();
   setupHeaderContact();
@@ -99,18 +105,23 @@ async function loadProducts() {
     }
     CATEGORY_MAP = await categoriesRes.json();
 
-    const indexPath =
-      CATEGORY_MAP?.gundam?.productTypes?.gunpla?.grades?.RG;
-    if (!indexPath) throw new Error("ไม่พบเส้นทางแคตตาล็อก RG");
+    const indexEntries = Object.values(CATEGORY_MAP || {}).flatMap((category) =>
+      Object.values(category?.productTypes || {}).flatMap((productType) =>
+        Object.entries(productType?.grades || {}),
+      ),
+    );
+    if (!indexEntries.length) throw new Error("ไม่พบเส้นทางแคตตาล็อกสินค้า");
 
-    const indexRes = await fetch(`./${indexPath}?v=split-json-20260731-1`, {
-      cache: "no-store",
-    });
-    if (!indexRes.ok) throw new Error(`RG index HTTP ${indexRes.status}`);
-
-    const data = await indexRes.json();
-    if (!Array.isArray(data)) throw new Error("RG index ต้องเป็นรายการสินค้า");
-    PRODUCTS = data;
+    const indexes = await Promise.all(indexEntries.map(async ([grade, indexPath]) => {
+      const indexRes = await fetch(`./${indexPath}?v=multi-grade-20260819-1`, {
+        cache: "no-store",
+      });
+      if (!indexRes.ok) throw new Error(`${grade} index HTTP ${indexRes.status}`);
+      const data = await indexRes.json();
+      if (!Array.isArray(data)) throw new Error(`${grade} index ต้องเป็นรายการสินค้า`);
+      return data;
+    }));
+    PRODUCTS = indexes.flat().sort(sortCatalogItems);
     try {
       const dynamicRes = await fetch("/api/catalog", { cache: "no-store" });
       if (dynamicRes.ok) {
@@ -404,6 +415,7 @@ function catalogGroupName(product, activeLine) {
   const explicit = String(product.seriesGroup || "").trim();
   if (explicit) return explicit;
   if (activeLine === "RG") return "Gundam";
+  if (activeLine === "MGSD") return "MGSD";
   return String(product.series || "").trim() || "รายการอื่น ๆ";
 }
 
@@ -555,7 +567,7 @@ function renderDetail(p) {
       <div class="detail-grid">
         <div class="gallery">
           <div class="gallery-main">
-            ${img0 ? `<img id="mainProductImg" src="${esc(img0)}" alt="${esc(p.name)}"${imageSizeAttrs(p.imageDimensions?.[0])} />` : `<span class="placeholder" style="font-family:var(--font-mono);color:var(--ink-soft)">ยังไม่มีรูปภาพ — เพิ่มได้ที่ data/products.json</span>`}
+            ${img0 ? `<img id="mainProductImg" src="${esc(img0)}" alt="${esc(p.name)}"${imageSizeAttrs(p.imageDimensions?.[0])} />` : `<span class="placeholder" style="font-family:var(--font-mono);color:var(--ink-soft)">ยังไม่มีรูปภาพ</span>`}
           </div>
           ${visibleProductImages.length > 1 ? `<div class="gallery-thumbs">
             ${visibleProductImages
@@ -584,7 +596,7 @@ function renderDetail(p) {
           <p class="product-summary">${esc(p.summary)}</p>
 
           <table class="spec-table">
-            <tr><td>ลำดับ RG</td><td>${p.rgNumber ? String(p.rgNumber).padStart(2, "0") : "-"}</td></tr>
+            <tr><td>ลำดับ ${esc(p.grade || "แคตตาล็อก")}</td><td>${catalogSequence(p) ? String(catalogSequence(p)).padStart(2, "0") : "-"}</td></tr>
             <tr><td>รหัสโมบิลสูท</td><td>${esc(p.modelCode || "-")}</td></tr>
             <tr><td>ผู้ผลิต</td><td>${esc(p.manufacturer)}</td></tr>
             <tr><td>ซีรีส์</td><td>${esc(p.series)}</td></tr>
