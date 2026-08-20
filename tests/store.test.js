@@ -31,6 +31,9 @@ test('store entry is separate from catalog categories',()=>{
   assert.doesNotMatch(app,/key:\s*["']zippo["']/);
   assert.match(app,/>สินค้าในร้าน</);
   assert.match(app,/href="\/shop\/"/);
+  assert.match(app,/id="storePreviewGrid"/);
+  assert.match(app,/class="store-preview-card__buy" action="\/shop\/" method="get"/);
+  assert.match(fs.readFileSync('shop/shop.js','utf8'),/directId/);
 });
 
 test('normalizes product money and rejects negative stock',()=>{

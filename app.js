@@ -351,13 +351,12 @@ function renderHome() {
       </label>
     </section>
 
-    <section class="store-gateway" aria-labelledby="storeGatewayTitle">
-      <div>
-        <span class="store-gateway__eyebrow">// สินค้าพร้อมขาย</span>
-        <h2 id="storeGatewayTitle">สินค้าในร้าน</h2>
-        <p>เลือกซื้อสินค้าที่มีสต็อกจริง พร้อมราคาและจำนวนคงเหลือ</p>
+    <section class="store-preview" aria-labelledby="storePreviewTitle">
+      <div class="store-preview__heading">
+        <div><span>// สินค้าพร้อมขาย</span><h2 id="storePreviewTitle">สินค้าในร้าน</h2><p>สินค้าที่มีสต็อกจริง เลือกจำนวนและกดซื้อได้จากหน้าแรก</p></div>
+        <a href="/shop/">ดูสินค้าทั้งหมด →</a>
       </div>
-      <a href="/shop/">ดูสินค้าในร้าน <span aria-hidden="true">→</span></a>
+      <div id="storePreviewGrid" class="store-preview__grid"><p class="store-preview__message">กำลังโหลดสินค้าในร้าน…</p></div>
     </section>
 
     <nav class="catalog-breadcrumb" aria-label="หมวดสินค้า">${breadcrumbParts}</nav>
@@ -414,6 +413,31 @@ function renderHome() {
 
   void recordPageView("home");
   void hydrateVisitorStats("homeVisitorStats");
+  void hydrateStorePreview();
+}
+
+async function hydrateStorePreview() {
+  const grid = document.getElementById("storePreviewGrid");
+  if (!grid) return;
+  try {
+    const response = await fetch("/api/store/products?category=one-piece-card", { cache: "no-store" });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "โหลดสินค้าไม่สำเร็จ");
+    const products = data.products || [];
+    if (!products.length) { grid.innerHTML = '<p class="store-preview__message">ยังไม่มีสินค้าที่เผยแพร่</p>'; return; }
+    const money = value => new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(Number(value) || 0);
+    grid.innerHTML = products.map(product => {
+      const soldOut = product.availableStock < 1 || product.status === "sold_out";
+      return `<article class="store-preview-card">
+        <div class="store-preview-card__image">${product.imageUrl ? `<img src="${esc(product.imageUrl)}" alt="${esc(product.name)}">` : '<span>ยังไม่มีรูปสินค้า</span>'}</div>
+        <div class="store-preview-card__body"><h3>${esc(product.name)}</h3>${product.level ? `<small>ระดับ ${esc(product.level)}</small>` : ''}
+          <p>${esc(product.description || '')}</p><strong class="store-preview-card__price">${money(product.price)}</strong>
+          <span class="store-preview-card__stock ${soldOut ? 'sold-out' : ''}">${soldOut ? 'Sold out' : `พร้อมขาย ${product.availableStock} ชิ้น`}</span>
+          <form class="store-preview-card__buy" action="/shop/" method="get"><input type="hidden" name="category" value="one-piece-card"><input type="hidden" name="product" value="${esc(product.id)}"><input name="quantity" type="number" min="1" max="${product.availableStock}" value="1" aria-label="จำนวน ${esc(product.name)}" ${soldOut ? 'disabled' : ''}>
+            <button type="submit" ${soldOut ? 'disabled' : ''}>${soldOut ? 'Sold out' : 'ซื้อสินค้า'}</button></form>
+        </div></article>`;
+    }).join("");
+  } catch (error) { grid.innerHTML = `<p class="store-preview__message error">${esc(error.message)}</p>`; }
 }
 
 function catalogGroupName(product, activeLine) {
