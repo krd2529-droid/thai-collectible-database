@@ -25,16 +25,17 @@ class D1Mock {
 const request=(url,options={})=>new Request(`https://toyskub.test${url}`,options);
 const read=response=>response.json();
 
-test('store products link to One Piece stock detail and checkout',()=>{
+test('store products move to One Piece stock category and detail routes',()=>{
   const app=fs.readFileSync('app.js','utf8');
   assert.doesNotMatch(app,/key:\s*["']available-products["']/);
   assert.doesNotMatch(app,/key:\s*["']zippo["']/);
   assert.match(app,/>สินค้าในร้าน</);
   assert.doesNotMatch(app,/\/shop\//);
   assert.match(app,/id="storePreviewGrid"/);
-  assert.match(app,/<h2>การ์ดวันพีช<\/h2>/);
+  assert.match(app,/<h1>การ์ดวันพีช<\/h1>/);
   assert.match(app,/data-store-category="one-piece-card"/);
   assert.match(app,/href="\/stock\/onepiececard\//);
+  assert.match(app,/renderStoreCategory/);
   assert.match(app,/renderStoreProduct/);
   assert.match(app,/beginStoreCheckout/);
   assert.match(app,/class="catalog-series-heading" aria-label="แคตตาล็อก"/);

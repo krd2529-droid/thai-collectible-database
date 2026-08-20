@@ -253,6 +253,7 @@ async function router() {
   if (window.location.hash === "#/product-preview") {
     try { const preview = JSON.parse(localStorage.getItem("toyskub_catalog_preview") || "null"); if (preview) return renderDetail(preview); } catch {}
   }
+  if (/^\/stock\/onepiececard\/?$/.test(window.location.pathname)) return renderStoreCategory();
   const stockMatch = window.location.pathname.match(/^\/stock\/onepiececard\/([^/]+)\/?$/);
   if (stockMatch) return renderStoreProduct(decodeURIComponent(stockMatch[1]));
   const match = window.location.pathname.match(/^\/product\/([^/]+)\/?$/);
@@ -351,10 +352,11 @@ function renderHome() {
 
     <section class="store-preview" aria-labelledby="storePreviewTitle">
       <div class="store-preview__heading">
-        <div><span>// สินค้าพร้อมขาย</span><h2 id="storePreviewTitle">สินค้าในร้าน</h2><p>สินค้าที่มีสต็อกจริง เลือกจำนวนและกดซื้อได้จากหน้าแรก</p></div>
-        <a href="#storePreviewGrid">ดูสินค้าในร้าน →</a>
+        <div><span>// สินค้าพร้อมขาย</span><h2 id="storePreviewTitle">สินค้าในร้าน</h2><p>สินค้าสต็อกจริง แยกจากข้อมูลแคตตาล็อก</p></div>
       </div>
-      <div id="storePreviewGrid" class="store-preview__categories"><p class="store-preview__message">กำลังโหลดสินค้าในร้าน…</p></div>
+      <div id="storePreviewGrid" class="store-preview__categories">
+        <a class="store-category-link" href="/stock/onepiececard/"><span>// หมวดสินค้า</span><strong>การ์ดวันพีช</strong><small>ดูสินค้าที่มีจำหน่าย →</small></a>
+      </div>
     </section>
 
     <header class="catalog-series-heading" aria-label="แคตตาล็อก">
@@ -413,18 +415,22 @@ function renderHome() {
 
   void recordPageView("home");
   void hydrateVisitorStats("homeVisitorStats");
-  void hydrateStorePreview();
 }
 
-async function hydrateStorePreview() {
-  const grid = document.getElementById("storePreviewGrid");
-  if (!grid) return;
+async function loadStoreProducts() {
+  const response = await fetch("/api/store/products?category=one-piece-card", { cache: "no-store" });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || "โหลดสินค้าไม่สำเร็จ");
+  return data.products || [];
+}
+
+async function renderStoreCategory() {
+  removeSchema();
+  document.title = "การ์ดวันพีช | สินค้าในร้าน TOYSKUB";
+  document.getElementById("canonicalUrl").href = "https://toyskub.com/stock/onepiececard/";
+  APP.innerHTML = '<section class="empty-state">กำลังโหลดสินค้าการ์ดวันพีช…</section>';
   try {
-    const response = await fetch("/api/store/products?category=one-piece-card", { cache: "no-store" });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || "โหลดสินค้าไม่สำเร็จ");
-    const products = data.products || [];
-    if (!products.length) { grid.innerHTML = '<p class="store-preview__message">ยังไม่มีสินค้าที่เผยแพร่</p>'; return; }
+    const products = await loadStoreProducts();
     const money = value => new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(Number(value) || 0);
     const cards = products.map(product => {
       const soldOut = product.availableStock < 1 || product.status === "sold_out";
@@ -437,21 +443,19 @@ async function hydrateStorePreview() {
             ${soldOut ? '<button type="button" disabled>Sold out</button>' : `<a href="/stock/onepiececard/${encodeURIComponent(product.id)}">ซื้อสินค้า</a>`}</div>
         </div></article>`;
     }).join("");
-    grid.innerHTML = `<section class="store-preview-category" data-store-category="one-piece-card">
-      <div class="catalog-series-heading"><h2>การ์ดวันพีช</h2><span>${products.length} รายการ</span></div>
-      <div class="store-preview__grid">${cards}</div>
-    </section>`;
-  } catch (error) { grid.innerHTML = `<p class="store-preview__message error">${esc(error.message)}</p>`; }
+    APP.innerHTML = `<nav class="catalog-breadcrumb" aria-label="เส้นทางสินค้า"><a href="/">หน้าหลัก</a><span>›</span><strong>สินค้าในร้าน</strong><span>›</span><strong>การ์ดวันพีช</strong></nav>
+      <section class="store-category-page" data-store-category="one-piece-card">
+        <div class="store-preview__heading"><div><span>// STOCK · ONE PIECE CARD</span><h1>การ์ดวันพีช</h1><p>สินค้าที่มีสต็อกจริง เลือกสินค้าเพื่อดูรายละเอียดและสั่งซื้อ</p></div><strong>${products.length} รายการ</strong></div>
+        ${products.length ? `<div class="store-preview__grid">${cards}</div>` : '<p class="store-preview__message">ยังไม่มีสินค้าที่เผยแพร่</p>'}
+      </section>`;
+  } catch (error) { APP.innerHTML = `<p class="store-preview__message error">${esc(error.message)}</p>`; }
 }
 
 async function renderStoreProduct(productId) {
   removeSchema();
   APP.innerHTML = '<section class="empty-state">กำลังโหลดสินค้า…</section>';
   try {
-    const response = await fetch("/api/store/products?category=one-piece-card", { cache: "no-store" });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || "โหลดสินค้าไม่สำเร็จ");
-    const product = (data.products || []).find(item => item.id === productId);
+    const product = (await loadStoreProducts()).find(item => item.id === productId);
     if (!product) {
       document.title = "ไม่พบสินค้า | TOYSKUB";
       APP.innerHTML = '<section class="empty-state"><strong>ไม่พบสินค้า</strong><a href="/">← กลับหน้าแรก</a></section>';
