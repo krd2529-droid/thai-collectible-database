@@ -33,7 +33,8 @@ test('store entry is separate from catalog categories',()=>{
   assert.match(app,/href="\/shop\/"/);
   assert.match(app,/id="storePreviewGrid"/);
   assert.match(app,/class="store-preview-card__buy" action="\/shop\/" method="get"/);
-  assert.match(app,/'<strong>แคตตาล็อก<\/strong>'/);
+  assert.match(app,/class="catalog-series-heading" aria-label="แคตตาล็อก"/);
+  assert.match(app,/<h2>แคตตาล็อก<\/h2>/);
   assert.match(fs.readFileSync('shop/shop.js','utf8'),/directId/);
 });
 

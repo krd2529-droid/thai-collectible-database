@@ -311,12 +311,8 @@ function renderHome() {
       })
     : [];
 
-  const breadcrumbParts = [
-    '<strong>แคตตาล็อก</strong>',
-    selectedCategory ? `<b>›</b><span>${esc(selectedCategory.label)}</span>` : '',
-    selectedType ? `<b>›</b><span>${esc(selectedType.label)}</span>` : '',
-    activeFilter ? `<b>›</b><strong>${esc(activeFilter)}</strong>` : '',
-  ].join('');
+  const catalogPath = [selectedCategory?.label, selectedType?.label, activeFilter]
+    .filter(Boolean).map(esc).join(' › ') || 'Gundam';
 
   const typeStepContent = activeCategory
     ? typeOptions.map((type) =>
@@ -359,7 +355,9 @@ function renderHome() {
       <div id="storePreviewGrid" class="store-preview__grid"><p class="store-preview__message">กำลังโหลดสินค้าในร้าน…</p></div>
     </section>
 
-    <nav class="catalog-breadcrumb" aria-label="แคตตาล็อก">${breadcrumbParts}</nav>
+    <header class="catalog-series-heading" aria-label="แคตตาล็อก">
+      <h2>แคตตาล็อก</h2><span>${catalogPath}</span>
+    </header>
 
     ${catalogStepHTML(
       "01",
