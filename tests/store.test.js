@@ -9,6 +9,8 @@ import { onRequestPost as createOrder } from '../functions/api/store/orders/inde
 import { onRequestGet as listAdminProducts, onRequestPost as createProduct } from '../functions/api/admin/store/products/index.js';
 import { onRequestPut as updateOrder } from '../functions/api/admin/store/orders/[id].js';
 import { onRequestPost as uploadMedia } from '../functions/api/admin/media/upload.js';
+import { onRequestPost as recordTraffic } from '../functions/api/analytics/view.js';
+import { onRequestGet as getTrafficStats } from '../functions/api/analytics/stats.js';
 
 class BoundStatement {
   constructor(db, sql, args) { this.db=db; this.sql=sql; this.args=args; }
@@ -17,7 +19,7 @@ class BoundStatement {
   async all() { return { results:this.db.prepare(this.sql).all(...this.args) }; }
 }
 class D1Mock {
-  constructor(schema='full') { this.sqlite=new DatabaseSync(':memory:');if(schema!=='empty')this.sqlite.exec(fs.readFileSync('migrations/0005_store_products_orders.sql','utf8'));if(schema==='full'){this.sqlite.exec(fs.readFileSync('migrations/0006_store_product_level.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0007_store_product_cost.sql','utf8'))} }
+  constructor(schema='full') { this.sqlite=new DatabaseSync(':memory:');if(schema!=='empty')this.sqlite.exec(fs.readFileSync('migrations/0005_store_products_orders.sql','utf8'));if(schema==='full'){this.sqlite.exec(fs.readFileSync('migrations/0003_analytics_views.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0006_store_product_level.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0007_store_product_cost.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0008_analytics_daily_rollup.sql','utf8'))} }
   prepare(sql) { return { bind:(...args)=>new BoundStatement(this.sqlite,sql,args), run:async()=>new BoundStatement(this.sqlite,sql,[]).run(), first:async()=>new BoundStatement(this.sqlite,sql,[]).first(), all:async()=>new BoundStatement(this.sqlite,sql,[]).all() }; }
   async batch(statements) { this.sqlite.exec('BEGIN'); try { const results=[]; for(const statement of statements)results.push(await statement.run()); this.sqlite.exec('COMMIT'); return results; } catch(error) { this.sqlite.exec('ROLLBACK'); throw error; } }
   close() { this.sqlite.close(); }
@@ -89,6 +91,42 @@ test('admin product create provisions empty and upgrades legacy store schema',as
 test('zero available stock is always presented as sold_out',()=>{
   const product=productFromRow({id:'op-0',name:'หมด',priceSatang:10000,stockQuantity:0,reservedQuantity:0,status:'published'});
   assert.equal(product.availableStock,0);assert.equal(product.status,'sold_out');
+});
+
+test('traffic uses daily rollups without hot-path schema work or raw events',async(t)=>{
+  const db=new D1Mock();t.after(()=>db.close());
+  const viewSource=fs.readFileSync('functions/api/analytics/view.js','utf8');
+  const statsSource=fs.readFileSync('functions/api/analytics/stats.js','utf8');
+  assert.doesNotMatch(viewSource,/CREATE TABLE|CREATE INDEX|analytics_views/);
+  assert.doesNotMatch(statsSource,/CREATE TABLE|CREATE INDEX|analytics_views|COUNT\(DISTINCT/);
+  for(const pageId of ['home','home','rg-001']){
+    const response=await recordTraffic({env:{TOYSKUB_DB:db},request:request('/api/analytics/view',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pageId,visitorId:crypto.randomUUID()})})});
+    assert.equal(response.status,200);
+  }
+  const site=await read(await getTrafficStats({env:{TOYSKUB_DB:db},request:request('/api/analytics/stats')}));
+  assert.equal(site.today,3);assert.equal(site.sevenDays,3);assert.equal(site.thirtyDays,3);assert.equal(site.total,3);
+  const page=await read(await getTrafficStats({env:{TOYSKUB_DB:db},request:request('/api/analytics/stats?pageId=home')}));
+  assert.equal(page.pageViews,2);
+  assert.equal(db.sqlite.prepare('SELECT COUNT(*) AS total FROM analytics_views').get().total,0);
+  assert.equal(db.sqlite.prepare('SELECT COUNT(*) AS total FROM analytics_daily').get().total,2);
+});
+
+test('traffic migration rolls up old events and preserves the raw table',()=>{
+  const sqlite=new DatabaseSync(':memory:');
+  try{
+    sqlite.exec(fs.readFileSync('migrations/0003_analytics_views.sql','utf8'));
+    const insert=sqlite.prepare('INSERT INTO analytics_views(page_id,visitor_id,viewed_at) VALUES(?,?,?)');
+    insert.run('home','visitor-a','2026-08-20 01:00:00');
+    insert.run('home','visitor-a','2026-08-20 02:00:00');
+    insert.run('home','visitor-b','2026-08-20 03:00:00');
+    insert.run('rg-001','visitor-a','2026-08-20 04:00:00');
+    sqlite.exec(fs.readFileSync('migrations/0008_analytics_daily_rollup.sql','utf8'));
+    assert.equal(sqlite.prepare("SELECT view_count FROM analytics_daily WHERE day='2026-08-20' AND page_id='home'").get().view_count,2);
+    assert.equal(sqlite.prepare("SELECT view_count FROM analytics_totals WHERE page_id='home'").get().view_count,2);
+    assert.equal(sqlite.prepare('SELECT COUNT(*) AS total FROM analytics_views').get().total,4);
+    const plan=sqlite.prepare("EXPLAIN QUERY PLAN SELECT SUM(view_count) FROM analytics_daily WHERE day>=date('now','-29 days')").all().map(row=>row.detail).join(' ');
+    assert.match(plan,/INDEX|PRIMARY KEY/i);
+  }finally{sqlite.close()}
 });
 
 test('public order reserves availability and rejects overselling',async(t)=>{

@@ -4,6 +4,7 @@ const PRODUCT_COUNT_EL = document.getElementById("productCount");
 let PRODUCTS = [];
 let CATEGORY_MAP = {};
 const PRODUCT_CACHE = new Map();
+const VISITOR_STATS_CACHE = new Map();
 let activeFilter = "";
 let activeCategory = "";
 let activeProductType = "";
@@ -208,14 +209,20 @@ async function recordPageView(pageId = "home") {
 }
 
 async function loadVisitorStats(pageId = "") {
+  const cacheKey = pageId || "__site__";
+  if (VISITOR_STATS_CACHE.has(cacheKey)) return VISITOR_STATS_CACHE.get(cacheKey);
+  const request = (async () => {
   try {
     const query = pageId ? `?pageId=${encodeURIComponent(pageId)}` : "";
-    const response = await fetch(`/api/analytics/stats${query}`, { cache: "no-store" });
+    const response = await fetch(`/api/analytics/stats${query}`);
     if (!response.ok) return null;
     return response.json();
   } catch {
     return null;
   }
+  })();
+  VISITOR_STATS_CACHE.set(cacheKey, request);
+  return request;
 }
 
 function visitorStatsHTML(id, compact = false) {

@@ -51,6 +51,7 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 ### TOY-EC-005: Analytics abuse/privacy controls (High)
 
 - ระบุว่า stats public หรือ admin-only
+- เปลี่ยน Traffic analytics เป็น daily rollup เพื่อลด D1 rows read และหยุด schema DDL บน request path (เสร็จใน Migration 0008)
 - dedupe/rate limit ingestion, validation และ retention cleanup
 - privacy notice/consent decision สำหรับ persistent visitor ID
 - load/abuse tests บน staging
