@@ -129,6 +129,18 @@ test('traffic migration rolls up old events and preserves the raw table',()=>{
   }finally{sqlite.close()}
 });
 
+test('traffic self-provisions rollups once when migration cannot be run manually',async(t)=>{
+  const db=new D1Mock('empty');t.after(()=>db.close());
+  const recorded=await recordTraffic({env:{TOYSKUB_DB:db},request:request('/api/analytics/view',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pageId:'home',visitorId:'visitor-a'})})});
+  assert.equal(recorded.status,200);
+  assert.equal(db.sqlite.prepare("SELECT view_count FROM analytics_daily WHERE page_id='home'").get().view_count,1);
+  const stats=await read(await getTrafficStats({env:{TOYSKUB_DB:db},request:request('/api/analytics/stats')}));
+  assert.equal(stats.total,1);
+  const helper=fs.readFileSync('functions/lib/analytics-db.js','utf8');
+  assert.match(helper,/no such table/);
+  assert.match(helper,/CREATE TABLE IF NOT EXISTS analytics_daily/);
+});
+
 test('public order reserves availability and rejects overselling',async(t)=>{
   const db=new D1Mock();t.after(()=>db.close());
   db.sqlite.prepare("INSERT INTO store_products(id,name,price_satang,stock_quantity,status) VALUES(?,?,?,?,?)").run('op-001','Starter Deck',25000,2,'published');
