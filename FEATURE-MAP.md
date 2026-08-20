@@ -76,7 +76,7 @@
 | `member_sessions` | F005 | token hash, activity time | expiry cleanup/revoke-all |
 | `audit_logs` | F004-F006 intended | user/action/details | coverage และ retention ไม่กำหนด |
 | `analytics_views` | F003 | persistent visitor ID, page/time | abuse, dedupe, retention/privacy |
-| `store_products` | F015, F016 | price, stock, media URL | published/sold-out state and active reservations |
+| `store_products` | F015, F016 | price, stock, media URL | Store API provision schema ที่ขาดและอัปเกรดคอลัมน์ `level`; published/sold-out state and active reservations |
 | `store_orders` | F015, F016 | recipient name, phone, address, note | pending → payment_review → paid/cancelled; retention policy required |
 
 ## Known inactive or ambiguous surfaces

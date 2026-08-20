@@ -1,5 +1,5 @@
 import { isAuthorized, json } from '../../../../lib/admin-auth.js';
-import { normalizeProduct, PRODUCT_SELECT, productFromRow, validateProduct } from '../../../../lib/store-db.js';
+import { ensureStoreSchema, normalizeProduct, PRODUCT_SELECT, productFromRow, validateProduct } from '../../../../lib/store-db.js';
 
 async function guard(context) {
   if (!(await isAuthorized(context.request, context.env))) return json({ ok: false, error: 'กรุณาเข้าสู่ระบบใหม่' }, 401);
@@ -10,6 +10,7 @@ async function guard(context) {
 export async function onRequestGet(context) {
   const denied = await guard(context); if (denied) return denied;
   try {
+    await ensureStoreSchema(context.env.TOYSKUB_DB);
     const result = await context.env.TOYSKUB_DB.prepare(`${PRODUCT_SELECT} ORDER BY p.sort_order,p.id`).all();
     return json({ ok: true, products: (result.results || []).map(productFromRow) });
   } catch { return json({ ok: false, error: 'ฐานข้อมูลสินค้าและคำสั่งซื้อยังไม่พร้อม กรุณาติดต่อผู้ดูแลระบบ' }, 503); }
@@ -17,6 +18,8 @@ export async function onRequestGet(context) {
 
 export async function onRequestPost(context) {
   const denied = await guard(context); if (denied) return denied;
+  try { await ensureStoreSchema(context.env.TOYSKUB_DB); }
+  catch { return json({ ok: false, error: 'เตรียมฐานข้อมูลสินค้าไม่สำเร็จ กรุณาลองใหม่' }, 503); }
   const product = normalizeProduct(await context.request.json().catch(() => ({})));
   const error = validateProduct(product); if (error) return json({ ok: false, error }, 400);
   try {

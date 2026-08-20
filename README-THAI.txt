@@ -57,6 +57,7 @@ ERROR หมายถึงต้องแก้ก่อนอัปโหล�
 - หน้าร้าน: /shop/
 - หลังบ้าน: /admin/store/
 - Migrations: migrations/0005_store_products_orders.sql และ migrations/0006_store_product_level.sql
+- Store API ตรวจและสร้างตาราง/ดัชนีที่ขาด รวมถึงเพิ่มคอลัมน์ level ให้ schema รุ่นเก่าอัตโนมัติก่อนใช้งาน
 - รัน test: node --test tests/store.test.js
 - ต้องรัน migration บน environment เป้าหมายก่อนเปิดใช้โค้ดร้านค้า
 - คำสั่งซื้อเก็บข้อมูลจัดส่งใน D1 และแสดงเฉพาะ API หลังบ้านที่ตรวจสิทธิ์

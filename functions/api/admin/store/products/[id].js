@@ -1,10 +1,12 @@
 import { isAuthorized, json } from '../../../../lib/admin-auth.js';
-import { cleanStoreId, normalizeProduct, validateProduct } from '../../../../lib/store-db.js';
+import { cleanStoreId, ensureStoreSchema, normalizeProduct, validateProduct } from '../../../../lib/store-db.js';
 
 export async function onRequestPut(context) {
   if (!(await isAuthorized(context.request, context.env))) return json({ ok: false, error: 'กรุณาเข้าสู่ระบบใหม่' }, 401);
   const db = context.env.TOYSKUB_DB;
   if (!db) return json({ ok: false, error: 'ไม่พบ TOYSKUB_DB' }, 503);
+  try { await ensureStoreSchema(db); }
+  catch { return json({ ok: false, error: 'เตรียมฐานข้อมูลสินค้าไม่สำเร็จ กรุณาลองใหม่' }, 503); }
   const routeId = cleanStoreId(context.params.id);
   const product = normalizeProduct({ ...(await context.request.json().catch(() => ({}))), id: routeId });
   const error = validateProduct(product); if (error) return json({ ok: false, error }, 400);

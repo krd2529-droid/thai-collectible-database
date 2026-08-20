@@ -1,5 +1,5 @@
 import { isAuthorized, json } from '../../../../lib/admin-auth.js';
-import { ORDER_STATUSES } from '../../../../lib/store-db.js';
+import { ensureStoreSchema, ORDER_STATUSES } from '../../../../lib/store-db.js';
 
 const TRANSITIONS = {
   pending: new Set(['payment_review','cancelled']),
@@ -12,6 +12,8 @@ export async function onRequestPut(context) {
   if (!(await isAuthorized(context.request, context.env))) return json({ ok: false, error: 'กรุณาเข้าสู่ระบบใหม่' }, 401);
   const db = context.env.TOYSKUB_DB;
   if (!db) return json({ ok: false, error: 'ไม่พบ TOYSKUB_DB' }, 503);
+  try { await ensureStoreSchema(db); }
+  catch { return json({ ok: false, error: 'เตรียมฐานข้อมูลสินค้าไม่สำเร็จ กรุณาลองใหม่' }, 503); }
   const id = Number(context.params.id);
   const body = await context.request.json().catch(() => ({}));
   const status = String(body.status || '');

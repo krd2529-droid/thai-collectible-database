@@ -1,5 +1,5 @@
 import { json } from '../../../lib/admin-auth.js';
-import { cleanStoreId, ORDER_SELECT, publicOrderFromRow } from '../../../lib/store-db.js';
+import { cleanStoreId, ensureStoreSchema, ORDER_SELECT, publicOrderFromRow } from '../../../lib/store-db.js';
 
 function reference() {
   const date = new Date().toISOString().slice(0, 10).replaceAll('-', '');
@@ -9,6 +9,8 @@ function reference() {
 export async function onRequestPost(context) {
   const db = context.env.TOYSKUB_DB;
   if (!db) return json({ ok: false, error: 'ร้านค้ายังไม่พร้อมใช้งาน' }, 503);
+  try { await ensureStoreSchema(db); }
+  catch { return json({ ok: false, error: 'เตรียมฐานข้อมูลสินค้าไม่สำเร็จ กรุณาลองใหม่' }, 503); }
   const body = await context.request.json().catch(() => ({}));
   const productId = cleanStoreId(body.productId);
   const quantity = Number(body.quantity);

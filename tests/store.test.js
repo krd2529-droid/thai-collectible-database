@@ -17,7 +17,7 @@ class BoundStatement {
   async all() { return { results:this.db.prepare(this.sql).all(...this.args) }; }
 }
 class D1Mock {
-  constructor() { this.sqlite=new DatabaseSync(':memory:'); this.sqlite.exec(fs.readFileSync('migrations/0005_store_products_orders.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0006_store_product_level.sql','utf8')); }
+  constructor(schema='full') { this.sqlite=new DatabaseSync(':memory:');if(schema!=='empty')this.sqlite.exec(fs.readFileSync('migrations/0005_store_products_orders.sql','utf8'));if(schema==='full')this.sqlite.exec(fs.readFileSync('migrations/0006_store_product_level.sql','utf8')); }
   prepare(sql) { return { bind:(...args)=>new BoundStatement(this.sqlite,sql,args), run:async()=>new BoundStatement(this.sqlite,sql,[]).run(), first:async()=>new BoundStatement(this.sqlite,sql,[]).first(), all:async()=>new BoundStatement(this.sqlite,sql,[]).all() }; }
   async batch(statements) { this.sqlite.exec('BEGIN'); try { const results=[]; for(const statement of statements)results.push(await statement.run()); this.sqlite.exec('COMMIT'); return results; } catch(error) { this.sqlite.exec('ROLLBACK'); throw error; } }
   close() { this.sqlite.close(); }
@@ -47,6 +47,21 @@ test('media upload reports missing storage and storage failures clearly',async()
   assert.equal(missing.status,503);assert.match((await read(missing)).error,/TOYSKUB_MEDIA/);
   const failed=await uploadMedia({request:makeUploadRequest(),env:{ADMIN_PASSWORD:secret,TOYSKUB_MEDIA:{put:async()=>{throw Error('storage unavailable')}}}});
   assert.equal(failed.status,503);assert.match((await read(failed)).error,/พื้นที่จัดเก็บ/);
+});
+
+test('admin product create provisions empty and upgrades legacy store schema',async(t)=>{
+  const secret='schema-test-secret';const cookie=(await createSessionCookie(secret)).split(';')[0];
+  for(const schema of ['empty','legacy']){
+    const db=new D1Mock(schema);t.after(()=>db.close());
+    const form=new FormData();form.append('id',`op-${schema}`);form.append('kind','store');form.append('file',new File(['image'],'card.webp',{type:'image/webp'}));
+    const uploaded=await uploadMedia({request:request('/api/admin/media/upload',{method:'POST',headers:{cookie},body:form}),env:{ADMIN_PASSWORD:secret,TOYSKUB_MEDIA:{put:async()=>{}}}});
+    assert.equal(uploaded.status,200);const imageUrl=(await read(uploaded)).url;
+    const body={id:`op-${schema}`,name:'Gear 2',description:'ใบ RAW ไม่มีตำหนิ',level:'PA',price:10000,stockQuantity:4,status:'draft',imageUrl};
+    const response=await createProduct({env:{TOYSKUB_DB:db,ADMIN_PASSWORD:secret},request:request('/api/admin/store/products',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify(body)})});
+    assert.equal(response.status,201,`${schema}: ${JSON.stringify(await read(response.clone()))}`);
+    const saved=db.sqlite.prepare('SELECT level,stock_quantity FROM store_products WHERE id=?').get(`op-${schema}`);
+    assert.equal(saved.level,'PA');assert.equal(saved.stock_quantity,4);
+  }
 });
 
 test('zero available stock is always presented as sold_out',()=>{
