@@ -13,13 +13,11 @@ let ADMIN_SESSION = { checked: false, authenticated: false, source: "none" };
 
 const CATEGORIES = [
   { key: "model", label: "Gundam", description: "รวมสินค้าของสะสม Gundam" },
-  { key: "available-products", label: "สินค้าที่มีจำหน่าย", description: "เลือกซื้อสินค้าพร้อมส่งจาก TOYSKUB" },
   { key: "zippo", label: "Zippo", description: "กำลังเพิ่มข้อมูล" },
 ];
 
 const PRODUCT_TYPES = {
   model: [{ key: "gunpla", label: "Gunpla", description: "โมเดลพลาสติกประกอบ แยกตามเกรด" }],
-  "available-products": [{ key: "one-piece-card", label: "One Piece Card", description: "การ์ด One Piece ที่มีจำหน่าย", href: "/shop/?category=one-piece-card" }],
   zippo: [{ key: "zippo", label: "Zippo", description: "ไฟแช็กและของสะสม Zippo" }],
 };
 
@@ -323,9 +321,8 @@ function renderHome() {
   ].join('');
 
   const typeStepContent = activeCategory
-    ? typeOptions.map((type) => type.href
-        ? `<a class="catalog-choice type-chip" href="${esc(type.href)}"><strong>${esc(type.label)}</strong><small>${esc(type.description)}</small></a>`
-        : `<button class="catalog-choice type-chip ${type.key === activeProductType ? "active" : ""}" data-type="${type.key}">
+    ? typeOptions.map((type) =>
+        `<button class="catalog-choice type-chip ${type.key === activeProductType ? "active" : ""}" data-type="${type.key}">
           <strong>${esc(type.label)}</strong><small>${esc(type.description)}</small>
         </button>`).join('')
     : '<p class="catalog-waiting">กรุณาเลือกหมวดหลักก่อน</p>';
@@ -354,6 +351,15 @@ function renderHome() {
         <span>SEARCH</span>
         <input id="productSearch" type="search" value="${esc(searchTerm)}" placeholder="${activeFilter ? 'ค้นหาชื่อสินค้า รุ่น รหัส หรือผู้ผลิต' : 'เลือกเกรดก่อนค้นหาสินค้า'}" ${activeFilter ? '' : 'disabled'} />
       </label>
+    </section>
+
+    <section class="store-gateway" aria-labelledby="storeGatewayTitle">
+      <div>
+        <span class="store-gateway__eyebrow">// TOYSKUB STORE · STOCK พร้อมขาย</span>
+        <h2 id="storeGatewayTitle">ร้านค้าแยกจากแคตตาล็อก</h2>
+        <p>One Piece Card ที่มีสต็อกจริง ราคา และปุ่มสั่งซื้อ ดูได้ในหน้าร้านโดยตรง</p>
+      </div>
+      <a href="/shop/?category=one-piece-card">เลือกซื้อสินค้าที่มีจำหน่าย <span aria-hidden="true">→</span></a>
     </section>
 
     <nav class="catalog-breadcrumb" aria-label="หมวดสินค้า">${breadcrumbParts}</nav>

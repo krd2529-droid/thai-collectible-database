@@ -114,7 +114,7 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 
 ### TOY-EC-014: One Piece Card storefront and order flow (Completed in TOY-PATCH-003)
 
-- เพิ่มหมวดสินค้าที่มีจำหน่าย → One Piece Card และหน้าร้าน responsive
+- เพิ่มหน้าร้าน One Piece Card แบบ responsive แยกจากหมวดและข้อมูลแคตตาล็อกโดยชัดเจน
 - เพิ่มสินค้า ราคา stock รูป และสถานะในหลังบ้าน
 - เพิ่ม checkout, ข้อมูลจัดส่ง, บัญชีธนาคาร และ handoff ไป Facebook
 - ใช้ pending/payment_review เป็น reservation และหัก stock เฉพาะ paid

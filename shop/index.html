@@ -3,15 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>One Piece Card พร้อมจำหน่าย · TOYSKUB</title>
-  <meta name="description" content="สินค้า One Piece Card ที่มีจำหน่ายจาก TOYSKUB">
-  <link rel="stylesheet" href="./shop.css?v=toy-patch-003">
+  <title>สินค้าที่มีจำหน่าย · TOYSKUB</title>
+  <meta name="description" content="เลือกซื้อสินค้าที่มีจำหน่ายและมีสต็อกจริงจาก TOYSKUB">
+  <link rel="stylesheet" href="./shop.css?v=store-split-20260820-1">
 </head>
 <body>
   <header class="shop-header"><a href="/" class="brand"><span>TK</span> TOYSKUB</a><a href="/">กลับฐานข้อมูล</a></header>
   <main class="shop-shell">
-    <nav class="crumb">หน้าหลัก › สินค้าที่มีจำหน่าย › <strong>One Piece Card</strong></nav>
-    <section class="hero"><p>// AVAILABLE PRODUCTS</p><h1>One Piece Card</h1><span>เลือกสินค้าและจำนวน ระบบจะจองรายการไว้รอตรวจสอบการชำระเงิน</span></section>
+    <nav id="shopCrumb" class="crumb"><a href="/">หน้าหลัก</a> › <strong>สินค้าที่มีจำหน่าย</strong></nav>
+    <section class="hero"><p>// TOYSKUB STORE · LIVE STOCK</p><h1 id="shopTitle">สินค้าที่มีจำหน่าย</h1><span id="shopSubtitle">เลือกหมวดสินค้าที่ต้องการ สินค้าในร้านค้าแยกจากข้อมูลแคตตาล็อก</span></section>
+    <section id="shopCategories" class="shop-categories product-grid" aria-label="หมวดย่อยสินค้า">
+      <a class="product-card" href="/shop/?category=one-piece-card"><div class="product-body"><span class="eyebrow">// หมวดย่อย</span><h2>การ์ดวันพีช</h2><p class="description">One Piece Card · ดูสินค้าที่มีสต็อกจริง</p></div></a>
+    </section>
     <div id="message" class="message loading">กำลังโหลดสินค้า…</div>
     <section id="products" class="product-grid" aria-live="polite"></section>
   </main>
@@ -33,6 +36,6 @@
       <a id="facebookButton" class="facebook hidden" href="https://www.facebook.com/IndyKookkoo/" target="_blank" rel="noopener noreferrer">คัดลอกข้อความแล้วเปิด Facebook</a>
     </form>
   </dialog>
-  <script src="./shop.js?v=toy-patch-003"></script>
+  <script src="./shop.js?v=store-split-20260820-1"></script>
 </body>
 </html>

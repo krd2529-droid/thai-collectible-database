@@ -24,6 +24,12 @@ class D1Mock {
 const request=(url,options={})=>new Request(`https://toyskub.test${url}`,options);
 const read=response=>response.json();
 
+test('store entry is separate from catalog categories',()=>{
+  const app=fs.readFileSync('app.js','utf8');
+  assert.doesNotMatch(app,/key:\s*["']available-products["']/);
+  assert.match(app,/href="\/shop\/\?category=one-piece-card"/);
+});
+
 test('normalizes product money and rejects negative stock',()=>{
   const valid=normalizeProduct({id:' OP Card 001 ',name:'การ์ดทดสอบ',price:19.99,stockQuantity:2,status:'published'});
   assert.equal(valid.id,'op-card-001');assert.equal(valid.priceSatang,1999);assert.equal(validateProduct(valid),'');
