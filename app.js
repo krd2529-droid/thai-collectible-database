@@ -350,7 +350,7 @@ function renderHome() {
     <section class="store-preview" aria-labelledby="storePreviewTitle">
       <div class="store-preview__heading">
         <div><span>// สินค้าพร้อมขาย</span><h2 id="storePreviewTitle">สินค้าในร้าน</h2><p>สินค้าที่มีสต็อกจริง เลือกจำนวนและกดซื้อได้จากหน้าแรก</p></div>
-        <a href="/shop/">ดูสินค้าทั้งหมด →</a>
+        <a href="#storePreviewGrid">ดูสินค้าในร้าน →</a>
       </div>
       <div id="storePreviewGrid" class="store-preview__categories"><p class="store-preview__message">กำลังโหลดสินค้าในร้าน…</p></div>
     </section>
@@ -431,15 +431,70 @@ async function hydrateStorePreview() {
         <div class="store-preview-card__body"><h3>${esc(product.name)}</h3>${product.level ? `<small>ระดับ ${esc(product.level)}</small>` : ''}
           <p>${esc(product.description || '')}</p><strong class="store-preview-card__price">${money(product.price)}</strong>
           <span class="store-preview-card__stock ${soldOut ? 'sold-out' : ''}">${soldOut ? 'Sold out' : `พร้อมขาย ${product.availableStock} ชิ้น`}</span>
-          <form class="store-preview-card__buy" action="/shop/" method="get"><input type="hidden" name="category" value="one-piece-card"><input type="hidden" name="product" value="${esc(product.id)}"><input name="quantity" type="number" min="1" max="${product.availableStock}" value="1" aria-label="จำนวน ${esc(product.name)}" ${soldOut ? 'disabled' : ''}>
-            <button type="submit" ${soldOut ? 'disabled' : ''}>${soldOut ? 'Sold out' : 'ซื้อสินค้า'}</button></form>
+          <div class="store-preview-card__buy"><input name="quantity" type="number" min="1" max="${product.availableStock}" value="1" aria-label="จำนวน ${esc(product.name)}" ${soldOut ? 'disabled' : ''}>
+            <button type="button" data-store-buy="${esc(product.id)}" ${soldOut ? 'disabled' : ''}>${soldOut ? 'Sold out' : 'ซื้อสินค้า'}</button></div>
         </div></article>`;
     }).join("");
     grid.innerHTML = `<section class="store-preview-category" data-store-category="one-piece-card">
       <div class="catalog-series-heading"><h2>การ์ดวันพีช</h2><span>${products.length} รายการ</span></div>
       <div class="store-preview__grid">${cards}</div>
     </section>`;
+    grid.querySelectorAll("[data-store-buy]").forEach(button => button.addEventListener("click", () => {
+      const product = products.find(item => item.id === button.dataset.storeBuy);
+      const quantity = Number(button.previousElementSibling?.value);
+      beginStoreCheckout(product, quantity);
+    }));
   } catch (error) { grid.innerHTML = `<p class="store-preview__message error">${esc(error.message)}</p>`; }
+}
+
+let selectedStoreOrder = null;
+let storeClientToken = "";
+let storeOrderMessage = "";
+const storeMoney = value => new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(Number(value) || 0);
+function storeCheckoutMessage(text = "", type = "") {
+  const element = document.getElementById("storeCheckoutMessage");
+  if (!element) return;
+  element.textContent = text;
+  element.className = text ? `store-checkout__message ${type}` : "store-checkout__message hidden";
+}
+function beginStoreCheckout(product, quantity) {
+  if (!product || !Number.isInteger(quantity) || quantity < 1 || quantity > product.availableStock) return;
+  selectedStoreOrder = { product, quantity };
+  storeClientToken = crypto.randomUUID();
+  document.getElementById("storeCheckoutSummary").innerHTML = `<b>${esc(product.name)}</b><br>จำนวน ${quantity} × ${storeMoney(product.price)}<br><strong>ยอดรวม ${storeMoney(product.price * quantity)}</strong>`;
+  const submit = document.getElementById("createStoreOrder");
+  submit.disabled = false;
+  submit.textContent = "ยืนยันและสร้างคำสั่งซื้อ";
+  submit.classList.remove("hidden");
+  document.getElementById("storeFacebookButton").classList.add("hidden");
+  storeCheckoutMessage();
+  document.getElementById("storeCheckoutDialog").showModal();
+}
+function setupStoreCheckout() {
+  const dialog = document.getElementById("storeCheckoutDialog");
+  if (!dialog || dialog.dataset.ready) return;
+  dialog.dataset.ready = "true";
+  document.getElementById("closeStoreCheckout").addEventListener("click", () => dialog.close());
+  document.getElementById("copyStoreAccount").addEventListener("click", async () => { await navigator.clipboard.writeText("444-118-1181"); storeCheckoutMessage("คัดลอกเลขบัญชีแล้ว"); });
+  document.getElementById("storeCheckoutForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    if (!selectedStoreOrder) return;
+    const button = document.getElementById("createStoreOrder");
+    button.disabled = true; button.textContent = "กำลังสร้างคำสั่งซื้อ…"; storeCheckoutMessage();
+    try {
+      const payload = { productId: selectedStoreOrder.product.id, quantity: selectedStoreOrder.quantity, clientToken: storeClientToken, customerName: document.getElementById("storeCustomerName").value, customerPhone: document.getElementById("storeCustomerPhone").value, shippingAddress: document.getElementById("storeShippingAddress").value, customerNote: document.getElementById("storeCustomerNote").value };
+      const response = await fetch("/api/store/orders", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "สร้างคำสั่งซื้อไม่สำเร็จ");
+      const order = data.order;
+      storeOrderMessage = `แจ้งชำระคำสั่งซื้อ ${order.reference}\nสินค้า: ${order.productName}\nจำนวน: ${order.quantity}\nยอดรวม: ${storeMoney(order.total)}`;
+      storeCheckoutMessage(`สร้างคำสั่งซื้อ ${order.reference} แล้ว กรุณาชำระเงินและส่งหลักฐานทาง Facebook`);
+      button.classList.add("hidden");
+      document.getElementById("storeFacebookButton").classList.remove("hidden");
+    } catch (error) { storeCheckoutMessage(error.message, "error"); button.disabled = false; }
+    finally { button.textContent = "ยืนยันและสร้างคำสั่งซื้อ"; }
+  });
+  document.getElementById("storeFacebookButton").addEventListener("click", async () => { try { await navigator.clipboard.writeText(storeOrderMessage); } catch {} });
 }
 
 function catalogGroupName(product, activeLine) {

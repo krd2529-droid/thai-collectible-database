@@ -9,7 +9,7 @@
 <link id="canonicalUrl" rel="canonical" href="https://toyskub.com/" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=store-four-column-20260820-1" />
+<link rel="stylesheet" href="style.css?v=store-home-checkout-20260820-1" />
 </head>
 <body>
 
@@ -25,7 +25,7 @@
     </a>
     <nav class="header-nav">
       <a class="header-nav-link active" href="/">แคตตาล็อก</a>
-      <a class="header-nav-link store" href="/shop/">ร้านค้า</a>
+      <a class="header-nav-link store" href="#storePreviewGrid">สินค้าในร้าน</a>
     </nav>
   </div>
 </header>
@@ -34,6 +34,25 @@
   <section class="empty-state">กำลังโหลดข้อมูลสินค้า…</section>
 </main>
 
+<dialog id="storeCheckoutDialog" class="store-checkout">
+  <form id="storeCheckoutForm">
+    <button id="closeStoreCheckout" class="store-checkout__close" type="button" aria-label="ปิด">×</button>
+    <p class="store-checkout__eyebrow">// ORDER SUMMARY</p><h2>สรุปคำสั่งซื้อ</h2>
+    <div id="storeCheckoutSummary" class="store-checkout__summary"></div>
+    <fieldset><legend>ข้อมูลจัดส่ง</legend>
+      <label>ชื่อผู้รับ<input id="storeCustomerName" maxlength="120" autocomplete="name" required></label>
+      <label>เบอร์โทร<input id="storeCustomerPhone" maxlength="30" inputmode="tel" autocomplete="tel" required></label>
+      <label>ที่อยู่จัดส่ง<textarea id="storeShippingAddress" maxlength="1000" rows="4" autocomplete="street-address" required></textarea></label>
+      <label>หมายเหตุ (ถ้ามี)<textarea id="storeCustomerNote" maxlength="500" rows="2"></textarea></label>
+    </fieldset>
+    <section class="store-checkout__bank"><small>ชำระเงินผ่าน</small><strong>ธนาคารกรุงศรีอยุธยา</strong><span>รัฐสิทธิ ดำรงรถการ</span><code>444-118-1181</code><button id="copyStoreAccount" type="button">คัดลอกเลขบัญชี</button></section>
+    <p class="store-checkout__notice">ระบบจะยังไม่ตัดสต็อกจริงจนกว่าแอดมินยืนยันการชำระเงิน</p>
+    <div id="storeCheckoutMessage" class="store-checkout__message hidden"></div>
+    <button id="createStoreOrder" class="store-checkout__primary" type="submit">ยืนยันและสร้างคำสั่งซื้อ</button>
+    <a id="storeFacebookButton" class="store-checkout__facebook hidden" href="https://www.facebook.com/IndyKookkoo/" target="_blank" rel="noopener noreferrer">คัดลอกข้อความแล้วเปิด Facebook</a>
+  </form>
+</dialog>
+
 <footer class="site-footer">
   <div class="footer-inner">
     <p class="footer-plate">TOYSKUB / TOYS DATA BASE</p>
@@ -41,7 +60,8 @@
   </div>
 </footer>
 
-<script src="app.js?v=store-category-group-20260820-1"></script>
+<script src="app.js?v=store-home-checkout-20260820-1"></script>
+<script>setupStoreCheckout()</script>
 
 
 </body>

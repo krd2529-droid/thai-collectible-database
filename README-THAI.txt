@@ -54,7 +54,7 @@ ERROR หมายถึงต้องแก้ก่อนอัปโหล�
 
 ร้านค้า One Piece Card
 
-- หน้าร้าน: /shop/
+- สินค้าในร้านและขั้นตอนสั่งซื้อ: หน้าแรก /
 - หลังบ้าน: /admin/store/
 - Migrations: migrations/0005_store_products_orders.sql, 0006_store_product_level.sql และ 0007_store_product_cost.sql
 - Store API ตรวจและสร้างตาราง/ดัชนีที่ขาด รวมถึงเพิ่มคอลัมน์ level ให้ schema รุ่นเก่าอัตโนมัติก่อนใช้งาน
