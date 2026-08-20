@@ -352,7 +352,7 @@ function renderHome() {
         <div><span>// สินค้าพร้อมขาย</span><h2 id="storePreviewTitle">สินค้าในร้าน</h2><p>สินค้าที่มีสต็อกจริง เลือกจำนวนและกดซื้อได้จากหน้าแรก</p></div>
         <a href="/shop/">ดูสินค้าทั้งหมด →</a>
       </div>
-      <div id="storePreviewGrid" class="store-preview__grid"><p class="store-preview__message">กำลังโหลดสินค้าในร้าน…</p></div>
+      <div id="storePreviewGrid" class="store-preview__categories"><p class="store-preview__message">กำลังโหลดสินค้าในร้าน…</p></div>
     </section>
 
     <header class="catalog-series-heading" aria-label="แคตตาล็อก">
@@ -424,7 +424,7 @@ async function hydrateStorePreview() {
     const products = data.products || [];
     if (!products.length) { grid.innerHTML = '<p class="store-preview__message">ยังไม่มีสินค้าที่เผยแพร่</p>'; return; }
     const money = value => new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(Number(value) || 0);
-    grid.innerHTML = products.map(product => {
+    const cards = products.map(product => {
       const soldOut = product.availableStock < 1 || product.status === "sold_out";
       return `<article class="store-preview-card">
         <div class="store-preview-card__image">${product.imageUrl ? `<img src="${esc(product.imageUrl)}" alt="${esc(product.name)}">` : '<span>ยังไม่มีรูปสินค้า</span>'}</div>
@@ -435,6 +435,10 @@ async function hydrateStorePreview() {
             <button type="submit" ${soldOut ? 'disabled' : ''}>${soldOut ? 'Sold out' : 'ซื้อสินค้า'}</button></form>
         </div></article>`;
     }).join("");
+    grid.innerHTML = `<section class="store-preview-category" data-store-category="one-piece-card">
+      <div class="catalog-series-heading"><h2>การ์ดวันพีช</h2><span>${products.length} รายการ</span></div>
+      <div class="store-preview__grid">${cards}</div>
+    </section>`;
   } catch (error) { grid.innerHTML = `<p class="store-preview__message error">${esc(error.message)}</p>`; }
 }
 

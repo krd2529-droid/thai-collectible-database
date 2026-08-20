@@ -32,6 +32,8 @@ test('store entry is separate from catalog categories',()=>{
   assert.match(app,/>สินค้าในร้าน</);
   assert.match(app,/href="\/shop\/"/);
   assert.match(app,/id="storePreviewGrid"/);
+  assert.match(app,/<h2>การ์ดวันพีช<\/h2>/);
+  assert.match(app,/data-store-category="one-piece-card"/);
   assert.match(app,/class="store-preview-card__buy" action="\/shop\/" method="get"/);
   assert.match(app,/class="catalog-series-heading" aria-label="แคตตาล็อก"/);
   assert.match(app,/<h2>แคตตาล็อก<\/h2>/);
