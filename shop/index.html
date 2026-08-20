@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>One Piece Card พร้อมจำหน่าย · TOYSKUB</title>
+  <meta name="description" content="สินค้า One Piece Card ที่มีจำหน่ายจาก TOYSKUB">
+  <link rel="stylesheet" href="./shop.css?v=toy-patch-003">
+</head>
+<body>
+  <header class="shop-header"><a href="/" class="brand"><span>TK</span> TOYSKUB</a><a href="/">กลับฐานข้อมูล</a></header>
+  <main class="shop-shell">
+    <nav class="crumb">หน้าหลัก › สินค้าที่มีจำหน่าย › <strong>One Piece Card</strong></nav>
+    <section class="hero"><p>// AVAILABLE PRODUCTS</p><h1>One Piece Card</h1><span>เลือกสินค้าและจำนวน ระบบจะจองรายการไว้รอตรวจสอบการชำระเงิน</span></section>
+    <div id="message" class="message loading">กำลังโหลดสินค้า…</div>
+    <section id="products" class="product-grid" aria-live="polite"></section>
+  </main>
+  <dialog id="checkoutDialog">
+    <form id="checkoutForm">
+      <button id="closeCheckout" class="close" type="button" aria-label="ปิด">×</button>
+      <p class="eyebrow">// ORDER SUMMARY</p><h2>สรุปคำสั่งซื้อ</h2>
+      <div id="checkoutSummary"></div>
+      <fieldset><legend>ข้อมูลจัดส่ง</legend>
+        <label>ชื่อผู้รับ<input id="customerName" maxlength="120" autocomplete="name" required></label>
+        <label>เบอร์โทร<input id="customerPhone" maxlength="30" inputmode="tel" autocomplete="tel" required></label>
+        <label>ที่อยู่จัดส่ง<textarea id="shippingAddress" maxlength="1000" rows="4" autocomplete="street-address" required></textarea></label>
+        <label>หมายเหตุ (ถ้ามี)<textarea id="customerNote" maxlength="500" rows="2"></textarea></label>
+      </fieldset>
+      <section class="bank-box"><small>ชำระเงินผ่าน</small><strong>ธนาคารกรุงศรีอยุธยา</strong><span>รัฐสิทธิ ดำรงรถการ</span><code>444-118-1181</code><button id="copyAccount" type="button">คัดลอกเลขบัญชี</button></section>
+      <p class="notice">ข้อมูลจัดส่งจะแสดงเฉพาะหลังบ้าน ระบบจะยังไม่ตัดสต็อกจริงจนกว่าแอดมินยืนยันการชำระเงิน</p>
+      <div id="checkoutMessage" class="message hidden"></div>
+      <button id="createOrder" class="primary" type="submit">ยืนยันและสร้างคำสั่งซื้อ</button>
+      <a id="facebookButton" class="facebook hidden" href="https://www.facebook.com/IndyKookkoo/" target="_blank" rel="noopener noreferrer">คัดลอกข้อความแล้วเปิด Facebook</a>
+    </form>
+  </dialog>
+  <script src="./shop.js?v=toy-patch-003"></script>
+</body>
+</html>

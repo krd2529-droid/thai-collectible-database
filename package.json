@@ -1,0 +1,10 @@
+{
+  "name": "toyskub",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "validate:catalog": "node tools/validate-catalog.mjs"
+  },
+  "engines": { "node": ">=22" }
+}

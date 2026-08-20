@@ -13,13 +13,13 @@ let ADMIN_SESSION = { checked: false, authenticated: false, source: "none" };
 
 const CATEGORIES = [
   { key: "model", label: "Gundam", description: "รวมสินค้าของสะสม Gundam" },
-  { key: "one-piece-card", label: "การ์ด One Piece", description: "กำลังเพิ่มข้อมูล" },
+  { key: "available-products", label: "สินค้าที่มีจำหน่าย", description: "เลือกซื้อสินค้าพร้อมส่งจาก TOYSKUB" },
   { key: "zippo", label: "Zippo", description: "กำลังเพิ่มข้อมูล" },
 ];
 
 const PRODUCT_TYPES = {
   model: [{ key: "gunpla", label: "Gunpla", description: "โมเดลพลาสติกประกอบ แยกตามเกรด" }],
-  "one-piece-card": [{ key: "one-piece-card", label: "การ์ด One Piece", description: "การ์ดสะสม One Piece" }],
+  "available-products": [{ key: "one-piece-card", label: "One Piece Card", description: "การ์ด One Piece ที่มีจำหน่าย", href: "/shop/?category=one-piece-card" }],
   zippo: [{ key: "zippo", label: "Zippo", description: "ไฟแช็กและของสะสม Zippo" }],
 };
 
@@ -323,8 +323,9 @@ function renderHome() {
   ].join('');
 
   const typeStepContent = activeCategory
-    ? typeOptions.map((type) =>
-        `<button class="catalog-choice type-chip ${type.key === activeProductType ? "active" : ""}" data-type="${type.key}">
+    ? typeOptions.map((type) => type.href
+        ? `<a class="catalog-choice type-chip" href="${esc(type.href)}"><strong>${esc(type.label)}</strong><small>${esc(type.description)}</small></a>`
+        : `<button class="catalog-choice type-chip ${type.key === activeProductType ? "active" : ""}" data-type="${type.key}">
           <strong>${esc(type.label)}</strong><small>${esc(type.description)}</small>
         </button>`).join('')
     : '<p class="catalog-waiting">กรุณาเลือกหมวดหลักก่อน</p>';

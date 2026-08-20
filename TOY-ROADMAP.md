@@ -112,6 +112,15 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - เพิ่ม index/detail JSON และ sitemap routes
 - เปลี่ยน public loader และ validator จาก RG-only เป็น multi-grade
 
+### TOY-EC-014: One Piece Card storefront and order flow (Completed in TOY-PATCH-003)
+
+- เพิ่มหมวดสินค้าที่มีจำหน่าย → One Piece Card และหน้าร้าน responsive
+- เพิ่มสินค้า ราคา stock รูป และสถานะในหลังบ้าน
+- เพิ่ม checkout, ข้อมูลจัดส่ง, บัญชีธนาคาร และ handoff ไป Facebook
+- ใช้ pending/payment_review เป็น reservation และหัก stock เฉพาะ paid
+- stock พร้อมขาย 0 แสดง Sold out และป้องกัน oversell/idempotent duplicate request
+- เพิ่ม migration 0005 และ integration tests ด้วยฐาน SQLite ชั่วคราว
+
 ## Phase 4 — Product growth (หลัง safety gates)
 
 เริ่มได้เมื่อ Phase 0-2 ผ่าน:

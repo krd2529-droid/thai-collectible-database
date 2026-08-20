@@ -51,3 +51,12 @@ node tools/validate-catalog.mjs
 หากขึ้น PASS แปลว่าโครงสร้าง JSON ใช้งานได้
 WARNING หมายถึง JSON ทำงานได้ แต่มีชื่อรูปที่ยังไม่พบไฟล์จริง
 ERROR หมายถึงต้องแก้ก่อนอัปโหลด
+
+ร้านค้า One Piece Card
+
+- หน้าร้าน: /shop/
+- หลังบ้าน: /admin/store/
+- Migration: migrations/0005_store_products_orders.sql
+- รัน test: node --test tests/store.test.js
+- ต้องรัน migration บน environment เป้าหมายก่อนเปิดใช้โค้ดร้านค้า
+- คำสั่งซื้อเก็บข้อมูลจัดส่งใน D1 และแสดงเฉพาะ API หลังบ้านที่ตรวจสิทธิ์

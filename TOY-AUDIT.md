@@ -142,9 +142,9 @@ R2 object ใช้ immutable URL และ timestamp key แต่ไม่พ�
 ## 6. ข้อมูลจริง ข้อมูลทดสอบ และ privacy
 
 - Static catalog และรูปใน repo ดูเป็นข้อมูลใช้งานจริง ไม่มี namespace สำหรับ fixture/test
-- D1 มี email, phone, password hash/salt, role, status และ session token hash ซึ่งเป็นข้อมูลส่วนบุคคล/ข้อมูลรับรอง
+- D1 มี email, phone, password hash/salt, role, status, session token hash และข้อมูลจัดส่งของคำสั่งซื้อ (ชื่อ เบอร์โทร ที่อยู่ หมายเหตุ) ซึ่งเป็นข้อมูลส่วนบุคคล/ข้อมูลรับรอง
 - Analytics เก็บ persistent visitor ID จาก localStorage
-- ไม่พบข้อมูลการเงินหรือ payment API ใน repository
+- หน้าร้านแสดงบัญชีรับชำระที่เจ้าของกำหนดแบบ static; ไม่มีการเก็บเลขบัญชีลูกค้าหรือเชื่อม payment API
 - ห้าม copy D1 production มาใช้ทดสอบโดยตรง ต้องสร้าง sanitized fixture และบัญชีทดสอบแยก
 - ต้องกำหนด retention สำหรับ session, analytics และ audit logs พร้อม privacy notice/consent ตามบริบทจริงก่อนขยาย tracking
 

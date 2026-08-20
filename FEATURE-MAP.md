@@ -18,6 +18,8 @@
 | TOY-F012 | AI catalog fill | RG editor | `POST /api/admin/ai/catalog-fill` | OpenAI Responses API | query/options → schema-constrained draft | cost, upstream error, source verification, secret |
 | TOY-F013 | Static catalog validation | CLI tool | none | grade indexes/detail/image filesystem | repository data → errors/warnings/exit code | ตรวจทุกเกรดที่ประกาศใน categories และ catalogImage แล้ว; ยังไม่ครอบคลุม sitemap/full schema/orphan files |
 | TOY-F014 | Search/SEO/public metadata | public HTML, `sitemap.xml`, `robots.txt`, `llms.txt` | none | static files | crawler request → metadata/routes | sitemap เป็น static 48 product URLs; D1 published itemsไม่ถูกเพิ่มอัตโนมัติ |
+| TOY-F015 | One Piece Card storefront | `/shop/`, `shop/shop.js` | `GET /api/store/products`, `POST /api/store/orders` | D1 `store_products`, `store_orders` | product, quantity, shipping input → pending order reference | ราคา/ชื่อถูก snapshot; public response ไม่คืนข้อมูลจัดส่ง; stock 0 = Sold out |
+| TOY-F016 | Store administration | `/admin/store/` | admin store product/order APIs + media upload | D1 + R2 `TOYSKUB_MEDIA` | product CRUD-like update, image, order transition → inventory state | auth required; paid เท่านั้นที่หัก stock; paid/cancelled เป็น terminal state |
 
 ## API inventory
 
@@ -57,6 +59,10 @@
 | POST | `/api/admin/media/upload` | editor+ or admin cookie | write display/thumbnail to R2 |
 | POST | `/api/admin/media/import-dalong-manual` | editor+ or admin cookie | external images → R2 |
 | POST | `/api/admin/ai/catalog-fill` | editor+ or admin cookie | OpenAI-generated draft |
+| GET/POST | `/api/admin/store/products` | editor+ or admin cookie | list/create store products |
+| PUT | `/api/admin/store/products/:id` | editor+ or admin cookie | edit/hide/publish product and stock |
+| GET | `/api/admin/store/orders` | editor+ or admin cookie | list orders including shipping data |
+| PUT | `/api/admin/store/orders/:id` | editor+ or admin cookie | transition order; paid deducts stock |
 
 หมายเหตุ: `isAuthorized` ยอมรับ `editor`, `admin`, `super_admin` เหมือนกันสำหรับ admin endpoints ที่ตรวจพบ ดังนั้นคำว่า “editor+” ในตารางไม่ได้หมายถึง permission matrix ที่ละเอียดกว่า
 
@@ -70,6 +76,8 @@
 | `member_sessions` | F005 | token hash, activity time | expiry cleanup/revoke-all |
 | `audit_logs` | F004-F006 intended | user/action/details | coverage และ retention ไม่กำหนด |
 | `analytics_views` | F003 | persistent visitor ID, page/time | abuse, dedupe, retention/privacy |
+| `store_products` | F015, F016 | price, stock, media URL | published/sold-out state and active reservations |
+| `store_orders` | F015, F016 | recipient name, phone, address, note | pending → payment_review → paid/cancelled; retention policy required |
 
 ## Known inactive or ambiguous surfaces
 

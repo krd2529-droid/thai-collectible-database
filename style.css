@@ -263,7 +263,7 @@ main { max-width: 1100px; margin: 0 auto; padding: 40px 28px 80px; min-height: 6
   text-align: left;
   cursor: pointer;
 }
-.catalog-choice { flex: 1 1 220px; max-width: 330px; }
+.catalog-choice { flex: 1 1 220px; max-width: 330px; text-decoration:none; }
 .grade-choice { min-width: 90px; }
 .catalog-choice strong,
 .grade-choice strong {
