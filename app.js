@@ -312,7 +312,7 @@ function renderHome() {
     : [];
 
   const breadcrumbParts = [
-    '<span>หน้าหลัก</span>',
+    '<strong>แคตตาล็อก</strong>',
     selectedCategory ? `<b>›</b><span>${esc(selectedCategory.label)}</span>` : '',
     selectedType ? `<b>›</b><span>${esc(selectedType.label)}</span>` : '',
     activeFilter ? `<b>›</b><strong>${esc(activeFilter)}</strong>` : '',
@@ -359,7 +359,7 @@ function renderHome() {
       <div id="storePreviewGrid" class="store-preview__grid"><p class="store-preview__message">กำลังโหลดสินค้าในร้าน…</p></div>
     </section>
 
-    <nav class="catalog-breadcrumb" aria-label="หมวดสินค้า">${breadcrumbParts}</nav>
+    <nav class="catalog-breadcrumb" aria-label="แคตตาล็อก">${breadcrumbParts}</nav>
 
     ${catalogStepHTML(
       "01",

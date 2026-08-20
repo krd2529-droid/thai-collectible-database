@@ -12,7 +12,7 @@ export async function onRequestGet(context) {
   try {
     await ensureStoreSchema(context.env.TOYSKUB_DB);
     const result = await context.env.TOYSKUB_DB.prepare(`${PRODUCT_SELECT} ORDER BY p.sort_order,p.id`).all();
-    return json({ ok: true, products: (result.results || []).map(productFromRow) });
+    return json({ ok: true, products: (result.results || []).map(row => productFromRow(row, { includeCost: true })) });
   } catch { return json({ ok: false, error: 'ฐานข้อมูลสินค้าและคำสั่งซื้อยังไม่พร้อม กรุณาติดต่อผู้ดูแลระบบ' }, 503); }
 }
 
@@ -24,9 +24,9 @@ export async function onRequestPost(context) {
   const error = validateProduct(product); if (error) return json({ ok: false, error }, 400);
   try {
     await context.env.TOYSKUB_DB.prepare(`INSERT INTO store_products
-      (id,name,description,level,category,price_satang,stock_quantity,image_url,status,sort_order)
-      VALUES(?,?,?,?,?,?,?,?,?,?)`).bind(product.id,product.name,product.description,product.level,product.category,
-      product.priceSatang,product.stockQuantity,product.imageUrl,product.status,product.sortOrder).run();
+      (id,name,description,level,category,price_satang,cost_price_satang,stock_quantity,image_url,status,sort_order)
+      VALUES(?,?,?,?,?,?,?,?,?,?,?)`).bind(product.id,product.name,product.description,product.level,product.category,
+      product.priceSatang,product.costPriceSatang,product.stockQuantity,product.imageUrl,product.status,product.sortOrder).run();
     return json({ ok: true, product }, 201);
   } catch (errorValue) {
     const conflict = String(errorValue).toLowerCase().includes('unique');

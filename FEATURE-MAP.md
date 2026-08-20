@@ -19,7 +19,7 @@
 | TOY-F013 | Static catalog validation | CLI tool | none | grade indexes/detail/image filesystem | repository data → errors/warnings/exit code | ตรวจทุกเกรดที่ประกาศใน categories และ catalogImage แล้ว; ยังไม่ครอบคลุม sitemap/full schema/orphan files |
 | TOY-F014 | Search/SEO/public metadata | public HTML, `sitemap.xml`, `robots.txt`, `llms.txt` | none | static files | crawler request → metadata/routes | sitemap เป็น static 48 product URLs; D1 published itemsไม่ถูกเพิ่มอัตโนมัติ |
 | TOY-F015 | One Piece Card storefront | การ์ดสินค้า/จำนวน/ปุ่มซื้อบน `/` และ checkout `/shop/`, `app.js`, `shop/shop.js` | `GET /api/store/products`, `POST /api/store/orders` | D1 `store_products`, `store_orders` (ไม่ใช้ catalog JSON/`catalog_items`) | product, quantity, shipping input → pending order reference | หน้าแรกส่ง product/quantity เข้า checkout โดยตรง; ราคา/ชื่อถูก snapshot; stock 0 = Sold out |
-| TOY-F016 | Store administration | `/admin/store/` | admin store product/order APIs + media upload | D1 + R2 `TOYSKUB_MEDIA` | product CRUD-like update (รวมระดับสินค้า), optimized image, order transition → inventory state | auth required; paid เท่านั้นที่หัก stock; paid/cancelled เป็น terminal state |
+| TOY-F016 | Store administration | `/admin/store/` | admin store product/order APIs + media upload | D1 + R2 `TOYSKUB_MEDIA` | product CRUD-like update (รวมระดับและราคาต้นทุน), optimized image, order transition → inventory state | ราคาต้นทุนส่งเฉพาะ admin API ห้ามออก public/store cart; paid เท่านั้นที่หัก stock |
 
 ## API inventory
 
@@ -76,7 +76,7 @@
 | `member_sessions` | F005 | token hash, activity time | expiry cleanup/revoke-all |
 | `audit_logs` | F004-F006 intended | user/action/details | coverage และ retention ไม่กำหนด |
 | `analytics_views` | F003 | persistent visitor ID, page/time | abuse, dedupe, retention/privacy |
-| `store_products` | F015, F016 | price, stock, media URL | Store API provision schema ที่ขาดและอัปเกรดคอลัมน์ `level`; published/sold-out state and active reservations |
+| `store_products` | F015, F016 | ราคาขาย, ราคาต้นทุน (admin-only), stock, media URL | Store API provision schema ที่ขาดและอัปเกรด `level`/`cost_price_satang`; public mapper ต้องไม่คืนราคาต้นทุน |
 | `store_orders` | F015, F016 | recipient name, phone, address, note | pending → payment_review → paid/cancelled; retention policy required |
 
 ## Known inactive or ambiguous surfaces
