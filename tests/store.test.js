@@ -28,7 +28,9 @@ const read=response=>response.json();
 test('store entry is separate from catalog categories',()=>{
   const app=fs.readFileSync('app.js','utf8');
   assert.doesNotMatch(app,/key:\s*["']available-products["']/);
-  assert.match(app,/href="\/shop\/\?category=one-piece-card"/);
+  assert.doesNotMatch(app,/key:\s*["']zippo["']/);
+  assert.match(app,/>สินค้าในร้าน</);
+  assert.match(app,/href="\/shop\/"/);
 });
 
 test('normalizes product money and rejects negative stock',()=>{

@@ -13,12 +13,10 @@ let ADMIN_SESSION = { checked: false, authenticated: false, source: "none" };
 
 const CATEGORIES = [
   { key: "model", label: "Gundam", description: "รวมสินค้าของสะสม Gundam" },
-  { key: "zippo", label: "Zippo", description: "กำลังเพิ่มข้อมูล" },
 ];
 
 const PRODUCT_TYPES = {
   model: [{ key: "gunpla", label: "Gunpla", description: "โมเดลพลาสติกประกอบ แยกตามเกรด" }],
-  zippo: [{ key: "zippo", label: "Zippo", description: "ไฟแช็กและของสะสม Zippo" }],
 };
 
 // ใส่ข้อมูลร้านสปอนเซอร์ได้สูงสุด 6 ร้าน
@@ -355,11 +353,11 @@ function renderHome() {
 
     <section class="store-gateway" aria-labelledby="storeGatewayTitle">
       <div>
-        <span class="store-gateway__eyebrow">// TOYSKUB STORE · STOCK พร้อมขาย</span>
-        <h2 id="storeGatewayTitle">ร้านค้าแยกจากแคตตาล็อก</h2>
-        <p>One Piece Card ที่มีสต็อกจริง ราคา และปุ่มสั่งซื้อ ดูได้ในหน้าร้านโดยตรง</p>
+        <span class="store-gateway__eyebrow">// สินค้าพร้อมขาย</span>
+        <h2 id="storeGatewayTitle">สินค้าในร้าน</h2>
+        <p>เลือกซื้อสินค้าที่มีสต็อกจริง พร้อมราคาและจำนวนคงเหลือ</p>
       </div>
-      <a href="/shop/?category=one-piece-card">เลือกซื้อสินค้าที่มีจำหน่าย <span aria-hidden="true">→</span></a>
+      <a href="/shop/">ดูสินค้าในร้าน <span aria-hidden="true">→</span></a>
     </section>
 
     <nav class="catalog-breadcrumb" aria-label="หมวดสินค้า">${breadcrumbParts}</nav>
