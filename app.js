@@ -253,6 +253,8 @@ async function router() {
   if (window.location.hash === "#/product-preview") {
     try { const preview = JSON.parse(localStorage.getItem("toyskub_catalog_preview") || "null"); if (preview) return renderDetail(preview); } catch {}
   }
+  const stockMatch = window.location.pathname.match(/^\/stock\/onepiececard\/([^/]+)\/?$/);
+  if (stockMatch) return renderStoreProduct(decodeURIComponent(stockMatch[1]));
   const match = window.location.pathname.match(/^\/product\/([^/]+)\/?$/);
   if (match) {
     const summary = PRODUCTS.find((product) => product.id === match[1]);
@@ -431,20 +433,44 @@ async function hydrateStorePreview() {
         <div class="store-preview-card__body"><h3>${esc(product.name)}</h3>${product.level ? `<small>ระดับ ${esc(product.level)}</small>` : ''}
           <p>${esc(product.description || '')}</p><strong class="store-preview-card__price">${money(product.price)}</strong>
           <span class="store-preview-card__stock ${soldOut ? 'sold-out' : ''}">${soldOut ? 'Sold out' : `พร้อมขาย ${product.availableStock} ชิ้น`}</span>
-          <div class="store-preview-card__buy"><input name="quantity" type="number" min="1" max="${product.availableStock}" value="1" aria-label="จำนวน ${esc(product.name)}" ${soldOut ? 'disabled' : ''}>
-            <button type="button" data-store-buy="${esc(product.id)}" ${soldOut ? 'disabled' : ''}>${soldOut ? 'Sold out' : 'ซื้อสินค้า'}</button></div>
+          <div class="store-preview-card__buy store-preview-card__buy--detail">
+            ${soldOut ? '<button type="button" disabled>Sold out</button>' : `<a href="/stock/onepiececard/${encodeURIComponent(product.id)}">ซื้อสินค้า</a>`}</div>
         </div></article>`;
     }).join("");
     grid.innerHTML = `<section class="store-preview-category" data-store-category="one-piece-card">
       <div class="catalog-series-heading"><h2>การ์ดวันพีช</h2><span>${products.length} รายการ</span></div>
       <div class="store-preview__grid">${cards}</div>
     </section>`;
-    grid.querySelectorAll("[data-store-buy]").forEach(button => button.addEventListener("click", () => {
-      const product = products.find(item => item.id === button.dataset.storeBuy);
-      const quantity = Number(button.previousElementSibling?.value);
-      beginStoreCheckout(product, quantity);
-    }));
   } catch (error) { grid.innerHTML = `<p class="store-preview__message error">${esc(error.message)}</p>`; }
+}
+
+async function renderStoreProduct(productId) {
+  removeSchema();
+  APP.innerHTML = '<section class="empty-state">กำลังโหลดสินค้า…</section>';
+  try {
+    const response = await fetch("/api/store/products?category=one-piece-card", { cache: "no-store" });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "โหลดสินค้าไม่สำเร็จ");
+    const product = (data.products || []).find(item => item.id === productId);
+    if (!product) {
+      document.title = "ไม่พบสินค้า | TOYSKUB";
+      APP.innerHTML = '<section class="empty-state"><strong>ไม่พบสินค้า</strong><a href="/">← กลับหน้าแรก</a></section>';
+      return;
+    }
+    const soldOut = product.availableStock < 1 || product.status === "sold_out";
+    document.title = `${product.name} | สินค้าในร้าน TOYSKUB`;
+    document.getElementById("canonicalUrl").href = `https://toyskub.com/stock/onepiececard/${encodeURIComponent(product.id)}`;
+    APP.innerHTML = `<nav class="catalog-breadcrumb" aria-label="เส้นทางสินค้า"><a href="/">หน้าหลัก</a><span>›</span><strong>สินค้าในร้าน</strong><span>›</span><strong>การ์ดวันพีช</strong><span>›</span><strong>${esc(product.name)}</strong></nav>
+      <article class="store-detail">
+        <div class="store-detail__image">${product.imageUrl ? `<img src="${esc(product.imageUrl)}" alt="${esc(product.name)}">` : '<span>ยังไม่มีรูปสินค้า</span>'}</div>
+        <div class="store-detail__body"><span class="store-detail__eyebrow">// STOCK · ONE PIECE CARD</span><h1>${esc(product.name)}</h1>${product.level ? `<strong class="store-detail__level">ระดับ ${esc(product.level)}</strong>` : ''}
+          <p>${esc(product.description || "")}</p><div class="store-detail__price">${storeMoney(product.price)}</div><div class="store-preview-card__stock ${soldOut ? "sold-out" : ""}">${soldOut ? "Sold out" : `พร้อมขาย ${product.availableStock} ชิ้น`}</div>
+          <div class="store-detail__buy"><label>จำนวน<input id="storeDetailQuantity" type="number" min="1" max="${product.availableStock}" value="1" ${soldOut ? "disabled" : ""}></label><button id="storeDetailBuy" type="button" ${soldOut ? "disabled" : ""}>${soldOut ? "Sold out" : "ซื้อสินค้า"}</button></div>
+          <a class="back-link" href="/">← กลับหน้าแรก</a>
+        </div>
+      </article>`;
+    document.getElementById("storeDetailBuy")?.addEventListener("click", () => beginStoreCheckout(product, Number(document.getElementById("storeDetailQuantity").value)));
+  } catch (error) { APP.innerHTML = `<section class="empty-state">${esc(error.message)}</section>`; }
 }
 
 let selectedStoreOrder = null;
