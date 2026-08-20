@@ -18,6 +18,7 @@ export function normalizeProduct(raw = {}) {
     id: cleanStoreId(raw.id),
     name: String(raw.name || '').trim().slice(0, 160),
     description: String(raw.description || '').trim().slice(0, 5000),
+    level: String(raw.level || '').trim().slice(0, 80),
     category: STORE_CATEGORY,
     priceSatang: Number.isFinite(price) ? Math.round(price * 100) : -1,
     stockQuantity: Number.isInteger(stock) ? stock : -1,
@@ -46,6 +47,7 @@ export function productFromRow(row = {}) {
     id: row.id,
     name: row.name,
     description: row.description,
+    level: row.level || '',
     category: row.category,
     price: Number(row.priceSatang || 0) / 100,
     stockQuantity,
@@ -59,7 +61,7 @@ export function productFromRow(row = {}) {
   };
 }
 
-export const PRODUCT_SELECT = `SELECT p.id,p.name,p.description,p.category,
+export const PRODUCT_SELECT = `SELECT p.id,p.name,p.description,p.level,p.category,
   p.price_satang AS priceSatang,p.stock_quantity AS stockQuantity,p.image_url AS imageUrl,
   p.status,p.sort_order AS sortOrder,p.created_at AS createdAt,p.updated_at AS updatedAt,
   COALESCE((SELECT SUM(o.quantity) FROM store_orders o

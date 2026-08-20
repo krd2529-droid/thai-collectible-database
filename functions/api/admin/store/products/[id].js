@@ -14,9 +14,9 @@ export async function onRequestPut(context) {
     if (product.stockQuantity < Number(reserved?.total || 0)) {
       return json({ ok: false, error: 'จำนวนคงเหลือต่ำกว่าจำนวนที่ถูกจอง กรุณายกเลิกคำสั่งซื้อก่อน' }, 409);
     }
-    const result = await db.prepare(`UPDATE store_products SET name=?,description=?,category=?,price_satang=?,
+    const result = await db.prepare(`UPDATE store_products SET name=?,description=?,level=?,category=?,price_satang=?,
       stock_quantity=?,image_url=?,status=?,sort_order=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`)
-      .bind(product.name,product.description,product.category,product.priceSatang,product.stockQuantity,
+      .bind(product.name,product.description,product.level,product.category,product.priceSatang,product.stockQuantity,
         product.imageUrl,product.status,product.sortOrder,routeId).run();
     if (!result.meta?.changes) return json({ ok: false, error: 'ไม่พบสินค้านี้' }, 404);
     return json({ ok: true, product });

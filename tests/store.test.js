@@ -8,6 +8,7 @@ import { onRequestGet as listProducts } from '../functions/api/store/products/in
 import { onRequestPost as createOrder } from '../functions/api/store/orders/index.js';
 import { onRequestPost as createProduct } from '../functions/api/admin/store/products/index.js';
 import { onRequestPut as updateOrder } from '../functions/api/admin/store/orders/[id].js';
+import { onRequestPost as uploadMedia } from '../functions/api/admin/media/upload.js';
 
 class BoundStatement {
   constructor(db, sql, args) { this.db=db; this.sql=sql; this.args=args; }
@@ -16,7 +17,7 @@ class BoundStatement {
   async all() { return { results:this.db.prepare(this.sql).all(...this.args) }; }
 }
 class D1Mock {
-  constructor() { this.sqlite=new DatabaseSync(':memory:'); this.sqlite.exec(fs.readFileSync('migrations/0005_store_products_orders.sql','utf8')); }
+  constructor() { this.sqlite=new DatabaseSync(':memory:'); this.sqlite.exec(fs.readFileSync('migrations/0005_store_products_orders.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0006_store_product_level.sql','utf8')); }
   prepare(sql) { return { bind:(...args)=>new BoundStatement(this.sqlite,sql,args), run:async()=>new BoundStatement(this.sqlite,sql,[]).run(), first:async()=>new BoundStatement(this.sqlite,sql,[]).first(), all:async()=>new BoundStatement(this.sqlite,sql,[]).all() }; }
   async batch(statements) { this.sqlite.exec('BEGIN'); try { const results=[]; for(const statement of statements)results.push(await statement.run()); this.sqlite.exec('COMMIT'); return results; } catch(error) { this.sqlite.exec('ROLLBACK'); throw error; } }
   close() { this.sqlite.close(); }
@@ -31,9 +32,19 @@ test('store entry is separate from catalog categories',()=>{
 });
 
 test('normalizes product money and rejects negative stock',()=>{
-  const valid=normalizeProduct({id:' OP Card 001 ',name:'การ์ดทดสอบ',price:19.99,stockQuantity:2,status:'published'});
-  assert.equal(valid.id,'op-card-001');assert.equal(valid.priceSatang,1999);assert.equal(validateProduct(valid),'');
+  const valid=normalizeProduct({id:' OP Card 001 ',name:'การ์ดทดสอบ',level:'  SR  ',price:19.99,stockQuantity:2,status:'published'});
+  assert.equal(valid.id,'op-card-001');assert.equal(valid.level,'SR');assert.equal(valid.priceSatang,1999);assert.equal(validateProduct(valid),'');
   assert.match(validateProduct(normalizeProduct({...valid,stockQuantity:-1})),/ไม่ติดลบ/);
+});
+
+test('media upload reports missing storage and storage failures clearly',async()=>{
+  const secret='upload-test-secret';
+  const cookie=await createSessionCookie(secret);
+  const makeUploadRequest=()=>{const form=new FormData();form.append('id','op11-080');form.append('kind','store');form.append('file',new File(['image'],'card.png',{type:'image/png'}));return request('/api/admin/media/upload',{method:'POST',headers:{cookie},body:form})};
+  const missing=await uploadMedia({request:makeUploadRequest(),env:{ADMIN_PASSWORD:secret}});
+  assert.equal(missing.status,503);assert.match((await read(missing)).error,/TOYSKUB_MEDIA/);
+  const failed=await uploadMedia({request:makeUploadRequest(),env:{ADMIN_PASSWORD:secret,TOYSKUB_MEDIA:{put:async()=>{throw Error('storage unavailable')}}}});
+  assert.equal(failed.status,503);assert.match((await read(failed)).error,/พื้นที่จัดเก็บ/);
 });
 
 test('zero available stock is always presented as sold_out',()=>{
@@ -60,8 +71,9 @@ test('admin API requires auth and paid transition deducts stock once',async(t)=>
   const db=new D1Mock();t.after(()=>db.close());const env={TOYSKUB_DB:db,ADMIN_PASSWORD:'test-admin-secret'};
   const denied=await createProduct({env,request:request('/api/admin/store/products',{method:'POST',headers:{'content-type':'application/json'},body:'{}'})});assert.equal(denied.status,401);
   const cookie=(await createSessionCookie(env.ADMIN_PASSWORD)).split(';')[0];
-  const productBody={id:'op-002',name:'Booster Pack',description:'สินค้า test',price:120,stockQuantity:1,status:'published',sortOrder:1,imageUrl:''};
+  const productBody={id:'op-002',name:'Booster Pack',description:'สินค้า test',level:'SEC',price:120,stockQuantity:1,status:'published',sortOrder:1,imageUrl:''};
   const created=await createProduct({env,request:request('/api/admin/store/products',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify(productBody)})});assert.equal(created.status,201);
+  assert.equal(db.sqlite.prepare('SELECT level FROM store_products WHERE id=?').get('op-002').level,'SEC');
   const orderPayload={productId:'op-002',quantity:1,clientToken:crypto.randomUUID(),customerName:'ผู้รับ ทดสอบ',customerPhone:'0899999999',shippingAddress:'100 ถนนทดสอบ เขตทดสอบ กรุงเทพมหานคร'};
   await createOrder({env,request:request('/api/store/orders',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(orderPayload)})});
   const id=Number(db.sqlite.prepare('SELECT id FROM store_orders').get().id);

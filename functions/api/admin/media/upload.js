@@ -19,7 +19,12 @@ export async function onRequestPost(context) {
     );
   }
 
-  const form = await context.request.formData();
+  let form;
+  try {
+    form = await context.request.formData();
+  } catch {
+    return json({ ok: false, error: 'อ่านไฟล์อัปโหลดไม่สำเร็จ กรุณาเลือกไฟล์ใหม่' }, 400);
+  }
   const file = form.get('file');
   const thumbnail = form.get('thumbnail');
   const id = clean(form.get('id'));
@@ -56,10 +61,15 @@ export async function onRequestPost(context) {
       customMetadata: { catalogId: id, kind, variant },
     },
   );
-  await Promise.all([
-    save(key, file, 'display'),
-    ...(thumbnail ? [save(thumbnailKey, thumbnail, 'thumbnail')] : []),
-  ]);
+  try {
+    await Promise.all([
+      save(key, file, 'display'),
+      ...(thumbnail ? [save(thumbnailKey, thumbnail, 'thumbnail')] : []),
+    ]);
+  } catch (error) {
+    console.error('media upload failed', { name: error?.name, message: error?.message });
+    return json({ ok: false, error: 'บันทึกรูปลงพื้นที่จัดเก็บไม่สำเร็จ กรุณาตรวจ R2 binding หรือทดลองใหม่' }, 503);
+  }
 
   return json({
     ok: true,
