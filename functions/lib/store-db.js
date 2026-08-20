@@ -6,6 +6,7 @@ const STORE_SCHEMA_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS store_products (
     id TEXT PRIMARY KEY,name TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',level TEXT NOT NULL DEFAULT '',
     category TEXT NOT NULL DEFAULT 'one-piece-card',price_satang INTEGER NOT NULL CHECK(price_satang >= 0),
+    cost_price_satang INTEGER NOT NULL DEFAULT 0 CHECK(cost_price_satang >= 0),
     stock_quantity INTEGER NOT NULL DEFAULT 0 CHECK(stock_quantity >= 0),image_url TEXT NOT NULL DEFAULT '',
     status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft','published','hidden','sold_out')),
     sort_order INTEGER NOT NULL DEFAULT 0,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -33,10 +34,16 @@ const STORE_SCHEMA_STATEMENTS = [
 
 export async function ensureStoreSchema(db) {
   await db.prepare(STORE_SCHEMA_STATEMENTS[0]).run();
-  try { await db.prepare('SELECT level FROM store_products LIMIT 1').first(); }
-  catch {
-    try { await db.prepare("ALTER TABLE store_products ADD COLUMN level TEXT NOT NULL DEFAULT ''").run(); }
-    catch (error) { if (!/duplicate column/i.test(String(error))) throw error; }
+  const additiveColumns = [
+    ['level', "ALTER TABLE store_products ADD COLUMN level TEXT NOT NULL DEFAULT ''"],
+    ['cost_price_satang', 'ALTER TABLE store_products ADD COLUMN cost_price_satang INTEGER NOT NULL DEFAULT 0 CHECK(cost_price_satang >= 0)'],
+  ];
+  for (const [column, sql] of additiveColumns) {
+    try { await db.prepare(`SELECT ${column} FROM store_products LIMIT 1`).first(); }
+    catch {
+      try { await db.prepare(sql).run(); }
+      catch (error) { if (!/duplicate column/i.test(String(error))) throw error; }
+    }
   }
   for (const statement of STORE_SCHEMA_STATEMENTS.slice(1)) await db.prepare(statement).run();
 }
@@ -51,6 +58,7 @@ export function cleanStoreId(value) {
 
 export function normalizeProduct(raw = {}) {
   const price = Number(raw.price);
+  const costPrice = Number(raw.costPrice);
   const stock = Number(raw.stockQuantity);
   const sortOrder = Number(raw.sortOrder);
   return {
@@ -60,6 +68,7 @@ export function normalizeProduct(raw = {}) {
     level: String(raw.level || '').trim().slice(0, 80),
     category: STORE_CATEGORY,
     priceSatang: Number.isFinite(price) ? Math.round(price * 100) : -1,
+    costPriceSatang: Number.isFinite(costPrice) ? Math.round(costPrice * 100) : 0,
     stockQuantity: Number.isInteger(stock) ? stock : -1,
     imageUrl: String(raw.imageUrl || '').trim().slice(0, 1000),
     status: PRODUCT_STATUSES.has(raw.status) ? raw.status : 'draft',
@@ -71,6 +80,7 @@ export function validateProduct(product) {
   if (!product.id) return 'กรุณากรอกรหัสสินค้า';
   if (!product.name) return 'กรุณากรอกชื่อสินค้า';
   if (product.priceSatang < 0) return 'ราคาสินค้าต้องไม่ติดลบ';
+  if (product.costPriceSatang < 0) return 'ราคาต้นทุนต้องไม่ติดลบ';
   if (product.stockQuantity < 0) return 'จำนวนสินค้าต้องเป็นจำนวนเต็มที่ไม่ติดลบ';
   if (product.imageUrl && !/^(?:\/media\/|\/images\/|https:\/\/)/i.test(product.imageUrl)) {
     return 'URL รูปสินค้าต้องเป็น HTTPS หรือ path รูปภายในเว็บไซต์';
@@ -78,11 +88,11 @@ export function validateProduct(product) {
   return '';
 }
 
-export function productFromRow(row = {}) {
+export function productFromRow(row = {}, { includeCost = false } = {}) {
   const stockQuantity = Number(row.stockQuantity || 0);
   const reservedQuantity = Number(row.reservedQuantity || 0);
   const availableStock = Math.max(0, stockQuantity - reservedQuantity);
-  return {
+  const product = {
     id: row.id,
     name: row.name,
     description: row.description,
@@ -98,10 +108,13 @@ export function productFromRow(row = {}) {
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
+  if (includeCost) product.costPrice = Number(row.costPriceSatang || 0) / 100;
+  return product;
 }
 
 export const PRODUCT_SELECT = `SELECT p.id,p.name,p.description,p.level,p.category,
-  p.price_satang AS priceSatang,p.stock_quantity AS stockQuantity,p.image_url AS imageUrl,
+  p.price_satang AS priceSatang,p.cost_price_satang AS costPriceSatang,
+  p.stock_quantity AS stockQuantity,p.image_url AS imageUrl,
   p.status,p.sort_order AS sortOrder,p.created_at AS createdAt,p.updated_at AS updatedAt,
   COALESCE((SELECT SUM(o.quantity) FROM store_orders o
     WHERE o.product_id=p.id AND o.status IN ('pending','payment_review')),0) AS reservedQuantity
