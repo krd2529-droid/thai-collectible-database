@@ -19,7 +19,7 @@
 | TOY-F013 | Static catalog validation | CLI tool | none | grade indexes/detail/image filesystem | repository data → errors/warnings/exit code | ตรวจทุกเกรดที่ประกาศใน categories และ catalogImage แล้ว; ยังไม่ครอบคลุม sitemap/full schema/orphan files |
 | TOY-F014 | Search/SEO/public metadata | public HTML, `sitemap.xml`, `robots.txt`, `llms.txt` | none | static files | crawler request → metadata/routes | sitemap เป็น static 48 product URLs; D1 published itemsไม่ถูกเพิ่มอัตโนมัติ |
 | TOY-F015 | One Piece Card storefront | ทางเข้าอยู่บน `/`, รายการสินค้า `/stock/onepiececard/`, หน้าสินค้าและ checkout `/stock/onepiececard/{product-id}` | `GET /api/store/products`, `POST /api/store/orders` | D1 `store_products`, `store_orders` (ไม่ใช้ catalog JSON/`catalog_items`) | product, quantity, shipping input → pending order reference | รายการสินค้าย้ายออกจากหน้าแรกและแยกจากแคตตาล็อก; stock 0 = Sold out |
-| TOY-F016 | Store administration | `/admin/store/` | admin store product/order APIs + media upload | D1 + R2 `TOYSKUB_MEDIA` | product CRUD-like update (รวมระดับและราคาต้นทุน), optimized image, order transition → inventory state | ราคาต้นทุนส่งเฉพาะ admin API ห้ามออก public/store cart; paid เท่านั้นที่หัก stock |
+| TOY-F016 | Store administration | `/admin/store/` พร้อมลิงก์ตรวจหน้ารวมและหน้าสินค้า `/stock/onepiececard/{product-id}` | admin store product/order APIs + media upload | D1 + R2 `TOYSKUB_MEDIA` | product CRUD-like update (รวมระดับ ราคาต้นทุน และ public URL), optimized image, order transition → inventory state | Draft/Hidden ไม่แสดงลิงก์เปิดหน้าสาธารณะ; ราคาต้นทุนส่งเฉพาะ admin API; paid เท่านั้นที่หัก stock |
 
 ## API inventory
 

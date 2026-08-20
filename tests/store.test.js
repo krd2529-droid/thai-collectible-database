@@ -44,6 +44,14 @@ test('store products move to One Piece stock category and detail routes',()=>{
   assert.doesNotMatch(index,/href="\/shop\/"/);
   assert.match(index,/id="storeCheckoutDialog"/);
   assert.match(index,/444-118-1181/);
+  const adminStore=fs.readFileSync('admin/store/store.js','utf8');
+  assert.match(adminStore,/\/stock\/onepiececard\//);
+  assert.match(adminStore,/publicProductPath/);
+  assert.match(adminStore,/ยังไม่เผยแพร่/);
+  assert.match(adminStore,/order-product-link/);
+  const adminStoreHtml=fs.readFileSync('admin/store/index.html','utf8');
+  assert.match(adminStoreHtml,/id="productPublicUrl"/);
+  assert.match(adminStoreHtml,/href="\/stock\/onepiececard\/"/);
 });
 
 test('normalizes product money and rejects negative stock',()=>{
