@@ -36,6 +36,7 @@
 .jarvis-query-label{display:grid;gap:6px;font:700 11px var(--font-mono);color:var(--ink-soft)}
 .jarvis-query-label input{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--ink);background:#fff;color:var(--ink);font:16px var(--font-body)}
 .jarvis-buttons{display:flex;gap:8px;flex-wrap:wrap}
+.jarvis-buttons .publish{background:#167a45;color:#fff;border-color:#101820}
 .jarvis-options{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:12px;color:var(--ink-soft);font-size:12px}
 .jarvis-options label{display:inline-flex;align-items:center;gap:6px}
 .jarvis-options span{margin-left:auto}

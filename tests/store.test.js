@@ -11,6 +11,7 @@ import { onRequestPut as updateOrder } from '../functions/api/admin/store/orders
 import { onRequestPost as uploadMedia } from '../functions/api/admin/media/upload.js';
 import { onRequestPost as recordTraffic } from '../functions/api/analytics/view.js';
 import { onRequestGet as getTrafficStats } from '../functions/api/analytics/stats.js';
+import { extractCoverUrl, extractManualUrls } from '../functions/api/admin/media/import-dalong-manual.js';
 
 class BoundStatement {
   constructor(db, sql, args) { this.db=db; this.sql=sql; this.args=args; }
@@ -139,6 +140,21 @@ test('traffic self-provisions rollups once when migration cannot be run manually
   const helper=fs.readFileSync('functions/lib/analytics-db.js','utf8');
   assert.match(helper,/no such table/);
   assert.match(helper,/CREATE TABLE IF NOT EXISTS analytics_daily/);
+});
+
+test('auto catalog extracts Dalong cover and manual links and remains draft-first',()=>{
+  const page='https://www.dalong.net/reviews/rg/rg32/rg32_i.htm';
+  const html='<img src="th/s_rg32.jpg"><img src="th/s_rg32_box.jpg"><img src="th/s_rg32m_0001.jpg"><img src="th/s_rg32m_0002.jpg"><img src="th/s_rg32_runner.jpg">';
+  assert.equal(extractCoverUrl(html,page),'https://www.dalong.net/reviews/rg/rg32/p/rg32.jpg');
+  assert.deepEqual(extractManualUrls(html,page),[
+    'https://www.dalong.net/reviews/rg/rg32/p/rg32m_0001.jpg',
+    'https://www.dalong.net/reviews/rg/rg32/p/rg32m_0002.jpg'
+  ]);
+  const ai=fs.readFileSync('functions/api/admin/ai/catalog-fill.js','utf8');
+  assert.match(ai,/dalongPageUrl/);assert.match(ai,/_i\.htm/);
+  const template=fs.readFileSync('admin/rg-template/template.js','utf8');
+  assert.match(template,/runAutoCatalog/);assert.match(template,/saveItem\(false,'draft'\)/);
+  assert.match(template,/ระบบจะไม่ Publish เอง/);
 });
 
 test('public order reserves availability and rejects overselling',async(t)=>{

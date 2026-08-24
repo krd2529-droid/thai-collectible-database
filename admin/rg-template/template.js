@@ -197,4 +197,34 @@ $('jarvisReplaceAll')?.addEventListener('click',()=>{
 });
 $('jarvisQuery')?.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();runJarvis(true)}});
 
+async function runAutoCatalog(){
+ const query=val('jarvisQuery')||val('name')||val('itemSku')||val('itemId');
+ if(!query){showMessage('ยังไม่มีชื่อรุ่น','กรอกชื่อรุ่นหรือรหัสก่อนเริ่ม Auto Catalog');$('jarvisQuery')?.focus();return}
+ const button=$('jarvisAutoCatalog');button.disabled=true;
+ try{
+  jarvisSetStatus(`1/4 กำลังค้นข้อมูลและหน้า Dalong ของ “${query}”…`,'working');
+  const result=await api('/api/admin/ai/catalog-fill',{method:'POST',body:JSON.stringify({query,includeEditorial:$('jarvisIncludeEditorial')?.checked!==false,includeBox:$('jarvisIncludeBox')?.checked!==false})});
+  const item=result.item||{};applyJarvisData(item,true);
+  const id=val('itemId');
+  if(!id)throw Error('ค้นข้อมูลได้แต่ไม่พบรหัสสินค้า จึงยังไม่สร้าง Draft');
+  if(!item.dalongPageUrl)throw Error('ไม่พบลิงก์ Dalong ที่ยืนยันได้ ฟอร์มถูกเติมไว้ให้ตรวจแต่ยังไม่บันทึก Draft');
+  jarvisSetStatus('2/4 พบ Dalong แล้ว กำลังนำเข้ารูปปกและคู่มือเข้า TOYSKUB…','working');
+  const media=await api('/api/admin/media/import-dalong-manual',{method:'POST',body:JSON.stringify({id,pageUrl:item.dalongPageUrl,includeCover:true})});
+  if(media.cover&&!gallery.some(x=>x.src===media.cover.src))gallery.unshift(media.cover);
+  const knownManual=new Set(manual.map(x=>x.src));
+  for(const image of media.images||[]){if(image?.src&&!knownManual.has(image.src)){manual.push(image);knownManual.add(image.src)}}
+  if(!lists.references.some(x=>x.url===media.pageUrl))lists.references.push({label:'Dalong.net · Information / Manual',url:media.pageUrl});
+  renderImages('gallery');renderImages('manual');renderList('references');
+  $('status').value='draft';
+  jarvisSetStatus(`3/4 นำเข้ารูปปก ${media.cover?'1':'0'} รูป และคู่มือ ${media.images?.length||0} หน้า · กำลังบันทึก Draft…`,'working');
+  if(!(await saveItem(false,'draft')))throw Error('นำเข้ารูปแล้ว แต่บันทึก Draft ไม่สำเร็จ');
+  jarvisSetStatus(`4/4 Auto Catalog สำเร็จ · ${id} เป็น Draft · ปก ${media.cover?'1':'0'} รูป · คู่มือ ${media.images?.length||0} หน้า`,'success');
+  showMessage('สร้าง Auto Catalog Draft สำเร็จ',`${id}\nรูปปก ${media.cover?'1':'0'} รูป\nคู่มือ Dalong ${media.images?.length||0} หน้า\nกรุณาตรวจข้อมูลก่อน Publish`);
+ }catch(error){jarvisSetStatus(error.message||'Auto Catalog ไม่สำเร็จ','error');showMessage('Auto Catalog ยังไม่สำเร็จ',error.message||'เกิดข้อผิดพลาด')}
+ finally{button.disabled=false}
+}
+$('jarvisAutoCatalog')?.addEventListener('click',()=>{
+ if(confirm('สร้าง Auto Catalog เป็น Draft พร้อมนำเข้ารูปปกและคู่มือ Dalong หรือไม่? ระบบจะไม่ Publish เอง'))runAutoCatalog();
+});
+
 initializeRows();bindAddButtons();loadFromQuery();

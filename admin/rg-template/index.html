@@ -39,6 +39,7 @@
         <input id="jarvisQuery" autocomplete="off" placeholder="เช่น RG 1/144 Hi-ν Gundam หรือ RG-039">
       </label>
       <div class="jarvis-buttons">
+        <button id="jarvisAutoCatalog" class="tool-button publish" type="button">⚙ Auto Catalog Draft</button>
         <button id="jarvisFillEmpty" class="tool-button primary" type="button">🤖 เติมเฉพาะช่องว่าง</button>
         <button id="jarvisReplaceAll" class="tool-button" type="button">เขียนทับข้อมูลในฟอร์ม</button>
       </div>
@@ -46,7 +47,7 @@
     <div class="jarvis-options">
       <label><input id="jarvisIncludeEditorial" type="checkbox" checked> เติมจุดเด่น ข้อดี ข้อควรพิจารณา และ FAQ</label>
       <label><input id="jarvisIncludeBox" type="checkbox" checked> เติมอุปกรณ์ในกล่อง</label>
-      <span>จาวิสจะไม่ใส่รูป คู่มือ YouTube หรือ Affiliate ให้เอง</span>
+      <span>Auto Catalog จะนำเข้ารูปปกและคู่มือจาก Dalong แล้วบันทึกเป็น Draft เท่านั้น</span>
     </div>
     <div id="jarvisStatus" class="jarvis-status" role="status">พร้อมค้นหา</div>
   </section>
@@ -144,6 +145,6 @@
 <dialog id="mediaDialog" class="media-dialog"><div class="media-dialog-box"><div class="media-dialog-head"><div><h3>เลือกจากแคตตาล็อก</h3><p>เลือกรูปที่มีอยู่แล้ว ไม่ต้องอัปโหลดซ้ำ</p></div><button id="mediaClose" class="tool-button" type="button">ปิด</button></div><div class="media-search-row"><input id="mediaCatalogId" placeholder="รหัสรายการ เช่น rg-039"><button id="mediaLoad" class="tool-button primary" type="button">โหลดรูป</button></div><div id="mediaCatalogInfo" class="media-catalog-info"></div><div id="mediaGrid" class="media-grid"></div><div class="media-dialog-foot"><span id="mediaSelectedCount">เลือกแล้ว 0 รูป</span><button id="mediaUseSelected" class="tool-button primary" type="button">ใช้รูปที่เลือก</button></div></div></dialog>
 
 <dialog id="messageDialog"><div class="dialog-box"><h3 id="dialogTitle">แจ้งเตือน</h3><p id="dialogMessage"></p><button id="dialogClose" class="tool-button primary">ตกลง</button></div></dialog>
-<script src="./template.js?v=dalong-manual-import-20260807-1"></script>
+<script src="./template.js?v=auto-catalog-dalong-20260824-1"></script>
 </body>
 </html>

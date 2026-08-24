@@ -6,7 +6,7 @@ const catalogSchema = {
   required: [
     'id','sku','name','rgNumber','modelCode','manufacturer','series','scale','releaseDate',
     'launchPriceJPY','heightCm','recommendedAge','productType','material','seriesGroup','summary',
-    'highlights','whatsDifferent','boxContents','notIncluded','pros','considerations','faq','references'
+    'highlights','whatsDifferent','boxContents','notIncluded','pros','considerations','faq','references','dalongPageUrl'
   ],
   properties: {
     id: { type: ['string','null'] },
@@ -50,7 +50,8 @@ const catalogSchema = {
         type: 'object', additionalProperties: false, required: ['label','url'],
         properties: { label: { type: 'string' }, url: { type: 'string' } }
       }
-    }
+    },
+    dalongPageUrl: { type: ['string','null'], description: 'Verified Dalong Information page URL ending in _i.htm, otherwise null' }
   }
 };
 
@@ -77,7 +78,7 @@ export async function onRequestPost(context) {
 
   const includeEditorial = body.includeEditorial !== false;
   const includeBox = body.includeBox !== false;
-  const prompt = `ค้นคว้าข้อมูลสินค้าโมเดลของสะสมต่อไปนี้เพื่อกรอกฐานข้อมูล TOYSKUB: "${query}"\n\nกติกา:\n- เน้นข้อมูลทางการจาก Bandai Hobby Site / Bandai Spirits และใช้ Dalong.net เป็นแหล่งเสริมเมื่อเกี่ยวข้อง\n- ห้ามเดาข้อมูลเชิงข้อเท็จจริง ถ้ายืนยันไม่ได้ให้คืน null หรือ array ว่าง\n- ราคา launchPriceJPY ต้องเป็นราคาเปิดตัวญี่ปุ่นก่อนภาษี\n- releaseDate ใช้ YYYY-MM-DD เฉพาะเมื่อยืนยันวันได้\n- ถ้าเป็น Real Grade ให้ id เป็น rg-เลขสามหลัก เช่น rg-039 และ sku เป็น RG-039\n- seriesGroup เลือก Gundam, Evangelion, Gaogaigar, Patlabor หรือ Special Version ตามที่เหมาะสม\n- เขียนภาษาไทยอ่านง่าย ไม่โฆษณาเกินจริง\n- references ใส่เฉพาะ URL ที่ค้นพบจริง พร้อมชื่อเว็บไซต์\n- ไม่ต้องหา URL รูป คู่มือ YouTube Shopee Lazada TikTok หรือ Affiliate\n${includeEditorial ? '- สร้างจุดเด่น ข้อแตกต่าง ข้อดี ข้อควรพิจารณา และ FAQ จากข้อมูลที่รองรับ' : '- highlights, whatsDifferent, pros, considerations และ faq ให้เป็น array ว่าง'}\n${includeBox ? '- เติมอุปกรณ์ในกล่องเฉพาะที่มีหลักฐานรองรับ' : '- boxContents และ notIncluded ให้เป็น array ว่าง'}`;
+  const prompt = `ค้นคว้าข้อมูลสินค้าโมเดลของสะสมต่อไปนี้เพื่อกรอกฐานข้อมูล TOYSKUB: "${query}"\n\nกติกา:\n- เน้นข้อมูลทางการจาก Bandai Hobby Site / Bandai Spirits และใช้ Dalong.net เป็นแหล่งเสริมเมื่อเกี่ยวข้อง\n- ห้ามเดาข้อมูลเชิงข้อเท็จจริง ถ้ายืนยันไม่ได้ให้คืน null หรือ array ว่าง\n- ราคา launchPriceJPY ต้องเป็นราคาเปิดตัวญี่ปุ่นก่อนภาษี\n- releaseDate ใช้ YYYY-MM-DD เฉพาะเมื่อยืนยันวันได้\n- ถ้าเป็น Real Grade ให้ id เป็น rg-เลขสามหลัก เช่น rg-039 และ sku เป็น RG-039\n- seriesGroup เลือก Gundam, Evangelion, Gaogaigar, Patlabor หรือ Special Version ตามที่เหมาะสม\n- เขียนภาษาไทยอ่านง่าย ไม่โฆษณาเกินจริง\n- references ใส่เฉพาะ URL ที่ค้นพบจริง พร้อมชื่อเว็บไซต์\n- หา Dalong Information URL ที่ตรงรุ่นและลงท้าย _i.htm ใส่ dalongPageUrl; ถ้ายืนยันไม่ได้ให้คืน null\n- ไม่ต้องเดา URL รูปโดยตรง ระบบจะตรวจและนำเข้ารูปปกกับคู่มือจากหน้า Dalong เอง\n- ไม่ต้องหา YouTube Shopee Lazada TikTok หรือ Affiliate\n${includeEditorial ? '- สร้างจุดเด่น ข้อแตกต่าง ข้อดี ข้อควรพิจารณา และ FAQ จากข้อมูลที่รองรับ' : '- highlights, whatsDifferent, pros, considerations และ faq ให้เป็น array ว่าง'}\n${includeBox ? '- เติมอุปกรณ์ในกล่องเฉพาะที่มีหลักฐานรองรับ' : '- boxContents และ notIncluded ให้เป็น array ว่าง'}`;
 
   const requestBody = {
     model: String(context.env.OPENAI_MODEL || 'gpt-5-mini'),
