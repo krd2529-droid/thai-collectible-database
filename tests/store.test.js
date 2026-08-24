@@ -12,6 +12,7 @@ import { onRequestPost as uploadMedia } from '../functions/api/admin/media/uploa
 import { onRequestPost as recordTraffic } from '../functions/api/analytics/view.js';
 import { onRequestGet as getTrafficStats } from '../functions/api/analytics/stats.js';
 import { extractCoverUrl, extractManualUrls } from '../functions/api/admin/media/import-dalong-manual.js';
+import { normalizeCatalogSeries } from '../functions/api/admin/ai/catalog-fill.js';
 
 class BoundStatement {
   constructor(db, sql, args) { this.db=db; this.sql=sql; this.args=args; }
@@ -155,6 +156,10 @@ test('auto catalog extracts Dalong cover and manual links and remains draft-firs
   const template=fs.readFileSync('admin/rg-template/template.js','utf8');
   assert.match(template,/runAutoCatalog/);assert.match(template,/saveItem\(false,'draft'\)/);
   assert.match(template,/ระบบจะไม่ Publish เอง/);
+  assert.equal(normalizeCatalogSeries('Real Grade (RG)'),null);
+  assert.equal(normalizeCatalogSeries('RG'),null);
+  assert.equal(normalizeCatalogSeries("Mobile Suit Gundam: Char's Counterattack"),"Mobile Suit Gundam: Char's Counterattack");
+  assert.match(ai,/series ต้องเป็นชื่อซีรีส์\/ผลงานต้นทาง/);
 });
 
 test('public order reserves availability and rejects overselling',async(t)=>{

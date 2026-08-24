@@ -15,7 +15,7 @@ const catalogSchema = {
     rgNumber: { type: ['integer','null'] },
     modelCode: { type: ['string','null'] },
     manufacturer: { type: ['string','null'] },
-    series: { type: ['string','null'] },
+    series: { type: ['string','null'], description: 'ชื่ออนิเมะ ภาพยนตร์ หรือผลงานต้นทาง เช่น Mobile Suit Gundam SEED; ห้ามใส่ชื่อเกรด เช่น Real Grade หรือ RG' },
     scale: { type: ['string','null'] },
     releaseDate: { type: ['string','null'], description: 'YYYY-MM-DD when verified, otherwise null' },
     launchPriceJPY: { type: ['integer','null'], description: 'Japanese launch price before tax' },
@@ -65,6 +65,13 @@ function outputText(response) {
   return '';
 }
 
+export function normalizeCatalogSeries(value) {
+  const series = String(value || '').trim();
+  if (!series) return null;
+  if (/^(?:real\s*grade(?:\s*\(\s*rg\s*\))?|rg)$/i.test(series)) return null;
+  return series;
+}
+
 export async function onRequestPost(context) {
   if (!(await isAuthorized(context.request, context.env))) {
     return json({ ok: false, error: 'กรุณาเข้าสู่ระบบแอดมินใหม่' }, 401);
@@ -78,7 +85,7 @@ export async function onRequestPost(context) {
 
   const includeEditorial = body.includeEditorial !== false;
   const includeBox = body.includeBox !== false;
-  const prompt = `ค้นคว้าข้อมูลสินค้าโมเดลของสะสมต่อไปนี้เพื่อกรอกฐานข้อมูล TOYSKUB: "${query}"\n\nกติกา:\n- เน้นข้อมูลทางการจาก Bandai Hobby Site / Bandai Spirits และใช้ Dalong.net เป็นแหล่งเสริมเมื่อเกี่ยวข้อง\n- ห้ามเดาข้อมูลเชิงข้อเท็จจริง ถ้ายืนยันไม่ได้ให้คืน null หรือ array ว่าง\n- ราคา launchPriceJPY ต้องเป็นราคาเปิดตัวญี่ปุ่นก่อนภาษี\n- releaseDate ใช้ YYYY-MM-DD เฉพาะเมื่อยืนยันวันได้\n- ถ้าเป็น Real Grade ให้ id เป็น rg-เลขสามหลัก เช่น rg-039 และ sku เป็น RG-039\n- seriesGroup เลือก Gundam, Evangelion, Gaogaigar, Patlabor หรือ Special Version ตามที่เหมาะสม\n- เขียนภาษาไทยอ่านง่าย ไม่โฆษณาเกินจริง\n- references ใส่เฉพาะ URL ที่ค้นพบจริง พร้อมชื่อเว็บไซต์\n- หา Dalong Information URL ที่ตรงรุ่นและลงท้าย _i.htm ใส่ dalongPageUrl; ถ้ายืนยันไม่ได้ให้คืน null\n- ไม่ต้องเดา URL รูปโดยตรง ระบบจะตรวจและนำเข้ารูปปกกับคู่มือจากหน้า Dalong เอง\n- ไม่ต้องหา YouTube Shopee Lazada TikTok หรือ Affiliate\n${includeEditorial ? '- สร้างจุดเด่น ข้อแตกต่าง ข้อดี ข้อควรพิจารณา และ FAQ จากข้อมูลที่รองรับ' : '- highlights, whatsDifferent, pros, considerations และ faq ให้เป็น array ว่าง'}\n${includeBox ? '- เติมอุปกรณ์ในกล่องเฉพาะที่มีหลักฐานรองรับ' : '- boxContents และ notIncluded ให้เป็น array ว่าง'}`;
+  const prompt = `ค้นคว้าข้อมูลสินค้าโมเดลของสะสมต่อไปนี้เพื่อกรอกฐานข้อมูล TOYSKUB: "${query}"\n\nกติกา:\n- เน้นข้อมูลทางการจาก Bandai Hobby Site / Bandai Spirits และใช้ Dalong.net เป็นแหล่งเสริมเมื่อเกี่ยวข้อง\n- ห้ามเดาข้อมูลเชิงข้อเท็จจริง ถ้ายืนยันไม่ได้ให้คืน null หรือ array ว่าง\n- ราคา launchPriceJPY ต้องเป็นราคาเปิดตัวญี่ปุ่นก่อนภาษี\n- releaseDate ใช้ YYYY-MM-DD เฉพาะเมื่อยืนยันวันได้\n- ถ้าเป็น Real Grade ให้ id เป็น rg-เลขสามหลัก เช่น rg-039 และ sku เป็น RG-039\n- series ต้องเป็นชื่อซีรีส์/ผลงานต้นทางที่ตัวหุ่นปรากฏ เช่น Mobile Suit Gundam SEED, Mobile Suit Gundam: Char's Counterattack หรือ Neon Genesis Evangelion เท่านั้น ห้ามใส่ชื่อเกรดสินค้า Real Grade, RG หรือคำว่า Gundam ลอย ๆ\n- grade ของหน้านี้กำหนดเป็น RG อยู่แล้ว จึงห้ามนำชื่อเกรดไปกรอกซ้ำใน series\n- seriesGroup เลือก Gundam, Evangelion, Gaogaigar, Patlabor หรือ Special Version ตามที่เหมาะสม\n- เขียนภาษาไทยอ่านง่าย ไม่โฆษณาเกินจริง\n- references ใส่เฉพาะ URL ที่ค้นพบจริง พร้อมชื่อเว็บไซต์\n- หา Dalong Information URL ที่ตรงรุ่นและลงท้าย _i.htm ใส่ dalongPageUrl; ถ้ายืนยันไม่ได้ให้คืน null\n- ไม่ต้องเดา URL รูปโดยตรง ระบบจะตรวจและนำเข้ารูปปกกับคู่มือจากหน้า Dalong เอง\n- ไม่ต้องหา YouTube Shopee Lazada TikTok หรือ Affiliate\n${includeEditorial ? '- สร้างจุดเด่น ข้อแตกต่าง ข้อดี ข้อควรพิจารณา และ FAQ จากข้อมูลที่รองรับ' : '- highlights, whatsDifferent, pros, considerations และ faq ให้เป็น array ว่าง'}\n${includeBox ? '- เติมอุปกรณ์ในกล่องเฉพาะที่มีหลักฐานรองรับ' : '- boxContents และ notIncluded ให้เป็น array ว่าง'}`;
 
   const requestBody = {
     model: String(context.env.OPENAI_MODEL || 'gpt-5-mini'),
@@ -113,6 +120,7 @@ export async function onRequestPost(context) {
   let item;
   try { item = JSON.parse(text); }
   catch { return json({ ok: false, error: 'รูปแบบข้อมูลจาก AI ไม่ถูกต้อง กรุณาลองใหม่' }, 502); }
+  item.series = normalizeCatalogSeries(item.series);
 
   return json({ ok: true, item, responseId: data.id || null });
 }

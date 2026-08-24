@@ -138,9 +138,10 @@ function jarvisReplaceList(type,data,fillOnly){
  renderList(type);
 }
 function applyJarvisData(data,fillOnly=true){
+ const series=/^(?:real\s*grade(?:\s*\(\s*rg\s*\))?|rg)$/i.test(String(data.series||'').trim())?null:data.series;
  const scalar={
   itemId:data.id,itemSku:data.sku,name:data.name,summary:data.summary,rgNumber:data.rgNumber,
-  modelCode:data.modelCode,manufacturer:data.manufacturer,series:data.series,scale:data.scale,
+  modelCode:data.modelCode,manufacturer:data.manufacturer,series,scale:data.scale,
   releaseDate:data.releaseDate,launchPriceJPY:data.launchPriceJPY,heightCm:data.heightCm,
   recommendedAge:data.recommendedAge,productType:data.productType,material:data.material,
   seriesGroup:data.seriesGroup
