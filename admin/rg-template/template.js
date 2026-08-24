@@ -139,8 +139,9 @@ function jarvisReplaceList(type,data,fillOnly){
 }
 function applyJarvisData(data,fillOnly=true){
  const series=/^(?:real\s*grade(?:\s*\(\s*rg\s*\))?|rg)$/i.test(String(data.series||'').trim())?null:data.series;
+ const name=/[\u0E00-\u0E7F]/u.test(String(data.name||''))?null:data.name;
  const scalar={
-  itemId:data.id,itemSku:data.sku,name:data.name,summary:data.summary,rgNumber:data.rgNumber,
+  itemId:data.id,itemSku:data.sku,name,summary:data.summary,rgNumber:data.rgNumber,
   modelCode:data.modelCode,manufacturer:data.manufacturer,series,scale:data.scale,
   releaseDate:data.releaseDate,launchPriceJPY:data.launchPriceJPY,heightCm:data.heightCm,
   recommendedAge:data.recommendedAge,productType:data.productType,material:data.material,

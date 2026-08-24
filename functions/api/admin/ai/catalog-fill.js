@@ -11,7 +11,7 @@ const catalogSchema = {
   properties: {
     id: { type: ['string','null'] },
     sku: { type: ['string','null'] },
-    name: { type: ['string','null'] },
+    name: { type: ['string','null'], description: 'Official Gundam/model name in English only; do not use Thai script' },
     rgNumber: { type: ['integer','null'] },
     modelCode: { type: ['string','null'] },
     manufacturer: { type: ['string','null'] },
@@ -72,6 +72,12 @@ export function normalizeCatalogSeries(value) {
   return series;
 }
 
+export function normalizeCatalogName(value) {
+  const name = String(value || '').trim();
+  if (!name || /[\u0E00-\u0E7F]/u.test(name)) return null;
+  return name;
+}
+
 export async function onRequestPost(context) {
   if (!(await isAuthorized(context.request, context.env))) {
     return json({ ok: false, error: 'กรุณาเข้าสู่ระบบแอดมินใหม่' }, 401);
@@ -91,7 +97,7 @@ export async function onRequestPost(context) {
     model: String(context.env.OPENAI_MODEL || 'gpt-5-mini'),
     tools: [{ type: 'web_search', search_context_size: 'medium' }],
     input: [
-      { role: 'system', content: 'คุณคือ JARVIS ผู้ช่วยจัดทำฐานข้อมูลของสะสมไทย ให้ความสำคัญกับความถูกต้อง แหล่งอ้างอิง และไม่เดาข้อมูล' },
+      { role: 'system', content: 'คุณคือ JARVIS ผู้ช่วยจัดทำฐานข้อมูลของสะสมไทย ให้ความสำคัญกับความถูกต้อง แหล่งอ้างอิง และไม่เดาข้อมูล ช่อง name ต้องใช้ชื่อรุ่นภาษาอังกฤษทางการเท่านั้น ห้ามใช้ชื่อภาษาไทย' },
       { role: 'user', content: prompt }
     ],
     text: {
@@ -121,6 +127,7 @@ export async function onRequestPost(context) {
   try { item = JSON.parse(text); }
   catch { return json({ ok: false, error: 'รูปแบบข้อมูลจาก AI ไม่ถูกต้อง กรุณาลองใหม่' }, 502); }
   item.series = normalizeCatalogSeries(item.series);
+  item.name = normalizeCatalogName(item.name);
 
   return json({ ok: true, item, responseId: data.id || null });
 }
