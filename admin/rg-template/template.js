@@ -144,7 +144,7 @@ function applyJarvisData(data,fillOnly=true){
   itemId:data.id,itemSku:data.sku,name,summary:data.summary,rgNumber:data.rgNumber,
   modelCode:data.modelCode,manufacturer:data.manufacturer,series,scale:data.scale,
   releaseDate:data.releaseDate,launchPriceJPY:data.launchPriceJPY,heightCm:data.heightCm,
-  recommendedAge:data.recommendedAge,productType:data.productType,material:data.material,
+  recommendedAge:'12 ปีขึ้นไป',productType:data.productType,material:data.material,
   seriesGroup:data.seriesGroup
  };
  Object.entries(scalar).forEach(([id,value])=>jarvisSetField(id,value,fillOnly));
