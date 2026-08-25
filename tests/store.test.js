@@ -12,6 +12,7 @@ import { onRequestPost as uploadMedia } from '../functions/api/admin/media/uploa
 import { onRequestPost as recordTraffic } from '../functions/api/analytics/view.js';
 import { onRequestGet as getTrafficStats } from '../functions/api/analytics/stats.js';
 import { extractCoverUrl, extractManualUrls } from '../functions/api/admin/media/import-dalong-manual.js';
+import { buildDalongCoverUrl } from '../functions/api/admin/media/dalong-cover.js';
 import { normalizeCatalogName, normalizeCatalogSeries, normalizeRecommendedAge } from '../functions/api/admin/ai/catalog-fill.js';
 
 class BoundStatement {
@@ -166,6 +167,16 @@ test('auto catalog extracts Dalong cover and manual links and remains draft-firs
   assert.equal(normalizeRecommendedAge(),'12 ปีขึ้นไป');
   assert.match(ai,/ชื่อนั้นค้นเฉพาะ bandai-hobby\.net/);
   assert.match(ai,/ยืนยันความสูงเมื่อประกอบ/);
+});
+
+test('catalog manager falls back to Dalong cover when an RG image is missing',()=>{
+  const manager=fs.readFileSync('admin/catalog/catalog.js','utf8');
+  assert.match(manager,/function dalongCoverFallback/);
+  assert.match(manager,/\/api\/admin\/media\/dalong-cover\?id=rg-/);
+  assert.match(manager,/data-fallback/);
+  assert.doesNotMatch(manager,/onerror="this\.style\.visibility='hidden'"/);
+  assert.equal(buildDalongCoverUrl('rg-031'),'https://www.dalong.net/reviews/rg/rg31/p/rg31.jpg');
+  assert.equal(buildDalongCoverUrl('../etc/passwd'),'');
 });
 
 test('public order reserves availability and rejects overselling',async(t)=>{

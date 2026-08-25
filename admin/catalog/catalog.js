@@ -51,6 +51,28 @@ function imageUrl(item) {
   return `/${String(path).replace(/^\/+/, "")}`;
 }
 
+function dalongCoverFallback(item) {
+  const match = String(item.id || "").toLowerCase().match(/^rg-0*(\d+)$/);
+  if (!match) return "";
+  const number = Number(match[1]);
+  if (!Number.isInteger(number) || number < 1) return "";
+  return `/api/admin/media/dalong-cover?id=rg-${String(number).padStart(3, "0")}`;
+}
+
+function bindImageFallbacks() {
+  $("rows").querySelectorAll("img[data-fallback]").forEach((image) => {
+    image.addEventListener("error", () => {
+      const fallback = image.dataset.fallback;
+      if (fallback && image.src !== fallback) {
+        image.removeAttribute("data-fallback");
+        image.src = fallback;
+        return;
+      }
+      image.style.visibility = "hidden";
+    });
+  });
+}
+
 function render() {
   const query = $("search").value.trim().toLowerCase();
   const list = items.filter((item) =>
@@ -63,10 +85,11 @@ function render() {
     ? list.map((item) => {
         const id = esc(item.id);
         const img = imageUrl(item);
+        const fallback = dalongCoverFallback(item);
         const status = item.status || item.catalogStatus || "draft";
         const statusLabel = status === "published" ? "เผยแพร่" : status === "hidden" ? "ซ่อน" : "ฉบับร่าง";
         return `<tr>
-          <td>${img ? `<img class="thumb" src="${esc(img)}" alt="" onerror="this.style.visibility='hidden'">` : "—"}</td>
+          <td>${img || fallback ? `<img class="thumb" src="${esc(img || fallback)}" data-fallback="${esc(fallback)}" alt="">` : "—"}</td>
           <td><b>${id}</b><br>${esc(item.name || "ยังไม่มีชื่อรุ่น")}</td>
           <td><b>${esc(item.line || item.grade || "—")}</b>
             ${item.seriesGroup ? `<br><small>กลุ่ม: ${esc(item.seriesGroup)}</small>` : ""}
@@ -82,6 +105,7 @@ function render() {
         </tr>`;
       }).join("")
     : '<tr><td colspan="5">ยังไม่มีรายการจาก D1 กด “เพิ่มรายการด้วยฟอร์มเต็ม” เพื่อสร้างรายการแรก</td></tr>';
+  bindImageFallbacks();
 }
 
 $("search").addEventListener("input", render);
