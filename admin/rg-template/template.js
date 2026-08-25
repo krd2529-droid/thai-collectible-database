@@ -148,7 +148,7 @@ function applyJarvisData(data,fillOnly=true){
   itemId:data.id,itemSku:data.sku,name,summary:data.summary,rgNumber:data[templateConfig.numberKey]??data.rgNumber??data.mgsdNumber,
   modelCode:data.modelCode,manufacturer:data.manufacturer,series,scale:data.scale,
   releaseDate:data.releaseDate,launchPriceJPY:data.launchPriceJPY,heightCm:data.heightCm,
-  recommendedAge:'12 ปีขึ้นไป',productType:data.productType,material:data.material,
+  recommendedAge:'15 ปีขึ้นไป',productType:data.productType,material:data.material,
   seriesGroup:data.seriesGroup
  };
  Object.entries(scalar).forEach(([id,value])=>jarvisSetField(id,value,fillOnly));

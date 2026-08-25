@@ -21,7 +21,7 @@ const catalogSchema = {
     releaseDate: { type: ['string','null'], description: 'YYYY-MM-DD when verified, otherwise null' },
     launchPriceJPY: { type: ['integer','null'], description: 'Japanese launch price before tax' },
     heightCm: { type: ['number','null'], description: 'Completed model height in centimeters, verified from bandai-hobby.net by searching the official Japanese product name' },
-    recommendedAge: { type: ['string','null'], description: 'Always return 12 ปีขึ้นไป' },
+    recommendedAge: { type: ['string','null'], description: 'Always return 15 ปีขึ้นไป' },
     productType: { type: ['string','null'] },
     material: { type: ['string','null'] },
     seriesGroup: { type: ['string','null'] },
@@ -80,7 +80,7 @@ export function normalizeCatalogName(value) {
 }
 
 export function normalizeRecommendedAge() {
-  return '12 ปีขึ้นไป';
+  return '15 ปีขึ้นไป';
 }
 
 export async function onRequestPost(context) {
@@ -106,7 +106,7 @@ export async function onRequestPost(context) {
     model: String(context.env.OPENAI_MODEL || 'gpt-5-mini'),
     tools: [{ type: 'web_search', search_context_size: 'medium' }],
     input: [
-      { role: 'system', content: 'คุณคือ JARVIS ผู้ช่วยจัดทำฐานข้อมูลของสะสมไทย ให้ความสำคัญกับความถูกต้อง แหล่งอ้างอิง และไม่เดาข้อมูล ช่อง name ต้องใช้ชื่อรุ่นภาษาอังกฤษทางการเท่านั้น ห้ามใช้ชื่อภาษาไทย ตั้ง recommendedAge เป็น 12 ปีขึ้นไป สำหรับ heightCm ให้หาชื่อสินค้าภาษาญี่ปุ่นทางการก่อน แล้วใช้ชื่อนั้นค้นเฉพาะ bandai-hobby.net เพื่อยืนยันความสูงเมื่อประกอบ และเพิ่มหน้า Bandai Hobby ที่ใช้เป็นหลักฐานใน references' },
+      { role: 'system', content: 'คุณคือ JARVIS ผู้ช่วยจัดทำฐานข้อมูลของสะสมไทย ให้ความสำคัญกับความถูกต้อง แหล่งอ้างอิง และไม่เดาข้อมูล ช่อง name ต้องใช้ชื่อรุ่นภาษาอังกฤษทางการเท่านั้น ห้ามใช้ชื่อภาษาไทย ตั้ง recommendedAge เป็น 15 ปีขึ้นไป สำหรับ heightCm ให้หาชื่อสินค้าภาษาญี่ปุ่นทางการก่อน แล้วใช้ชื่อนั้นค้นเฉพาะ bandai-hobby.net เพื่อยืนยันความสูงเมื่อประกอบ และเพิ่มหน้า Bandai Hobby ที่ใช้เป็นหลักฐานใน references' },
       { role: 'user', content: prompt }
     ],
     text: {
