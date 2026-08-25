@@ -86,6 +86,7 @@ function render() {
         const id = esc(item.id);
         const img = imageUrl(item);
         const fallback = dalongCoverFallback(item);
+        const templatePath = String(item.line || item.grade || "").toUpperCase() === "MGSD" || /^mgsd-/i.test(String(item.id || "")) ? "mgsd-template" : "rg-template";
         const status = item.status || item.catalogStatus || "draft";
         const statusLabel = status === "published" ? "เผยแพร่" : status === "hidden" ? "ซ่อน" : "ฉบับร่าง";
         return `<tr>
@@ -98,7 +99,7 @@ function render() {
           <td><span class="status-pill ${esc(status)}">${statusLabel}</span></td>
           <td><div class="row-actions">
             <button class="gallery-toggle ${item.showGalleryImages === false ? "is-off" : "is-on"}" data-gallery-toggle="${id}" data-gallery-visible="${item.showGalleryImages !== false}" type="button">${item.showGalleryImages === false ? "รูปสินค้า: ปิด (เหลือรูปปก)" : "รูปสินค้า: เปิด"}</button>
-            <a class="table-action primary" href="/admin/rg-template/?id=${encodeURIComponent(item.id)}">แก้ไขข้อมูลครบ</a>
+            <a class="table-action primary" href="/admin/${templatePath}/?id=${encodeURIComponent(item.id)}">แก้ไขข้อมูลครบ</a>
             <a class="table-action" href="/product/${encodeURIComponent(item.id)}" target="_blank" rel="noopener">ดูหน้าเว็บ</a>
             <button class="danger" data-delete="${id}" type="button">ย้ายไปถังขยะ</button>
           </div></td>

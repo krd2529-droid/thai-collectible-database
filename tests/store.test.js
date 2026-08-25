@@ -4,6 +4,7 @@ import test from 'node:test';
 import { DatabaseSync } from 'node:sqlite';
 import { createSessionCookie } from '../functions/lib/admin-auth.js';
 import { normalizeProduct, productFromRow, validateProduct } from '../functions/lib/store-db.js';
+import { normalizeCatalogInput } from '../functions/lib/catalog-db.js';
 import { onRequestGet as listProducts } from '../functions/api/store/products/index.js';
 import { onRequestPost as createOrder } from '../functions/api/store/orders/index.js';
 import { onRequestGet as listAdminProducts, onRequestPost as createProduct } from '../functions/api/admin/store/products/index.js';
@@ -177,6 +178,27 @@ test('catalog manager falls back to Dalong cover when an RG image is missing',()
   assert.doesNotMatch(manager,/onerror="this\.style\.visibility='hidden'"/);
   assert.equal(buildDalongCoverUrl('rg-031'),'https://www.dalong.net/reviews/rg/rg31/p/rg31.jpg');
   assert.equal(buildDalongCoverUrl('../etc/passwd'),'');
+});
+
+test('MGSD admin template keeps MGSD identifiers and catalog paths separate from RG',()=>{
+  const page=fs.readFileSync('admin/mgsd-template/index.html','utf8');
+  const template=fs.readFileSync('admin/rg-template/template.js','utf8');
+  const manager=fs.readFileSync('admin/catalog/catalog.js','utf8');
+  const ai=fs.readFileSync('functions/api/admin/ai/catalog-fill.js','utf8');
+  assert.match(page,/data-template-line="MGSD"/);
+  assert.match(page,/MGSD INLINE TEMPLATE/);
+  assert.match(page,/Auto Catalog/);
+  assert.match(template,/numberKey:'mgsdNumber'/);
+  assert.match(template,/dataFolder:'mgsd'/);
+  assert.match(template,/catalogLine:templateConfig\.line/);
+  assert.match(manager,/"mgsd-template"/);
+  assert.match(ai,/MGSD เท่านั้น/);
+  const item=normalizeCatalogInput({id:'mgsd-006',name:'MGSD Test Gundam',categoryCode:'gd',productType:'Gunpla',productTypeCode:'gp',line:'MGSD',mgsdNumber:6,scale:'Non-scale'});
+  assert.equal(item.mgsdNumber,6);
+  assert.equal(item.rgNumber,null);
+  assert.equal(item.lineCode,'mgsd');
+  assert.equal(item.catalogPath,'gd/gp/mgsd');
+  assert.equal(item.sortOrder,6);
 });
 
 test('public order reserves availability and rejects overselling',async(t)=>{

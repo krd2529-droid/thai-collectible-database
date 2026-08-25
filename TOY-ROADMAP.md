@@ -53,6 +53,7 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - ระบุว่า stats public หรือ admin-only
 - เปลี่ยน Traffic analytics เป็น daily rollup เพื่อลด D1 rows read และหยุด schema DDL บน request path (เสร็จใน Migration 0008)
 - เพิ่ม Auto Catalog Draft สำหรับ RG: AI เติมข้อมูลและ Dalong URL, backend ตรวจ host แล้วนำเข้ารูปปก/คู่มือเข้า R2 โดยไม่ Publish อัตโนมัติ
+- เพิ่ม MGSD Template แยกที่ `/admin/mgsd-template/` โดยใช้ editor/Auto Catalog ชุดร่วม แต่บังคับรหัส `mgsd-*`, เกรด MGSD, Non-scale และ Dalong หมวด SD
 - dedupe/rate limit ingestion, validation และ retention cleanup
 - privacy notice/consent decision สำหรับ persistent visitor ID
 - load/abuse tests บน staging
