@@ -5,7 +5,7 @@ export const ORDER_STATUSES = new Set(['pending', 'payment_review', 'paid', 'can
 
 const STORE_SCHEMA_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS store_products (
-    id TEXT PRIMARY KEY,name TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',level TEXT NOT NULL DEFAULT '',
+    id TEXT PRIMARY KEY,name TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',level TEXT NOT NULL DEFAULT '',brand TEXT NOT NULL DEFAULT '',
     category TEXT NOT NULL DEFAULT 'one-piece-card',price_satang INTEGER NOT NULL CHECK(price_satang >= 0),
     cost_price_satang INTEGER NOT NULL DEFAULT 0 CHECK(cost_price_satang >= 0),
     stock_quantity INTEGER NOT NULL DEFAULT 0 CHECK(stock_quantity >= 0),image_url TEXT NOT NULL DEFAULT '',
@@ -38,6 +38,7 @@ export async function ensureStoreSchema(db) {
   const additiveColumns = [
     ['level', "ALTER TABLE store_products ADD COLUMN level TEXT NOT NULL DEFAULT ''"],
     ['cost_price_satang', 'ALTER TABLE store_products ADD COLUMN cost_price_satang INTEGER NOT NULL DEFAULT 0 CHECK(cost_price_satang >= 0)'],
+    ['brand', "ALTER TABLE store_products ADD COLUMN brand TEXT NOT NULL DEFAULT ''"],
   ];
   for (const [column, sql] of additiveColumns) {
     try { await db.prepare(`SELECT ${column} FROM store_products LIMIT 1`).first(); }
@@ -67,6 +68,7 @@ export function normalizeProduct(raw = {}) {
     name: String(raw.name || '').trim().slice(0, 160),
     description: String(raw.description || '').trim().slice(0, 5000),
     level: String(raw.level || '').trim().slice(0, 80),
+    brand: String(raw.brand || '').trim().slice(0, 120),
     category: STORE_CATEGORIES.has(String(raw.category || '').trim().toLowerCase()) ? String(raw.category).trim().toLowerCase() : STORE_CATEGORY,
     priceSatang: Number.isFinite(price) ? Math.round(price * 100) : -1,
     costPriceSatang: Number.isFinite(costPrice) ? Math.round(costPrice * 100) : 0,
@@ -99,6 +101,7 @@ export function productFromRow(row = {}, { includeCost = false } = {}) {
     name: row.name,
     description: row.description,
     level: row.level || '',
+    brand: row.brand || '',
     category: row.category,
     price: Number(row.priceSatang || 0) / 100,
     stockQuantity,
@@ -114,7 +117,7 @@ export function productFromRow(row = {}, { includeCost = false } = {}) {
   return product;
 }
 
-export const PRODUCT_SELECT = `SELECT p.id,p.name,p.description,p.level,p.category,
+export const PRODUCT_SELECT = `SELECT p.id,p.name,p.description,p.level,p.brand,p.category,
   p.price_satang AS priceSatang,p.cost_price_satang AS costPriceSatang,
   p.stock_quantity AS stockQuantity,p.image_url AS imageUrl,
   p.status,p.sort_order AS sortOrder,p.created_at AS createdAt,p.updated_at AS updatedAt,

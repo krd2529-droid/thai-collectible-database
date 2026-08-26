@@ -23,7 +23,7 @@ class BoundStatement {
   async all() { return { results:this.db.prepare(this.sql).all(...this.args) }; }
 }
 class D1Mock {
-  constructor(schema='full') { this.sqlite=new DatabaseSync(':memory:');if(schema!=='empty')this.sqlite.exec(fs.readFileSync('migrations/0005_store_products_orders.sql','utf8'));if(schema==='full'){this.sqlite.exec(fs.readFileSync('migrations/0003_analytics_views.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0006_store_product_level.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0007_store_product_cost.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0008_analytics_daily_rollup.sql','utf8'))} }
+  constructor(schema='full') { this.sqlite=new DatabaseSync(':memory:');if(schema!=='empty')this.sqlite.exec(fs.readFileSync('migrations/0005_store_products_orders.sql','utf8'));if(schema==='full'){this.sqlite.exec(fs.readFileSync('migrations/0003_analytics_views.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0006_store_product_level.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0007_store_product_cost.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0008_analytics_daily_rollup.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0009_store_product_brand.sql','utf8'))} }
   prepare(sql) { return { bind:(...args)=>new BoundStatement(this.sqlite,sql,args), run:async()=>new BoundStatement(this.sqlite,sql,[]).run(), first:async()=>new BoundStatement(this.sqlite,sql,[]).first(), all:async()=>new BoundStatement(this.sqlite,sql,[]).all() }; }
   async batch(statements) { this.sqlite.exec('BEGIN'); try { const results=[]; for(const statement of statements)results.push(await statement.run()); this.sqlite.exec('COMMIT'); return results; } catch(error) { this.sqlite.exec('ROLLBACK'); throw error; } }
   close() { this.sqlite.close(); }
@@ -62,11 +62,13 @@ test('store products have separate One Piece Card and toys category routes',()=>
   assert.match(adminStoreHtml,/href="\/stock\/onepiececard\/"/);
   assert.match(adminStoreHtml,/href="\/stock\/toys\/"/);
   assert.match(adminStoreHtml,/id="productCategory"/);
+  assert.match(adminStoreHtml,/id="productBrand"/);
+  assert.match(adminStoreHtml,/แสดงเฉพาะหลังบ้าน ไม่ส่งออกหน้าร้าน/);
 });
 
 test('normalizes product money and rejects negative stock',()=>{
-  const valid=normalizeProduct({id:' OP Card 001 ',name:'การ์ดทดสอบ',level:'  SR  ',price:19.99,costPrice:12.5,stockQuantity:2,status:'published'});
-  assert.equal(valid.id,'op-card-001');assert.equal(valid.level,'SR');assert.equal(valid.priceSatang,1999);assert.equal(valid.costPriceSatang,1250);assert.equal(validateProduct(valid),'');
+  const valid=normalizeProduct({id:' OP Card 001 ',name:'การ์ดทดสอบ',brand:' Bandai ',level:'  SR  ',price:19.99,costPrice:12.5,stockQuantity:2,status:'published'});
+  assert.equal(valid.id,'op-card-001');assert.equal(valid.brand,'Bandai');assert.equal(valid.level,'SR');assert.equal(valid.priceSatang,1999);assert.equal(valid.costPriceSatang,1250);assert.equal(validateProduct(valid),'');
   assert.match(validateProduct(normalizeProduct({...valid,stockQuantity:-1})),/ไม่ติดลบ/);
   assert.match(validateProduct(normalizeProduct({...valid,price:19.99,costPrice:-1})),/ราคาต้นทุน/);
   assert.equal(normalizeProduct({...valid,category:'toys'}).category,'toys');
@@ -75,12 +77,14 @@ test('normalizes product money and rejects negative stock',()=>{
 test('public store API filters products by requested shop category',async(t)=>{
   const db=new D1Mock();t.after(()=>db.close());
   db.sqlite.prepare("INSERT INTO store_products(id,name,category,price_satang,stock_quantity,status) VALUES(?,?,?,?,?,?)").run('op-card','Card','one-piece-card',10000,1,'published');
-  db.sqlite.prepare("INSERT INTO store_products(id,name,category,price_satang,stock_quantity,status) VALUES(?,?,?,?,?,?)").run('toy-001','Toy','toys',20000,2,'published');
+  db.sqlite.prepare("INSERT INTO store_products(id,name,brand,category,price_satang,cost_price_satang,stock_quantity,status) VALUES(?,?,?,?,?,?,?,?)").run('toy-001','Toy','Bandai','toys',20000,12500,2,'published');
   const response=await listProducts({env:{TOYSKUB_DB:db},request:request('/api/store/products?category=toys')});
   assert.equal(response.status,200);
   const data=await read(response);
   assert.deepEqual(data.products.map(product=>product.id),['toy-001']);
   assert.equal(data.products[0].category,'toys');
+  assert.equal(data.products[0].brand,'Bandai');
+  assert.equal('costPrice' in data.products[0],false);
 });
 
 test('media upload reports missing storage and storage failures clearly',async()=>{
@@ -100,11 +104,11 @@ test('admin product create provisions empty and upgrades legacy store schema',as
     const form=new FormData();form.append('id',`op-${schema}`);form.append('kind','store');form.append('file',new File(['image'],'card.webp',{type:'image/webp'}));
     const uploaded=await uploadMedia({request:request('/api/admin/media/upload',{method:'POST',headers:{cookie},body:form}),env:{ADMIN_PASSWORD:secret,TOYSKUB_MEDIA:{put:async()=>{}}}});
     assert.equal(uploaded.status,200);const imageUrl=(await read(uploaded)).url;
-    const body={id:`op-${schema}`,name:'Gear 2',description:'ใบ RAW ไม่มีตำหนิ',level:'PA',price:10000,costPrice:7500,stockQuantity:4,status:'draft',imageUrl};
+    const body={id:`op-${schema}`,name:'Gear 2',brand:'Bandai',description:'ใบ RAW ไม่มีตำหนิ',level:'PA',price:10000,costPrice:7500,stockQuantity:4,status:'draft',imageUrl};
     const response=await createProduct({env:{TOYSKUB_DB:db,ADMIN_PASSWORD:secret},request:request('/api/admin/store/products',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify(body)})});
     assert.equal(response.status,201,`${schema}: ${JSON.stringify(await read(response.clone()))}`);
-    const saved=db.sqlite.prepare('SELECT level,cost_price_satang,stock_quantity FROM store_products WHERE id=?').get(`op-${schema}`);
-    assert.equal(saved.level,'PA');assert.equal(saved.cost_price_satang,750000);assert.equal(saved.stock_quantity,4);
+    const saved=db.sqlite.prepare('SELECT level,brand,cost_price_satang,stock_quantity FROM store_products WHERE id=?').get(`op-${schema}`);
+    assert.equal(saved.level,'PA');assert.equal(saved.brand,'Bandai');assert.equal(saved.cost_price_satang,750000);assert.equal(saved.stock_quantity,4);
   }
 });
 

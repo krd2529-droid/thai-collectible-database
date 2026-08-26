@@ -24,8 +24,8 @@ export async function onRequestPost(context) {
   const error = validateProduct(product); if (error) return json({ ok: false, error }, 400);
   try {
     await context.env.TOYSKUB_DB.prepare(`INSERT INTO store_products
-      (id,name,description,level,category,price_satang,cost_price_satang,stock_quantity,image_url,status,sort_order)
-      VALUES(?,?,?,?,?,?,?,?,?,?,?)`).bind(product.id,product.name,product.description,product.level,product.category,
+      (id,name,description,level,brand,category,price_satang,cost_price_satang,stock_quantity,image_url,status,sort_order)
+      VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`).bind(product.id,product.name,product.description,product.level,product.brand,product.category,
       product.priceSatang,product.costPriceSatang,product.stockQuantity,product.imageUrl,product.status,product.sortOrder).run();
     return json({ ok: true, product }, 201);
   } catch (errorValue) {

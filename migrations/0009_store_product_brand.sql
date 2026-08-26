@@ -1,0 +1,1 @@
+ALTER TABLE store_products ADD COLUMN brand TEXT NOT NULL DEFAULT '';

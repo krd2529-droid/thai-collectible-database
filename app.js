@@ -452,7 +452,7 @@ async function renderStoreCategory(categorySlug='onepiececard') {
       const soldOut = product.availableStock < 1 || product.status === "sold_out";
       return `<article class="store-preview-card">
         <div class="store-preview-card__image">${product.imageUrl ? `<img src="${esc(product.imageUrl)}" alt="${esc(product.name)}">` : '<span>ยังไม่มีรูปสินค้า</span>'}</div>
-        <div class="store-preview-card__body"><h3>${esc(product.name)}</h3>${product.level ? `<small>ระดับ ${esc(product.level)}</small>` : ''}
+        <div class="store-preview-card__body"><h3>${esc(product.name)}</h3>${product.brand ? `<small>ยี่ห้อ ${esc(product.brand)}</small>` : ''}${product.level ? `<small>ระดับ ${esc(product.level)}</small>` : ''}
           <p>${esc(product.description || '')}</p><strong class="store-preview-card__price">${money(product.price)}</strong>
           <span class="store-preview-card__stock ${soldOut ? 'sold-out' : ''}">${soldOut ? 'Sold out' : `พร้อมขาย ${product.availableStock} ชิ้น`}</span>
           <div class="store-preview-card__buy store-preview-card__buy--detail">
@@ -484,7 +484,7 @@ async function renderStoreProduct(categorySlug,productId) {
     APP.innerHTML = `<nav class="catalog-breadcrumb" aria-label="เส้นทางสินค้า"><a href="/">หน้าหลัก</a><span>›</span><strong>สินค้าในร้าน</strong><span>›</span><strong>${category.label}</strong><span>›</span><strong>${esc(product.name)}</strong></nav>
       <article class="store-detail">
         <div class="store-detail__image">${product.imageUrl ? `<img src="${esc(product.imageUrl)}" alt="${esc(product.name)}">` : '<span>ยังไม่มีรูปสินค้า</span>'}</div>
-        <div class="store-detail__body"><span class="store-detail__eyebrow">// STOCK · ${category.eyebrow}</span><h1>${esc(product.name)}</h1>${product.level ? `<strong class="store-detail__level">ระดับ ${esc(product.level)}</strong>` : ''}
+        <div class="store-detail__body"><span class="store-detail__eyebrow">// STOCK · ${category.eyebrow}</span><h1>${esc(product.name)}</h1>${product.brand ? `<strong class="store-detail__level">ยี่ห้อ ${esc(product.brand)}</strong>` : ''}${product.level ? `<strong class="store-detail__level">ระดับ ${esc(product.level)}</strong>` : ''}
           <p>${esc(product.description || "")}</p><div class="store-detail__price">${storeMoney(product.price)}</div><div class="store-preview-card__stock ${soldOut ? "sold-out" : ""}">${soldOut ? "Sold out" : `พร้อมขาย ${product.availableStock} ชิ้น`}</div>
           <div class="store-detail__buy"><label>จำนวน<input id="storeDetailQuantity" type="number" min="1" max="${product.availableStock}" value="1" ${soldOut ? "disabled" : ""}></label><button id="storeDetailBuy" type="button" ${soldOut ? "disabled" : ""}>${soldOut ? "Sold out" : "ซื้อสินค้า"}</button></div>
           <a class="back-link" href="/">← กลับหน้าแรก</a>
