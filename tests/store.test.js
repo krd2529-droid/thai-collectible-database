@@ -31,16 +31,18 @@ class D1Mock {
 const request=(url,options={})=>new Request(`https://toyskub.test${url}`,options);
 const read=response=>response.json();
 
-test('store products move to One Piece stock category and detail routes',()=>{
+test('store products have separate One Piece Card and toys category routes',()=>{
   const app=fs.readFileSync('app.js','utf8');
   assert.doesNotMatch(app,/key:\s*["']available-products["']/);
   assert.doesNotMatch(app,/key:\s*["']zippo["']/);
   assert.match(app,/>สินค้าในร้าน</);
   assert.doesNotMatch(app,/\/shop\//);
   assert.match(app,/id="storePreviewGrid"/);
-  assert.match(app,/<h1>การ์ดวันพีช<\/h1>/);
-  assert.match(app,/data-store-category="one-piece-card"/);
+  assert.match(app,/label: 'การ์ดวันพีช'/);
+  assert.match(app,/label: 'ของเล่น'/);
+  assert.match(app,/data-store-category="\$\{category\.apiKey\}"/);
   assert.match(app,/href="\/stock\/onepiececard\//);
+  assert.match(app,/href="\/stock\/toys\//);
   assert.match(app,/renderStoreCategory/);
   assert.match(app,/renderStoreProduct/);
   assert.match(app,/beginStoreCheckout/);
@@ -51,13 +53,15 @@ test('store products move to One Piece stock category and detail routes',()=>{
   assert.match(index,/id="storeCheckoutDialog"/);
   assert.match(index,/444-118-1181/);
   const adminStore=fs.readFileSync('admin/store/store.js','utf8');
-  assert.match(adminStore,/\/stock\/onepiececard\//);
+  assert.match(adminStore,/categorySlug/);
   assert.match(adminStore,/publicProductPath/);
   assert.match(adminStore,/ยังไม่เผยแพร่/);
   assert.match(adminStore,/order-product-link/);
   const adminStoreHtml=fs.readFileSync('admin/store/index.html','utf8');
   assert.match(adminStoreHtml,/id="productPublicUrl"/);
   assert.match(adminStoreHtml,/href="\/stock\/onepiececard\/"/);
+  assert.match(adminStoreHtml,/href="\/stock\/toys\/"/);
+  assert.match(adminStoreHtml,/id="productCategory"/);
 });
 
 test('normalizes product money and rejects negative stock',()=>{
@@ -65,6 +69,18 @@ test('normalizes product money and rejects negative stock',()=>{
   assert.equal(valid.id,'op-card-001');assert.equal(valid.level,'SR');assert.equal(valid.priceSatang,1999);assert.equal(valid.costPriceSatang,1250);assert.equal(validateProduct(valid),'');
   assert.match(validateProduct(normalizeProduct({...valid,stockQuantity:-1})),/ไม่ติดลบ/);
   assert.match(validateProduct(normalizeProduct({...valid,price:19.99,costPrice:-1})),/ราคาต้นทุน/);
+  assert.equal(normalizeProduct({...valid,category:'toys'}).category,'toys');
+});
+
+test('public store API filters products by requested shop category',async(t)=>{
+  const db=new D1Mock();t.after(()=>db.close());
+  db.sqlite.prepare("INSERT INTO store_products(id,name,category,price_satang,stock_quantity,status) VALUES(?,?,?,?,?,?)").run('op-card','Card','one-piece-card',10000,1,'published');
+  db.sqlite.prepare("INSERT INTO store_products(id,name,category,price_satang,stock_quantity,status) VALUES(?,?,?,?,?,?)").run('toy-001','Toy','toys',20000,2,'published');
+  const response=await listProducts({env:{TOYSKUB_DB:db},request:request('/api/store/products?category=toys')});
+  assert.equal(response.status,200);
+  const data=await read(response);
+  assert.deepEqual(data.products.map(product=>product.id),['toy-001']);
+  assert.equal(data.products[0].category,'toys');
 });
 
 test('media upload reports missing storage and storage failures clearly',async()=>{

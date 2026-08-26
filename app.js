@@ -20,6 +20,11 @@ const PRODUCT_TYPES = {
   model: [{ key: "gunpla", label: "Gunpla", description: "โมเดลพลาสติกประกอบ แยกตามเกรด" }],
 };
 
+const STORE_CATEGORIES = {
+  onepiececard: { apiKey: 'one-piece-card', label: 'การ์ดวันพีช', eyebrow: 'ONE PIECE CARD', loading: 'กำลังโหลดสินค้าการ์ดวันพีช…' },
+  toys: { apiKey: 'toys', label: 'ของเล่น', eyebrow: 'TOYS', loading: 'กำลังโหลดของเล่น…' },
+};
+
 // ใส่ข้อมูลร้านสปอนเซอร์ได้สูงสุด 6 ร้าน
 // ตัวอย่าง: { name: "ชื่อร้าน", description: "รายละเอียดสั้น ๆ", logo: "shop-01.jpg", url: "https://..." }
 const SPONSORS = [
@@ -260,9 +265,10 @@ async function router() {
   if (window.location.hash === "#/product-preview") {
     try { const preview = JSON.parse(localStorage.getItem("toyskub_catalog_preview") || "null"); if (preview) return renderDetail(preview); } catch {}
   }
-  if (/^\/stock\/onepiececard\/?$/.test(window.location.pathname)) return renderStoreCategory();
-  const stockMatch = window.location.pathname.match(/^\/stock\/onepiececard\/([^/]+)\/?$/);
-  if (stockMatch) return renderStoreProduct(decodeURIComponent(stockMatch[1]));
+  const stockCategoryMatch = window.location.pathname.match(/^\/stock\/(onepiececard|toys)\/?$/);
+  if (stockCategoryMatch) return renderStoreCategory(stockCategoryMatch[1]);
+  const stockMatch = window.location.pathname.match(/^\/stock\/(onepiececard|toys)\/([^/]+)\/?$/);
+  if (stockMatch) return renderStoreProduct(stockMatch[1],decodeURIComponent(stockMatch[2]));
   const match = window.location.pathname.match(/^\/product\/([^/]+)\/?$/);
   if (match) {
     const summary = PRODUCTS.find((product) => product.id === match[1]);
@@ -363,6 +369,7 @@ function renderHome() {
       </div>
       <div id="storePreviewGrid" class="store-preview__categories">
         <a class="store-category-link" href="/stock/onepiececard/"><span>// หมวดสินค้า</span><strong>การ์ดวันพีช</strong><small>ดูสินค้าที่มีจำหน่าย →</small></a>
+        <a class="store-category-link" href="/stock/toys/"><span>// หมวดสินค้า</span><strong>ของเล่น</strong><small>ดูสินค้าที่มีจำหน่าย →</small></a>
       </div>
     </section>
 
@@ -424,20 +431,22 @@ function renderHome() {
   void hydrateVisitorStats("homeVisitorStats");
 }
 
-async function loadStoreProducts() {
-  const response = await fetch("/api/store/products?category=one-piece-card", { cache: "no-store" });
+async function loadStoreProducts(categorySlug='onepiececard') {
+  const category=STORE_CATEGORIES[categorySlug]||STORE_CATEGORIES.onepiececard;
+  const response = await fetch(`/api/store/products?category=${encodeURIComponent(category.apiKey)}`, { cache: "no-store" });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.error || "โหลดสินค้าไม่สำเร็จ");
   return data.products || [];
 }
 
-async function renderStoreCategory() {
+async function renderStoreCategory(categorySlug='onepiececard') {
+  const category=STORE_CATEGORIES[categorySlug]||STORE_CATEGORIES.onepiececard;
   removeSchema();
-  document.title = "การ์ดวันพีช | สินค้าในร้าน TOYSKUB";
-  document.getElementById("canonicalUrl").href = "https://toyskub.com/stock/onepiececard/";
-  APP.innerHTML = '<section class="empty-state">กำลังโหลดสินค้าการ์ดวันพีช…</section>';
+  document.title = `${category.label} | สินค้าในร้าน TOYSKUB`;
+  document.getElementById("canonicalUrl").href = `https://toyskub.com/stock/${categorySlug}/`;
+  APP.innerHTML = `<section class="empty-state">${category.loading}</section>`;
   try {
-    const products = await loadStoreProducts();
+    const products = await loadStoreProducts(categorySlug);
     const money = value => new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" }).format(Number(value) || 0);
     const cards = products.map(product => {
       const soldOut = product.availableStock < 1 || product.status === "sold_out";
@@ -447,22 +456,23 @@ async function renderStoreCategory() {
           <p>${esc(product.description || '')}</p><strong class="store-preview-card__price">${money(product.price)}</strong>
           <span class="store-preview-card__stock ${soldOut ? 'sold-out' : ''}">${soldOut ? 'Sold out' : `พร้อมขาย ${product.availableStock} ชิ้น`}</span>
           <div class="store-preview-card__buy store-preview-card__buy--detail">
-            ${soldOut ? '<button type="button" disabled>Sold out</button>' : `<a href="/stock/onepiececard/${encodeURIComponent(product.id)}">ซื้อสินค้า</a>`}</div>
+            ${soldOut ? '<button type="button" disabled>Sold out</button>' : `<a href="/stock/${categorySlug}/${encodeURIComponent(product.id)}">ซื้อสินค้า</a>`}</div>
         </div></article>`;
     }).join("");
-    APP.innerHTML = `<nav class="catalog-breadcrumb" aria-label="เส้นทางสินค้า"><a href="/">หน้าหลัก</a><span>›</span><strong>สินค้าในร้าน</strong><span>›</span><strong>การ์ดวันพีช</strong></nav>
-      <section class="store-category-page" data-store-category="one-piece-card">
-        <div class="store-preview__heading"><div><span>// STOCK · ONE PIECE CARD</span><h1>การ์ดวันพีช</h1><p>สินค้าที่มีสต็อกจริง เลือกสินค้าเพื่อดูรายละเอียดและสั่งซื้อ</p></div><strong>${products.length} รายการ</strong></div>
+    APP.innerHTML = `<nav class="catalog-breadcrumb" aria-label="เส้นทางสินค้า"><a href="/">หน้าหลัก</a><span>›</span><strong>สินค้าในร้าน</strong><span>›</span><strong>${category.label}</strong></nav>
+      <section class="store-category-page" data-store-category="${category.apiKey}">
+        <div class="store-preview__heading"><div><span>// STOCK · ${category.eyebrow}</span><h1>${category.label}</h1><p>สินค้าที่มีสต็อกจริง เลือกสินค้าเพื่อดูรายละเอียดและสั่งซื้อ</p></div><strong>${products.length} รายการ</strong></div>
         ${products.length ? `<div class="store-preview__grid">${cards}</div>` : '<p class="store-preview__message">ยังไม่มีสินค้าที่เผยแพร่</p>'}
       </section>`;
   } catch (error) { APP.innerHTML = `<p class="store-preview__message error">${esc(error.message)}</p>`; }
 }
 
-async function renderStoreProduct(productId) {
+async function renderStoreProduct(categorySlug,productId) {
+  const category=STORE_CATEGORIES[categorySlug]||STORE_CATEGORIES.onepiececard;
   removeSchema();
   APP.innerHTML = '<section class="empty-state">กำลังโหลดสินค้า…</section>';
   try {
-    const product = (await loadStoreProducts()).find(item => item.id === productId);
+    const product = (await loadStoreProducts(categorySlug)).find(item => item.id === productId);
     if (!product) {
       document.title = "ไม่พบสินค้า | TOYSKUB";
       APP.innerHTML = '<section class="empty-state"><strong>ไม่พบสินค้า</strong><a href="/">← กลับหน้าแรก</a></section>';
@@ -470,11 +480,11 @@ async function renderStoreProduct(productId) {
     }
     const soldOut = product.availableStock < 1 || product.status === "sold_out";
     document.title = `${product.name} | สินค้าในร้าน TOYSKUB`;
-    document.getElementById("canonicalUrl").href = `https://toyskub.com/stock/onepiececard/${encodeURIComponent(product.id)}`;
-    APP.innerHTML = `<nav class="catalog-breadcrumb" aria-label="เส้นทางสินค้า"><a href="/">หน้าหลัก</a><span>›</span><strong>สินค้าในร้าน</strong><span>›</span><strong>การ์ดวันพีช</strong><span>›</span><strong>${esc(product.name)}</strong></nav>
+    document.getElementById("canonicalUrl").href = `https://toyskub.com/stock/${categorySlug}/${encodeURIComponent(product.id)}`;
+    APP.innerHTML = `<nav class="catalog-breadcrumb" aria-label="เส้นทางสินค้า"><a href="/">หน้าหลัก</a><span>›</span><strong>สินค้าในร้าน</strong><span>›</span><strong>${category.label}</strong><span>›</span><strong>${esc(product.name)}</strong></nav>
       <article class="store-detail">
         <div class="store-detail__image">${product.imageUrl ? `<img src="${esc(product.imageUrl)}" alt="${esc(product.name)}">` : '<span>ยังไม่มีรูปสินค้า</span>'}</div>
-        <div class="store-detail__body"><span class="store-detail__eyebrow">// STOCK · ONE PIECE CARD</span><h1>${esc(product.name)}</h1>${product.level ? `<strong class="store-detail__level">ระดับ ${esc(product.level)}</strong>` : ''}
+        <div class="store-detail__body"><span class="store-detail__eyebrow">// STOCK · ${category.eyebrow}</span><h1>${esc(product.name)}</h1>${product.level ? `<strong class="store-detail__level">ระดับ ${esc(product.level)}</strong>` : ''}
           <p>${esc(product.description || "")}</p><div class="store-detail__price">${storeMoney(product.price)}</div><div class="store-preview-card__stock ${soldOut ? "sold-out" : ""}">${soldOut ? "Sold out" : `พร้อมขาย ${product.availableStock} ชิ้น`}</div>
           <div class="store-detail__buy"><label>จำนวน<input id="storeDetailQuantity" type="number" min="1" max="${product.availableStock}" value="1" ${soldOut ? "disabled" : ""}></label><button id="storeDetailBuy" type="button" ${soldOut ? "disabled" : ""}>${soldOut ? "Sold out" : "ซื้อสินค้า"}</button></div>
           <a class="back-link" href="/">← กลับหน้าแรก</a>

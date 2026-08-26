@@ -118,6 +118,12 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 ### TOY-EC-014: One Piece Card storefront and order flow (Completed in TOY-PATCH-003)
 
 - เพิ่มหน้าร้าน One Piece Card แบบ responsive แยกจากหมวดและข้อมูลแคตตาล็อกโดยชัดเจน
+
+### TOY-EC-016: Store category expansion (Completed)
+
+- เพิ่มหมวด `ของเล่น` ในสินค้าในร้านที่ `/stock/toys/` โดยไม่ย้ายหรือปะปนสินค้าการ์ดวันพีชเดิม
+- หลังบ้านเลือกหมวดสินค้าได้ และหน้ารวม/หน้ารายละเอียดสร้าง URL ตามหมวดที่เลือก
+- API หน้าบ้านกรองสินค้าด้วย category เพื่อรองรับการเพิ่มหมวดร้านในอนาคต
 - เพิ่มสินค้า ราคา stock รูป และสถานะในหลังบ้าน
 - เพิ่ม checkout, ข้อมูลจัดส่ง, บัญชีธนาคาร และ handoff ไป Facebook
 - ใช้ pending/payment_review เป็น reservation และหัก stock เฉพาะ paid

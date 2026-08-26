@@ -1,4 +1,5 @@
 export const STORE_CATEGORY = 'one-piece-card';
+export const STORE_CATEGORIES = new Set([STORE_CATEGORY, 'toys']);
 export const PRODUCT_STATUSES = new Set(['draft', 'published', 'hidden', 'sold_out']);
 export const ORDER_STATUSES = new Set(['pending', 'payment_review', 'paid', 'cancelled']);
 
@@ -66,7 +67,7 @@ export function normalizeProduct(raw = {}) {
     name: String(raw.name || '').trim().slice(0, 160),
     description: String(raw.description || '').trim().slice(0, 5000),
     level: String(raw.level || '').trim().slice(0, 80),
-    category: STORE_CATEGORY,
+    category: STORE_CATEGORIES.has(String(raw.category || '').trim().toLowerCase()) ? String(raw.category).trim().toLowerCase() : STORE_CATEGORY,
     priceSatang: Number.isFinite(price) ? Math.round(price * 100) : -1,
     costPriceSatang: Number.isFinite(costPrice) ? Math.round(costPrice * 100) : 0,
     stockQuantity: Number.isInteger(stock) ? stock : -1,
@@ -79,6 +80,7 @@ export function normalizeProduct(raw = {}) {
 export function validateProduct(product) {
   if (!product.id) return 'กรุณากรอกรหัสสินค้า';
   if (!product.name) return 'กรุณากรอกชื่อสินค้า';
+  if (!STORE_CATEGORIES.has(product.category)) return 'หมวดสินค้าไม่ถูกต้อง';
   if (product.priceSatang < 0) return 'ราคาสินค้าต้องไม่ติดลบ';
   if (product.costPriceSatang < 0) return 'ราคาต้นทุนต้องไม่ติดลบ';
   if (product.stockQuantity < 0) return 'จำนวนสินค้าต้องเป็นจำนวนเต็มที่ไม่ติดลบ';
