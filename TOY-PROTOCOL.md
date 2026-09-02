@@ -1,6 +1,6 @@
 # TOYSKUB Development Protocol
 
-Protocol version: `TOY-PROTOCOL/1.0-draft`  
+Protocol version: `TOY-PROTOCOL/1.1`
 สถานะ: ใช้ควบคุมงานใหม่ได้ทันที แต่ deployment gate ต้องยืนยันกับเจ้าของระบบ
 
 ## 1. หลักบังคับ
@@ -9,7 +9,7 @@ Protocol version: `TOY-PROTOCOL/1.0-draft`
 2. หนึ่ง Event Case มีหนึ่งเป้าหมายและ impact boundary ชัดเจน
 3. ห้ามแก้ไฟล์นอก boundary โดยไม่หยุดและขยายขอบเขตอย่างเปิดเผย
 4. ห้ามลบ/แทน legacy code เพราะค้นชื่อไม่พบเพียงอย่างเดียว ต้องตรวจ import, HTML, route, dynamic reference, data และ Git history
-5. ห้าม Commit จน test gate ผ่านและผู้ใช้อนุญาต; ห้าม Push/Deploy จนได้รับคำสั่งเฉพาะ
+5. เมื่อ Patch ผ่าน test gate และ review แล้ว ให้ Commit และ Push ไปยัง remote ของ branch ปัจจุบันทันทีตาม standing authorization ของเจ้าของ; Deploy ยังต้องได้รับคำสั่งเฉพาะ
 6. ห้ามใส่ secret, token, production cookie, PII หรือ production database dump ลง Git/log/test fixture
 
 ## 2. Event Case record
@@ -42,8 +42,8 @@ Patch version ที่เสนอ:
 6. Diagnose — หากล้ม ให้เก็บ error และหาสาเหตุ ห้ามปิด/skip test เพื่อให้เขียว
 7. Retest — รัน targeted test ซ้ำ แล้วรัน suite ที่เกี่ยวข้อง
 8. Review — ตรวจ diff, secret, PII, migration, destructive behavior และ rollback
-9. Handoff — สรุปผลและเสนอ patch number; รออนุญาต Commit
-10. Release — Push/Deploy เฉพาะเมื่อมีคำสั่ง และทำ post-deploy smoke test
+9. Commit — บันทึก patch ด้วย Event Case ID หลัง test/review ผ่าน
+10. Release — Push branch ปัจจุบันทันที; Deploy เฉพาะเมื่อมีคำสั่ง และทำ post-deploy smoke test
 
 ## 4. Git และ version
 
@@ -112,8 +112,8 @@ Patch version ที่เสนอ:
 
 - Audit/document: ทำได้ตามขอบเขตที่อนุมัติ
 - Patch: ต้องมี Event Case และ test evidence
-- Commit: ต้องได้รับคำสั่งหรืออนุมัติจากเจ้าของ
-- Push: ต้องได้รับคำสั่งเฉพาะ ห้ามอนุมานจากการอนุญาต Commit
+- Commit: อนุญาตถาวรหลัง Patch ผ่าน test gate และ review
+- Push: อนุญาตถาวรให้ Push Commit ของ Patch ไปยัง remote ของ branch ปัจจุบันทันที
 - Deploy/migration production: ต้องได้รับคำสั่งเฉพาะ พร้อม target environment และ rollback readiness
 
 หากสถานะ Git, production หรือ requirement เปลี่ยนระหว่างงาน ให้หยุดก่อน mutation ถัดไปและรายงาน baseline ใหม่

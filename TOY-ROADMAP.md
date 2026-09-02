@@ -162,5 +162,5 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - targeted + regression gates ผ่าน
 - diff ไม่มี secret/PII/fixture production
 - เอกสาร feature/API/schema อัปเดตตามจริง
-- สรุป patch version และรออนุญาต Commit
-- Push/Deploy เป็นสถานะแยกและต้องได้รับคำสั่งเฉพาะ
+- สรุป patch version แล้ว Commit และ Push ทันทีเมื่อ test/review ผ่าน ตาม TOY-PROTOCOL/1.1
+- Deploy เป็นสถานะแยกและต้องได้รับคำสั่งเฉพาะ
