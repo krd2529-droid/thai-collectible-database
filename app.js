@@ -125,7 +125,7 @@ async function loadProducts() {
     }));
     PRODUCTS = indexes.flat().sort(sortCatalogItems);
     try {
-      const dynamicRes = await fetch("/api/catalog", { cache: "no-store" });
+      const dynamicRes = await fetch("/api/catalog");
       if (dynamicRes.ok) {
         const dynamicData = await dynamicRes.json();
         const dynamicItems = Array.isArray(dynamicData.items) ? dynamicData.items : [];
@@ -433,7 +433,7 @@ function renderHome() {
 
 async function loadStoreProducts(categorySlug='onepiececard') {
   const category=STORE_CATEGORIES[categorySlug]||STORE_CATEGORIES.onepiececard;
-  const response = await fetch(`/api/store/products?category=${encodeURIComponent(category.apiKey)}`, { cache: "no-store" });
+  const response = await fetch(`/api/store/products?category=${encodeURIComponent(category.apiKey)}`);
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.error || "โหลดสินค้าไม่สำเร็จ");
   return data.products || [];

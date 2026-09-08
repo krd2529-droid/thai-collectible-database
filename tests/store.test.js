@@ -6,6 +6,7 @@ import { createSessionCookie } from '../functions/lib/admin-auth.js';
 import { normalizeProduct, productFromRow, validateProduct } from '../functions/lib/store-db.js';
 import { normalizeCatalogInput } from '../functions/lib/catalog-db.js';
 import { onRequestGet as listProducts } from '../functions/api/store/products/index.js';
+import { onRequestGet as listCatalog } from '../functions/api/catalog/index.js';
 import { onRequestPost as createOrder } from '../functions/api/store/orders/index.js';
 import { onRequestGet as listAdminProducts, onRequestPost as createProduct } from '../functions/api/admin/store/products/index.js';
 import { onRequestPut as updateOrder } from '../functions/api/admin/store/orders/[id].js';
@@ -23,8 +24,8 @@ class BoundStatement {
   async all() { return { results:this.db.prepare(this.sql).all(...this.args) }; }
 }
 class D1Mock {
-  constructor(schema='full') { this.sqlite=new DatabaseSync(':memory:');if(schema!=='empty')this.sqlite.exec(fs.readFileSync('migrations/0005_store_products_orders.sql','utf8'));if(schema==='full'){this.sqlite.exec(fs.readFileSync('migrations/0003_analytics_views.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0006_store_product_level.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0007_store_product_cost.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0008_analytics_daily_rollup.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0009_store_product_brand.sql','utf8'))} }
-  prepare(sql) { return { bind:(...args)=>new BoundStatement(this.sqlite,sql,args), run:async()=>new BoundStatement(this.sqlite,sql,[]).run(), first:async()=>new BoundStatement(this.sqlite,sql,[]).first(), all:async()=>new BoundStatement(this.sqlite,sql,[]).all() }; }
+  constructor(schema='full') { this.queries=[];this.sqlite=new DatabaseSync(':memory:');if(schema!=='empty')this.sqlite.exec(fs.readFileSync('migrations/0005_store_products_orders.sql','utf8'));if(schema==='full'){this.sqlite.exec(fs.readFileSync('migrations/0003_analytics_views.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0006_store_product_level.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0007_store_product_cost.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0008_analytics_daily_rollup.sql','utf8'));this.sqlite.exec(fs.readFileSync('migrations/0009_store_product_brand.sql','utf8'))} }
+  prepare(sql) { this.queries.push(sql);return { bind:(...args)=>new BoundStatement(this.sqlite,sql,args), run:async()=>new BoundStatement(this.sqlite,sql,[]).run(), first:async()=>new BoundStatement(this.sqlite,sql,[]).first(), all:async()=>new BoundStatement(this.sqlite,sql,[]).all() }; }
   async batch(statements) { this.sqlite.exec('BEGIN'); try { const results=[]; for(const statement of statements)results.push(await statement.run()); this.sqlite.exec('COMMIT'); return results; } catch(error) { this.sqlite.exec('ROLLBACK'); throw error; } }
   close() { this.sqlite.close(); }
 }
@@ -78,6 +79,7 @@ test('public store API filters products by requested shop category',async(t)=>{
   const db=new D1Mock();t.after(()=>db.close());
   db.sqlite.prepare("INSERT INTO store_products(id,name,category,price_satang,stock_quantity,status) VALUES(?,?,?,?,?,?)").run('op-card','Card','one-piece-card',10000,1,'published');
   db.sqlite.prepare("INSERT INTO store_products(id,name,brand,category,price_satang,cost_price_satang,stock_quantity,status) VALUES(?,?,?,?,?,?,?,?)").run('toy-001','Toy','Bandai','toys',20000,12500,2,'published');
+  db.queries=[];
   const response=await listProducts({env:{TOYSKUB_DB:db},request:request('/api/store/products?category=toys')});
   assert.equal(response.status,200);
   const data=await read(response);
@@ -85,6 +87,29 @@ test('public store API filters products by requested shop category',async(t)=>{
   assert.equal(data.products[0].category,'toys');
   assert.equal(data.products[0].brand,'Bandai');
   assert.equal('costPrice' in data.products[0],false);
+  assert.equal(db.queries.length,1);
+  assert.doesNotMatch(db.queries.join(' '),/\b(?:CREATE|ALTER|PRAGMA)\b/i);
+  assert.match(response.headers.get('cache-control'),/s-maxage=30/);
+});
+
+test('public catalog reads only visible overlays and compact exclusion ids',async(t)=>{
+  const db=new D1Mock();t.after(()=>db.close());
+  db.sqlite.exec(`CREATE TABLE catalog_items(id TEXT PRIMARY KEY,status TEXT NOT NULL,sort_order INTEGER NOT NULL,payload_json TEXT NOT NULL);
+    CREATE INDEX idx_catalog_status_sort ON catalog_items(status,sort_order,id)`);
+  const insert=db.sqlite.prepare('INSERT INTO catalog_items VALUES(?,?,?,?)');
+  insert.run('rg-001','published',1,JSON.stringify({id:'rg-001',name:'RG One',status:'published'}));
+  insert.run('rg-draft','draft',2,JSON.stringify({id:'rg-draft',name:'Draft'}));
+  insert.run('rg-hidden','hidden',3,'not-json-and-must-not-be-parsed');
+  db.queries=[];
+  const response=await listCatalog({env:{TOYSKUB_DB:db}});
+  assert.equal(response.status,200);
+  const data=await read(response);
+  assert.deepEqual(data.items.map(item=>item.id),['rg-001']);
+  assert.deepEqual(data.excludedIds,['rg-hidden']);
+  assert.equal(db.queries.length,2);
+  assert.ok(db.queries.every(sql=>/WHERE status/.test(sql)));
+  assert.doesNotMatch(db.queries.join(' '),/\b(?:CREATE|ALTER|PRAGMA)\b/i);
+  assert.match(response.headers.get('cache-control'),/s-maxage=60/);
 });
 
 test('media upload reports missing storage and storage failures clearly',async()=>{

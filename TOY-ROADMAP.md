@@ -164,3 +164,9 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - เอกสาร feature/API/schema อัปเดตตามจริง
 - สรุป patch version แล้ว Commit และ Push ทันทีเมื่อ test/review ผ่าน ตาม TOY-PROTOCOL/1.1
 - Deploy เป็นสถานะแยกและต้องได้รับคำสั่งเฉพาะ
+
+### TOY-EC-017: Database read slimming (Completed)
+
+- เอา schema creation/probe ออกจาก public catalog และ store read path; schema ใช้ migrations/admin mutation path
+- แยก query catalog เป็น published payload กับ compact excluded IDs เพื่อไม่อ่าน payload ของ draft/hidden/trash/deleted เกินจำเป็น
+- เปิด short-lived HTTP cache สำหรับ public catalog, detail และ stock โดย order API ยังตรวจ stock จริงก่อนรับคำสั่งซื้อ
