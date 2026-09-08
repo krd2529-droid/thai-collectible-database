@@ -9,7 +9,7 @@ async function requireAdmin(context) {
 
 export async function onRequestGet(context) {
   const denied=await requireAdmin(context); if(denied) return denied;
-  const db=context.env.TOYSKUB_DB; await ensureCategoriesTable(db);
+  const db=context.env.TOYSKUB_DB;
   const result=await db.prepare(`SELECT id,name,slug,description,sort_order AS sortOrder,is_active AS isActive,
     parent_id AS parentId,node_type AS nodeType,source_path AS sourcePath,created_at AS createdAt,updated_at AS updatedAt
     FROM categories ORDER BY COALESCE(parent_id,0),sort_order,name COLLATE NOCASE`).all();

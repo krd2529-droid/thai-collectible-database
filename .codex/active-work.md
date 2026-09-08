@@ -1,10 +1,9 @@
 # Active patch
 
-- Event: `TOY-EC-017` / `TOY-PATCH-006`
-- Outcome: ลด D1 reads บนเส้นทางหน้าบ้านโดยไม่เปลี่ยนข้อมูลที่ผู้ใช้เห็น
-- Acceptance: public catalog/store read ไม่มี schema DDL/probe, SQL กรองเฉพาะสถานะที่ต้องใช้, response cache ได้ช่วงสั้น, ราคาทุนยังไม่ออก public API
-- Phase: PATCH_DELIVERED
-- Scope: public catalog/store APIs, frontend fetch policy, API regression tests, protocol/feature docs
-- Baseline: `7afdeee`
-- Verification: 15/15 automated tests, catalog validation 0 errors, diff check passed
-- Delivery: commit `687d44a` pushed to `origin/main`; not deployed
+- Event: `TOY-EC-018` / `TOY-PATCH-007`
+- Outcome: ลด D1 reads ของหน้าบ้านและหลังบ้านโดยไม่ลดหรือซ่อนข้อมูล
+- Acceptance: admin GET และ session lookup ไม่รัน schema DDL/probe, catalog list ไม่ส่ง payload JSON เต็ม, behavior เดิมผ่าน regression
+- Phase: verification and delivery
+- Scope: member session read, admin catalog/store/orders/categories/members GET, tests and protocol docs
+- Baseline: `b3690d3`
+- Delivery: test, review, commit and push; not deployed

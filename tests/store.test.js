@@ -112,6 +112,25 @@ test('public catalog reads only visible overlays and compact exclusion ids',asyn
   assert.match(response.headers.get('cache-control'),/s-maxage=60/);
 });
 
+test('admin read handlers do not provision schemas or return full catalog payloads',()=>{
+  const getSection=(file,next='export async function onRequestPost')=>{
+    const source=fs.readFileSync(file,'utf8').split('export async function onRequestGet')[1]||'';
+    return source.split(next)[0];
+  };
+  const catalog=getSection('functions/api/admin/catalog/index.js');
+  const products=getSection('functions/api/admin/store/products/index.js');
+  const categories=getSection('functions/api/admin/categories/index.js');
+  const members=getSection('functions/api/admin/members/index.js','export function onRequest');
+  const orders=fs.readFileSync('functions/api/admin/store/orders/index.js','utf8');
+  const memberLookup=(fs.readFileSync('functions/lib/member-auth.js','utf8').split('export async function getCurrentMember')[1]||'').split('export async function deleteCurrentMemberSession')[0];
+  for(const source of [catalog,products,categories,members,orders,memberLookup]){
+    assert.doesNotMatch(source,/ensure(?:CatalogTables|StoreSchema|CategoriesTable|MemberTables)/);
+  }
+  assert.match(catalog,/json_extract\(payload_json/);
+  assert.doesNotMatch(catalog,/payload_json AS payloadJson/);
+  assert.ok(memberLookup.indexOf('getCookie')<memberLookup.indexOf('sha256'));
+});
+
 test('media upload reports missing storage and storage failures clearly',async()=>{
   const secret='upload-test-secret';
   const cookie=await createSessionCookie(secret);
@@ -270,7 +289,8 @@ test('admin API requires auth and paid transition deducts stock once',async(t)=>
   const created=await createProduct({env,request:request('/api/admin/store/products',{method:'POST',headers:{cookie,'content-type':'application/json'},body:JSON.stringify(productBody)})});assert.equal(created.status,201);
   assert.equal(db.sqlite.prepare('SELECT level FROM store_products WHERE id=?').get('op-002').level,'SEC');
   assert.equal(db.sqlite.prepare('SELECT cost_price_satang FROM store_products WHERE id=?').get('op-002').cost_price_satang,8000);
-  const adminProducts=await read(await listAdminProducts({env,request:request('/api/admin/store/products',{headers:{cookie}})}));assert.equal(adminProducts.products[0].costPrice,80);
+  db.queries=[];const adminProducts=await read(await listAdminProducts({env,request:request('/api/admin/store/products',{headers:{cookie}})}));assert.equal(adminProducts.products[0].costPrice,80);
+  assert.equal(db.queries.length,1);assert.doesNotMatch(db.queries.join(' '),/\b(?:CREATE|ALTER|PRAGMA)\b/i);
   const orderPayload={productId:'op-002',quantity:1,clientToken:crypto.randomUUID(),customerName:'ผู้รับ ทดสอบ',customerPhone:'0899999999',shippingAddress:'100 ถนนทดสอบ เขตทดสอบ กรุงเทพมหานคร'};
   await createOrder({env,request:request('/api/store/orders',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(orderPayload)})});
   const id=Number(db.sqlite.prepare('SELECT id FROM store_orders').get().id);

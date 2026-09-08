@@ -170,3 +170,9 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - เอา schema creation/probe ออกจาก public catalog และ store read path; schema ใช้ migrations/admin mutation path
 - แยก query catalog เป็น published payload กับ compact excluded IDs เพื่อไม่อ่าน payload ของ draft/hidden/trash/deleted เกินจำเป็น
 - เปิด short-lived HTTP cache สำหรับ public catalog, detail และ stock โดย order API ยังตรวจ stock จริงก่อนรับคำสั่งซื้อ
+
+### TOY-EC-018: Admin read slimming (Completed)
+
+- ตัด schema creation/probe ออกจาก admin GET ของ catalog, store products, orders, categories และ members
+- session auth ตรวจว่ามี member cookie ก่อน query D1 และไม่สร้าง schema ใน read path
+- catalog list คืนเฉพาะฟิลด์รายการและ gallery flag จาก SQL แทนการส่ง/parse payload JSON เต็ม

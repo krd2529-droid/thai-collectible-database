@@ -10,7 +10,6 @@ async function guard(context) {
 export async function onRequestGet(context) {
   const denied = await guard(context); if (denied) return denied;
   try {
-    await ensureStoreSchema(context.env.TOYSKUB_DB);
     const result = await context.env.TOYSKUB_DB.prepare(`${PRODUCT_SELECT} ORDER BY p.sort_order,p.id`).all();
     return json({ ok: true, products: (result.results || []).map(row => productFromRow(row, { includeCost: true })) });
   } catch { return json({ ok: false, error: 'ฐานข้อมูลสินค้าและคำสั่งซื้อยังไม่พร้อม กรุณาติดต่อผู้ดูแลระบบ' }, 503); }

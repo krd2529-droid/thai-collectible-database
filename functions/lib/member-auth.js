@@ -33,7 +33,6 @@ export function clearMemberCookie() {
 export async function getCurrentMember(request, env) {
   const db = env.TOYSKUB_DB;
   if (!db) return null;
-  await ensureMemberTables(db);
   const token = getCookie(request, COOKIE_NAME);
   if (!token) return null;
   const tokenHash = await sha256(token);
