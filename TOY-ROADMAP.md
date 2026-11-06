@@ -176,3 +176,9 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - ตัด schema creation/probe ออกจาก admin GET ของ catalog, store products, orders, categories และ members
 - session auth ตรวจว่ามี member cookie ก่อน query D1 และไม่สร้าง schema ใน read path
 - catalog list คืนเฉพาะฟิลด์รายการและ gallery flag จาก SQL แทนการส่ง/parse payload JSON เต็ม
+
+### TOY-EC-019: Canonical MGSD grouping (Completed)
+
+- MGSD ที่มีค่า legacy `seriesGroup=Gundam` แสดงและบันทึกเป็นกลุ่ม `MGSD` โดยอัตโนมัติ
+- `Special Version` ยังคงแยกกลุ่มได้ตามเดิม
+- MGSD Template และ Auto Catalog ใช้ค่าเริ่มต้น `MGSD` เพื่อไม่สร้างกลุ่มผิดซ้ำ

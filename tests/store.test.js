@@ -257,12 +257,24 @@ test('MGSD admin template keeps MGSD identifiers and catalog paths separate from
   assert.match(template,/catalogLine:templateConfig\.line/);
   assert.match(manager,/"mgsd-template"/);
   assert.match(ai,/MGSD เท่านั้น/);
-  const item=normalizeCatalogInput({id:'mgsd-006',name:'MGSD Test Gundam',categoryCode:'gd',productType:'Gunpla',productTypeCode:'gp',line:'MGSD',mgsdNumber:6,scale:'Non-scale'});
+  const item=normalizeCatalogInput({id:'mgsd-006',name:'MGSD Test Gundam',categoryCode:'gd',productType:'Gunpla',productTypeCode:'gp',line:'MGSD',seriesGroup:'Gundam',mgsdNumber:6,scale:'Non-scale'});
   assert.equal(item.mgsdNumber,6);
   assert.equal(item.rgNumber,null);
   assert.equal(item.lineCode,'mgsd');
   assert.equal(item.catalogPath,'gd/gp/mgsd');
   assert.equal(item.sortOrder,6);
+  assert.equal(item.seriesGroup,'MGSD');
+  assert.equal(normalizeCatalogInput({...item,seriesGroup:'Special Version'}).seriesGroup,'Special Version');
+  assert.match(page,/id="seriesGroup" value="MGSD"/);
+  assert.match(ai,/catalogLine === 'MGSD'.*item\.seriesGroup = 'MGSD'/s);
+});
+
+test('MGSD legacy Gundam series group stays in the MGSD section',()=>{
+  const app=fs.readFileSync('app.js','utf8');
+  const source=app.match(/function catalogGroupName\(product, activeLine\) \{[\s\S]*?\n\}/)?.[0];
+  assert.ok(source,'catalogGroupName function must exist');
+  const groupName=Function(`${source}; return catalogGroupName({seriesGroup:'Gundam',grade:'MGSD'},'MGSD');`)();
+  assert.equal(groupName,'MGSD');
 });
 
 test('public order reserves availability and rejects overselling',async(t)=>{

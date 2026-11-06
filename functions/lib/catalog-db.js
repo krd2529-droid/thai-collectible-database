@@ -30,6 +30,10 @@ export async function ensureCatalogTables(db) {
   await db.prepare(`CREATE INDEX IF NOT EXISTS idx_catalog_status_sort ON catalog_items(status,sort_order,id)`).run();
 }
 const code = value => String(value || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+export function normalizeSeriesGroup(value, line = '') {
+  const group = String(value || '').trim();
+  return String(line || '').trim().toUpperCase() === 'MGSD' && (!group || group === 'Gundam' || group === 'MGSD') ? 'MGSD' : group;
+}
 export function normalizeCatalogInput(raw = {}) {
   const cleanList = (value) => Array.isArray(value) ? value.map(v => String(v || '').trim()).filter(Boolean) : String(value || '').split('\n').map(v => v.trim()).filter(Boolean);
   const cleanPairs = (value, a, b) => Array.isArray(value) ? value.map(x => ({[a]: String(x?.[a] || '').trim(), [b]: String(x?.[b] || '').trim()})).filter(x => x[a] || x[b]) : [];
@@ -54,7 +58,7 @@ export function normalizeCatalogInput(raw = {}) {
     name: String(raw.name || '').trim(),
     grade: line,
     scale: String(raw.scale || '').trim(),
-    seriesGroup: String(raw.seriesGroup || '').trim(),
+    seriesGroup: normalizeSeriesGroup(raw.seriesGroup, line),
     seriesGroupOrder: Number(raw.seriesGroupOrder) || 0,
     series: String(raw.series || '').trim(),
     manufacturer: String(raw.manufacturer || '').trim(),
@@ -100,7 +104,7 @@ export function summaryFromPayload(p) {
     id:p.id, category:p.category, categoryLabel:p.categoryLabel, categoryCode:p.categoryCode,
     productType:p.productType, productTypeCode:p.productTypeCode, line:p.line, lineCode:p.lineCode,
     sku:p.sku, rgNumber:p.rgNumber, mgsdNumber:p.mgsdNumber, name:p.name, grade:p.grade, scale:p.scale,
-    seriesGroup:p.seriesGroup, seriesGroupOrder:p.seriesGroupOrder, series:p.series, manufacturer:p.manufacturer, catalogImage:p.catalogImage,
+    seriesGroup:normalizeSeriesGroup(p.seriesGroup,p.line||p.grade), seriesGroupOrder:p.seriesGroupOrder, series:p.series, manufacturer:p.manufacturer, catalogImage:p.catalogImage,
     images:p.images?.length ? p.images : (p.catalogImage ? [p.catalogImage] : []), showGalleryImages:p.showGalleryImages !== false,
     catalogPath:p.catalogPath, sortOrder:Number(p.sortOrder)||Number(p.rgNumber)||Number(p.mgsdNumber)||0, status:p.status, inStock:null, source:'d1'
   };

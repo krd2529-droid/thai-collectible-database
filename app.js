@@ -546,9 +546,9 @@ function setupStoreCheckout() {
 
 function catalogGroupName(product, activeLine) {
   const explicit = String(product.seriesGroup || "").trim();
+  if (activeLine === "MGSD" && (!explicit || explicit === "Gundam" || explicit === "MGSD")) return "MGSD";
   if (explicit) return explicit;
   if (activeLine === "RG") return "Gundam";
-  if (activeLine === "MGSD") return "MGSD";
   return String(product.series || "").trim() || "รายการอื่น ๆ";
 }
 
