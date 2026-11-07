@@ -4,7 +4,7 @@ const catalogSchema = {
   type: 'object',
   additionalProperties: false,
   required: [
-    'id','sku','name','rgNumber','mgsdNumber','modelCode','manufacturer','series','scale','releaseDate',
+    'id','sku','name','rgNumber','mgsdNumber','mgNumber','modelCode','manufacturer','series','scale','releaseDate',
     'launchPriceJPY','heightCm','recommendedAge','productType','material','seriesGroup','summary',
     'highlights','whatsDifferent','boxContents','notIncluded','pros','considerations','faq','references','dalongPageUrl'
   ],
@@ -14,6 +14,7 @@ const catalogSchema = {
     name: { type: ['string','null'], description: 'Official Gundam/model name in English only; do not use Thai script' },
     rgNumber: { type: ['integer','null'] },
     mgsdNumber: { type: ['integer','null'] },
+    mgNumber: { type: ['integer','null'] },
     modelCode: { type: ['string','null'] },
     manufacturer: { type: ['string','null'] },
     series: { type: ['string','null'], description: 'ชื่ออนิเมะ ภาพยนตร์ หรือผลงานต้นทาง เช่น Mobile Suit Gundam SEED; ห้ามใส่ชื่อเกรด เช่น Real Grade หรือ RG' },
@@ -96,10 +97,14 @@ export async function onRequestPost(context) {
 
   const includeEditorial = body.includeEditorial !== false;
   const includeBox = body.includeBox !== false;
-  const catalogLine = String(body.catalogLine || 'RG').trim().toUpperCase() === 'MGSD' ? 'MGSD' : 'RG';
-  const lineRule = catalogLine === 'MGSD'
-    ? '- งานนี้เป็น MGSD เท่านั้น: id ใช้ mgsd-เลขสามหลัก เช่น mgsd-001, sku ใช้ MGSD-001, mgsdNumber ใส่ลำดับ, rgNumber เป็น null, scale เป็น Non-scale, seriesGroup ใช้ MGSD หรือ Special Version และห้ามนำข้อมูลรุ่น RG มาปะปน'
-    : '- งานนี้เป็น Real Grade เท่านั้น: id ใช้ rg-เลขสามหลัก เช่น rg-039, sku ใช้ RG-039, rgNumber ใส่ลำดับ และ mgsdNumber เป็น null';
+  const requestedLine = String(body.catalogLine || 'RG').trim().toUpperCase();
+  const catalogLine = ['RG','MGSD','MG'].includes(requestedLine) ? requestedLine : 'RG';
+  let lineRule = catalogLine === 'MGSD'
+    ? '- งานนี้เป็น MGSD เท่านั้น: id ใช้ mgsd-เลขสามหลัก เช่น mgsd-001, sku ใช้ MGSD-001, mgsdNumber ใส่ลำดับ, rgNumber และ mgNumber เป็น null, scale เป็น Non-scale, seriesGroup ใช้ MGSD หรือ Special Version และห้ามนำข้อมูลรุ่น RG/MG มาปะปน'
+    : catalogLine === 'MG'
+      ? '- งานนี้เป็น Master Grade เท่านั้น: id ใช้ mg-เลขสามหลัก เช่น mg-001, sku ใช้ MG-001, mgNumber ใส่ลำดับ, rgNumber และ mgsdNumber เป็น null, scale เป็น 1/100, seriesGroup ใช้ Gundam หรือ Special Version และห้ามนำข้อมูลรุ่น RG/MGSD มาปะปน'
+      : '- งานนี้เป็น Real Grade เท่านั้น: id ใช้ rg-เลขสามหลัก เช่น rg-039, sku ใช้ RG-039, rgNumber ใส่ลำดับ และ mgsdNumber กับ mgNumber เป็น null';
+  if (catalogLine === 'MG') lineRule += '\n- หน้า Dalong ของ MG ต้องอยู่ใน /reviews/mg/mgXX/ และลงท้าย _i.htm';
   const prompt = `ค้นคว้าข้อมูลสินค้า ${catalogLine} ต่อไปนี้เพื่อกรอกฐานข้อมูล TOYSKUB: "${query}"\n\nกติกา:\n- เน้นข้อมูลทางการจาก Bandai Hobby Site / Bandai Spirits และใช้ Dalong.net เป็นแหล่งเสริมเมื่อเกี่ยวข้อง\n${lineRule}\n- ห้ามเดาข้อมูลเชิงข้อเท็จจริง ถ้ายืนยันไม่ได้ให้คืน null หรือ array ว่าง\n- ราคา launchPriceJPY ต้องเป็นราคาเปิดตัวญี่ปุ่นก่อนภาษี\n- releaseDate ใช้ YYYY-MM-DD เฉพาะเมื่อยืนยันวันได้\n- series ต้องเป็นชื่อซีรีส์/ผลงานต้นทางที่ตัวหุ่นปรากฏ เช่น Mobile Suit Gundam SEED หรือ Mobile Suit Gundam: Iron-Blooded Orphans เท่านั้น ห้ามใส่ชื่อเกรดสินค้า RG, Real Grade, MGSD หรือคำว่า Gundam ลอย ๆ\n- grade ของหน้านี้กำหนดจาก catalogLine อยู่แล้ว จึงห้ามนำชื่อเกรดไปกรอกซ้ำใน series\n- seriesGroup เลือก Gundam หรือ Special Version สำหรับ MGSD; ส่วน RG เลือก Gundam, Evangelion, Gaogaigar, Patlabor หรือ Special Version ตามที่เหมาะสม\n- เขียนภาษาไทยอ่านง่าย ไม่โฆษณาเกินจริง\n- references ใส่เฉพาะ URL ที่ค้นพบจริง พร้อมชื่อเว็บไซต์\n- หา Dalong Information URL ที่ตรงรุ่นและลงท้าย _i.htm ใส่ dalongPageUrl; MGSD อยู่ในหมวด /reviews/sd/mgsdXX/ ส่วน RG อยู่ใน /reviews/rg/rgXX/; ถ้ายืนยันไม่ได้ให้คืน null\n- ไม่ต้องเดา URL รูปโดยตรง ระบบจะตรวจและนำเข้ารูปปกกับคู่มือจากหน้า Dalong เอง\n- ไม่ต้องหา YouTube Shopee Lazada TikTok หรือ Affiliate\n${includeEditorial ? '- สร้างจุดเด่น ข้อแตกต่าง ข้อดี ข้อควรพิจารณา และ FAQ จากข้อมูลที่รองรับ' : '- highlights, whatsDifferent, pros, considerations และ faq ให้เป็น array ว่าง'}\n${includeBox ? '- เติมอุปกรณ์ในกล่องเฉพาะที่มีหลักฐานรองรับ' : '- boxContents และ notIncluded ให้เป็น array ว่าง'}`;
 
   const requestBody = {

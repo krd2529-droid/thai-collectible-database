@@ -298,6 +298,32 @@ test('MGSD legacy Gundam series group stays in the MGSD section',()=>{
   assert.equal(groupName,'MGSD');
 });
 
+test('MG template uses MG identity and the home catalog exposes MG',()=>{
+  const page=fs.readFileSync('admin/rg-template/index.html','utf8');
+  const template=fs.readFileSync('admin/rg-template/template.js','utf8');
+  const dashboard=fs.readFileSync('admin/index.html','utf8');
+  const manager=fs.readFileSync('admin/catalog/catalog.js','utf8');
+  const ai=fs.readFileSync('functions/api/admin/ai/catalog-fill.js','utf8');
+  const app=fs.readFileSync('app.js','utf8');
+  assert.match(page,/id="templateBrandLabel"/);
+  assert.match(template,/\['RG','MGSD','MG'\]/);
+  assert.match(template,/numberKey:'mgNumber'/);
+  assert.match(template,/defaultScale:'1\/100'/);
+  assert.match(template,/dataFolder:'mg'/);
+  assert.match(dashboard,/href="\/admin\/rg-template\/?\?line=MG"/);
+  assert.match(manager,/itemLine === "MG"/);
+  assert.match(ai,/Master Grade เท่านั้น/);
+  assert.match(ai,/catalogLine === 'MG'/);
+  assert.match(app,/configuredGrades\.filter\(\(grade\) => grade === 'MG'\)/);
+  const item=normalizeCatalogInput({id:'mg-001',name:'RX-78-2 Gundam',categoryLabel:'Gundam',categoryCode:'gd',productType:'Gunpla',productTypeCode:'gp',line:'MG',scale:'1/100',mgNumber:1,seriesGroup:'Gundam'});
+  assert.equal(item.mgNumber,1);
+  assert.equal(item.lineCode,'mg');
+  assert.equal(item.catalogPath,'gd/gp/mg');
+  assert.equal(item.sortOrder,1);
+  assert.equal(item.rgNumber,null);
+  assert.equal(item.mgsdNumber,null);
+});
+
 test('public order reserves availability and rejects overselling',async(t)=>{
   const db=new D1Mock();t.after(()=>db.close());
   db.sqlite.prepare("INSERT INTO store_products(id,name,price_satang,stock_quantity,status) VALUES(?,?,?,?,?)").run('op-001','Starter Deck',25000,2,'published');

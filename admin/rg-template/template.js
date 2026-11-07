@@ -1,8 +1,30 @@
 const $=id=>document.getElementById(id);
-const templateLine=String(document.body.dataset.templateLine||'RG').toUpperCase();
-const templateConfig=templateLine==='MGSD'
- ? {line:'MGSD',lineCode:'mgsd',numberKey:'mgsdNumber',idExample:'mgsd-001',dataFolder:'mgsd',defaultScale:'Non-scale'}
- : {line:'RG',lineCode:'rg',numberKey:'rgNumber',idExample:'rg-039',dataFolder:'rg',defaultScale:'1/144'};
+const requestedLine=String(new URLSearchParams(location.search).get('line')||document.body.dataset.templateLine||'RG').toUpperCase();
+const templateLine=['RG','MGSD','MG'].includes(requestedLine)?requestedLine:'RG';
+const templateConfig={
+ RG:{line:'RG',lineCode:'rg',numberKey:'rgNumber',idExample:'rg-039',dataFolder:'rg',defaultScale:'1/144',queryExample:'RG 1/144 Hi-ν Gundam',productType:'โมเดลพลาสติกประกอบ (Gunpla RG)'},
+ MGSD:{line:'MGSD',lineCode:'mgsd',numberKey:'mgsdNumber',idExample:'mgsd-001',dataFolder:'mgsd',defaultScale:'Non-scale',queryExample:'MGSD Freedom Gundam',productType:'โมเดลพลาสติกประกอบ (Gunpla MGSD)'},
+ MG:{line:'MG',lineCode:'mg',numberKey:'mgNumber',idExample:'mg-001',dataFolder:'mg',defaultScale:'1/100',queryExample:'MG 1/100 RX-78-2 Gundam',productType:'โมเดลพลาสติกประกอบ (Gunpla MG)'}
+}[templateLine];
+function applyTemplateIdentity(){
+ const setText=(id,text)=>{const element=$(id);if(element)element.textContent=text};
+ document.body.dataset.templateLine=templateLine;
+ document.title=`${templateLine} Blank Template · TOYSKUB`;
+ setText('templateBrandLabel',`${templateLine} INLINE TEMPLATE`);
+ setText('templateSearchExample',templateConfig.queryExample);
+ $('jarvisQuery').placeholder=`เช่น ${templateConfig.queryExample} หรือ ${templateConfig.idExample.toUpperCase()}`;
+ $('itemId').placeholder=`เช่น ${templateConfig.idExample}`;
+ $('itemSku').placeholder=`เช่น ${templateConfig.idExample.toUpperCase()}`;
+ setText('seriesGroupLabel',`กลุ่มในหน้า ${templateLine}`);
+ setText('templateGradeBadge',`${templateLine} GRADE`);
+ setText('sequenceLabel',`ลำดับ ${templateLine}`);
+ $('rgNumber').placeholder=`ลำดับ ${templateLine}`;
+ setText('gradeScalePrefix',`${templateLine} · `);
+ $('scale').value=templateConfig.defaultScale;
+ $('productType').value=templateConfig.productType;
+ $('mediaCatalogId').placeholder=`รหัสรายการ เช่น ${templateConfig.idExample}`;
+}
+applyTemplateIdentity();
 let gallery=[],manual=[],editingId=null,dragSource=null,mediaTarget='gallery',mediaCandidates=[],mediaSelected=new Set();
 const lists={highlights:[],differences:[],box:[],notIncluded:[],pros:[],considerations:[],faq:[],references:[]};
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -36,7 +58,8 @@ $('uploadGalleryButton').onclick=()=>$('galleryInput').click();$('uploadManualBu
 async function importManualFromDalong(){
  const id=val('itemId').toLowerCase();
  if(!id){showMessage('ยังไม่มีรหัสรายการ','กรุณากรอกรหัสรายการก่อนดึงรูปคู่มือ');$('itemId')?.focus();return}
- const pageUrl=prompt(`วางลิงก์หน้าข้อมูลของ Dalong\nตัวอย่าง ${templateLine==='MGSD'?'https://www.dalong.net/reviews/sd/mgsd01/mgsd01_i.htm':'https://www.dalong.net/reviews/rg/rg32/rg32_i.htm'}`);
+ const dalongExample=templateLine==='MGSD'?'https://www.dalong.net/reviews/sd/mgsd01/mgsd01_i.htm':templateLine==='MG'?'https://www.dalong.net/reviews/mg/mg01/mg01_i.htm':'https://www.dalong.net/reviews/rg/rg32/rg32_i.htm';
+ const pageUrl=prompt(`วางลิงก์หน้าข้อมูลของ Dalong\nตัวอย่าง ${dalongExample}`);
  if(!pageUrl)return;
  const button=$('importManualUrlButton');
  button.disabled=true;
@@ -145,7 +168,7 @@ function applyJarvisData(data,fillOnly=true){
  const series=/^(?:real\s*grade(?:\s*\(\s*rg\s*\))?|rg|mgsd|master\s*grade\s*sd)$/i.test(String(data.series||'').trim())?null:data.series;
  const name=/[\u0E00-\u0E7F]/u.test(String(data.name||''))?null:data.name;
  const scalar={
-  itemId:data.id,itemSku:data.sku,name,summary:data.summary,rgNumber:data[templateConfig.numberKey]??data.rgNumber??data.mgsdNumber,
+  itemId:data.id,itemSku:data.sku,name,summary:data.summary,rgNumber:data[templateConfig.numberKey]??data.rgNumber??data.mgsdNumber??data.mgNumber,
   modelCode:data.modelCode,manufacturer:data.manufacturer,series,scale:data.scale,
   releaseDate:data.releaseDate,launchPriceJPY:data.launchPriceJPY,heightCm:data.heightCm,
   recommendedAge:'15 ปีขึ้นไป',productType:data.productType,material:data.material,

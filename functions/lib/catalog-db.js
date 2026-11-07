@@ -49,6 +49,8 @@ export function normalizeCatalogInput(raw = {}) {
   const inferredRgNumber = idNumberMatch ? Number(idNumberMatch[1]) : null;
   const mgsdNumberMatch = id.match(/^mgsd-(\d+)$/i);
   const inferredMgsdNumber = mgsdNumberMatch ? Number(mgsdNumberMatch[1]) : null;
+  const mgNumberMatch = id.match(/^mg-(\d+)$/i);
+  const inferredMgNumber = mgNumberMatch ? Number(mgNumberMatch[1]) : null;
   const p = {
     id,
     category: String(raw.category || 'model').trim(),
@@ -61,6 +63,7 @@ export function normalizeCatalogInput(raw = {}) {
     sku: String(raw.sku || id.toUpperCase()).trim(),
     rgNumber: raw.rgNumber === '' || raw.rgNumber == null ? inferredRgNumber : Number(raw.rgNumber),
     mgsdNumber: raw.mgsdNumber === '' || raw.mgsdNumber == null ? inferredMgsdNumber : Number(raw.mgsdNumber),
+    mgNumber: raw.mgNumber === '' || raw.mgNumber == null ? inferredMgNumber : Number(raw.mgNumber),
     name: normalizeCatalogProductName(raw.name, line),
     grade: line,
     scale: String(raw.scale || '').trim(),
@@ -100,7 +103,7 @@ export function normalizeCatalogInput(raw = {}) {
     catalogImage: String(raw.catalogImage || cleanList(raw.images)[0] || '').trim(),
     inStock: null,
     status: ['draft','published','hidden','trash','deleted'].includes(raw.status) ? raw.status : 'draft',
-    sortOrder: raw.sortOrder === '' || raw.sortOrder == null ? (Number(raw.rgNumber ?? raw.mgsdNumber) || inferredRgNumber || inferredMgsdNumber || 0) : Number(raw.sortOrder),
+    sortOrder: raw.sortOrder === '' || raw.sortOrder == null ? (Number(raw.rgNumber ?? raw.mgsdNumber ?? raw.mgNumber) || inferredRgNumber || inferredMgsdNumber || inferredMgNumber || 0) : Number(raw.sortOrder),
   };
   p.catalogPath = [p.categoryCode,p.productTypeCode,p.lineCode,code(p.series)].filter(Boolean).join('/');
   return p;
@@ -109,10 +112,10 @@ export function summaryFromPayload(p) {
   return {
     id:p.id, category:p.category, categoryLabel:p.categoryLabel, categoryCode:p.categoryCode,
     productType:p.productType, productTypeCode:p.productTypeCode, line:p.line, lineCode:p.lineCode,
-    sku:p.sku, rgNumber:p.rgNumber, mgsdNumber:p.mgsdNumber, name:p.name, grade:p.grade, scale:p.scale,
+    sku:p.sku, rgNumber:p.rgNumber, mgsdNumber:p.mgsdNumber, mgNumber:p.mgNumber, name:p.name, grade:p.grade, scale:p.scale,
     seriesGroup:normalizeSeriesGroup(p.seriesGroup,p.line||p.grade), seriesGroupOrder:p.seriesGroupOrder, series:p.series, manufacturer:p.manufacturer, catalogImage:p.catalogImage,
     images:p.images?.length ? p.images : (p.catalogImage ? [p.catalogImage] : []), showGalleryImages:p.showGalleryImages !== false,
-    catalogPath:p.catalogPath, sortOrder:Number(p.sortOrder)||Number(p.rgNumber)||Number(p.mgsdNumber)||0, status:p.status, inStock:null, source:'d1'
+    catalogPath:p.catalogPath, sortOrder:Number(p.sortOrder)||Number(p.rgNumber)||Number(p.mgsdNumber)||Number(p.mgNumber)||0, status:p.status, inStock:null, source:'d1'
   };
 }
 

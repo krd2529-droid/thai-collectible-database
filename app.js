@@ -316,8 +316,11 @@ function renderHome() {
   const typeProducts = activeProductType
     ? categoryProducts.filter((p) => productTypeKey(p) === activeProductType)
     : [];
+  const categoryConfig = Object.values(CATEGORY_MAP || {}).find((category) => category?.label === selectedCategory?.label);
+  const productTypeConfig = Object.values(categoryConfig?.productTypes || {}).find((type) => type?.label === selectedType?.label);
+  const configuredGrades = Object.keys(productTypeConfig?.grades || {});
   const grades = activeProductType
-    ? [...new Set(typeProducts.map((p) => p.grade).filter(Boolean))]
+    ? [...new Set([...typeProducts.map((p) => p.grade).filter(Boolean), ...configuredGrades.filter((grade) => grade === 'MG')])]
     : [];
 
   const filtered = activeFilter
