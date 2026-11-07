@@ -34,6 +34,12 @@ export function normalizeSeriesGroup(value, line = '') {
   const group = String(value || '').trim();
   return String(line || '').trim().toUpperCase() === 'MGSD' && (!group || group === 'Gundam' || group === 'MGSD') ? 'MGSD' : group;
 }
+export function normalizeCatalogProductName(value, line = '') {
+  const name = String(value || '').trim();
+  if (String(line || '').trim().toUpperCase() !== 'RG' || !name) return name;
+  const modelName = name.replace(/^(?:RG\s*(?:1\s*\/\s*144)?|MG(?=\s))\s*/i, '').trim();
+  return modelName ? `RG 1/144 ${modelName}` : name;
+}
 export function normalizeCatalogInput(raw = {}) {
   const cleanList = (value) => Array.isArray(value) ? value.map(v => String(v || '').trim()).filter(Boolean) : String(value || '').split('\n').map(v => v.trim()).filter(Boolean);
   const cleanPairs = (value, a, b) => Array.isArray(value) ? value.map(x => ({[a]: String(x?.[a] || '').trim(), [b]: String(x?.[b] || '').trim()})).filter(x => x[a] || x[b]) : [];
@@ -55,7 +61,7 @@ export function normalizeCatalogInput(raw = {}) {
     sku: String(raw.sku || id.toUpperCase()).trim(),
     rgNumber: raw.rgNumber === '' || raw.rgNumber == null ? inferredRgNumber : Number(raw.rgNumber),
     mgsdNumber: raw.mgsdNumber === '' || raw.mgsdNumber == null ? inferredMgsdNumber : Number(raw.mgsdNumber),
-    name: String(raw.name || '').trim(),
+    name: normalizeCatalogProductName(raw.name, line),
     grade: line,
     scale: String(raw.scale || '').trim(),
     seriesGroup: normalizeSeriesGroup(raw.seriesGroup, line),

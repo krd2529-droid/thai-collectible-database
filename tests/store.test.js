@@ -4,7 +4,7 @@ import test from 'node:test';
 import { DatabaseSync } from 'node:sqlite';
 import { createSessionCookie } from '../functions/lib/admin-auth.js';
 import { normalizeProduct, productFromRow, validateProduct } from '../functions/lib/store-db.js';
-import { normalizeCatalogInput } from '../functions/lib/catalog-db.js';
+import { normalizeCatalogInput, normalizeCatalogProductName } from '../functions/lib/catalog-db.js';
 import { onRequestGet as listProducts } from '../functions/api/store/products/index.js';
 import { onRequestGet as listCatalog } from '../functions/api/catalog/index.js';
 import { onRequestPost as createOrder } from '../functions/api/store/orders/index.js';
@@ -73,6 +73,27 @@ test('normalizes product money and rejects negative stock',()=>{
   assert.match(validateProduct(normalizeProduct({...valid,stockQuantity:-1})),/ไม่ติดลบ/);
   assert.match(validateProduct(normalizeProduct({...valid,price:19.99,costPrice:-1})),/ราคาต้นทุน/);
   assert.equal(normalizeProduct({...valid,category:'toys'}).category,'toys');
+});
+
+test('RG catalog names always use the RG 1/144 prefix',()=>{
+  assert.equal(normalizeCatalogProductName('RG RX-78-2 Gundam','RG'),'RG 1/144 RX-78-2 Gundam');
+  assert.equal(normalizeCatalogProductName('RG1/144 Wing Gundam EW','RG'),'RG 1/144 Wing Gundam EW');
+  assert.equal(normalizeCatalogProductName('MG Gundam Astray Red Frame','RG'),'RG 1/144 Gundam Astray Red Frame');
+  assert.equal(normalizeCatalogProductName('MGSD Freedom Gundam','MGSD'),'MGSD Freedom Gundam');
+
+  const db=new DatabaseSync(':memory:');
+  db.exec(`CREATE TABLE catalog_items (id TEXT PRIMARY KEY,name TEXT,line TEXT,grade TEXT,payload_json TEXT,updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`);
+  const insert=db.prepare('INSERT INTO catalog_items(id,name,line,grade,payload_json) VALUES(?,?,?,?,?)');
+  for(const [id,name,line] of [['rg-001','RG RX-78-2 Gundam','RG'],['rg-005','RG1/144 Freedom Gundam','RG'],['rg-019','MG Gundam Astray Red Frame','RG'],['mgsd-001','MGSD Freedom Gundam','MGSD']]) insert.run(id,name,line,line,JSON.stringify({id,name,line}));
+  db.exec(fs.readFileSync('migrations/0010_catalog_rg_name_prefix.sql','utf8'));
+  const rows=db.prepare('SELECT id,name,JSON_EXTRACT(payload_json,\'$.name\') AS payloadName FROM catalog_items ORDER BY id').all();
+  assert.deepEqual(rows.map(row=>({...row})),[
+    {id:'mgsd-001',name:'MGSD Freedom Gundam',payloadName:'MGSD Freedom Gundam'},
+    {id:'rg-001',name:'RG 1/144 RX-78-2 Gundam',payloadName:'RG 1/144 RX-78-2 Gundam'},
+    {id:'rg-005',name:'RG 1/144 Freedom Gundam',payloadName:'RG 1/144 Freedom Gundam'},
+    {id:'rg-019',name:'RG 1/144 Gundam Astray Red Frame',payloadName:'RG 1/144 Gundam Astray Red Frame'}
+  ]);
+  db.close();
 });
 
 test('public store API filters products by requested shop category',async(t)=>{
