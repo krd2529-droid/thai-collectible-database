@@ -182,3 +182,9 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - MGSD ที่มีค่า legacy `seriesGroup=Gundam` แสดงและบันทึกเป็นกลุ่ม `MGSD` โดยอัตโนมัติ
 - `Special Version` ยังคงแยกกลุ่มได้ตามเดิม
 - MGSD Template และ Auto Catalog ใช้ค่าเริ่มต้น `MGSD` เพื่อไม่สร้างกลุ่มผิดซ้ำ
+
+### TOY-EC-020: TOYSKUB browser-tab logo (Completed)
+
+- เพิ่ม favicon ตรา `TK` ให้สอดคล้องกับตราบนหัวเว็บ
+- ผูก favicon เดียวกันกับหน้าบ้าน หลังบ้าน ร้าน สมาชิก และหน้า RG/MGSD Template
+- ไม่เปลี่ยน layout, business behavior, API หรือฐานข้อมูล
