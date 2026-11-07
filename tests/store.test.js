@@ -67,6 +67,17 @@ test('store products have separate One Piece Card and toys category routes',()=>
   assert.match(adminStoreHtml,/แสดงเฉพาะหลังบ้าน ไม่ส่งออกหน้าร้าน/);
 });
 
+test('VCA sponsor occupies the first advertising slot with the supplied Shopee link',()=>{
+  const app=fs.readFileSync('app.js','utf8');
+  const css=fs.readFileSync('style.css','utf8');
+  assert.match(app,/name:\s*"VCA"/);
+  assert.match(app,/logo:\s*"\/images\/sponsors\/vca\.png"/);
+  assert.match(app,/url:\s*"https:\/\/s\.shopee\.co\.th\/1Bltd2F90"/);
+  assert.match(app,/rel="noopener sponsored nofollow"/);
+  assert.match(css,/\.sponsor-card:not\(\.sponsor-empty\) \.sponsor-logo/);
+  assert.ok(fs.statSync('images/sponsors/vca.png').size>0);
+});
+
 test('normalizes product money and rejects negative stock',()=>{
   const valid=normalizeProduct({id:' OP Card 001 ',name:'การ์ดทดสอบ',brand:' Bandai ',level:'  SR  ',price:19.99,costPrice:12.5,stockQuantity:2,status:'published'});
   assert.equal(valid.id,'op-card-001');assert.equal(valid.brand,'Bandai');assert.equal(valid.level,'SR');assert.equal(valid.priceSatang,1999);assert.equal(valid.costPriceSatang,1250);assert.equal(validateProduct(valid),'');

@@ -1,10 +1,10 @@
 # Active patch
 
-- Event: `TOY-EC-022`
-- Outcome: หลังบ้านมี MG Template คล้าย RG และหน้าแรกเลือก MG ได้
-- Acceptance: MG ใช้ id/number/scale/folder แยก; Auto Catalog รองรับ MG; Catalog Manager เปิดโหมด MG; หน้าแรกมีปุ่ม MG; RG/MGSD เดิมไม่เปลี่ยน
-- Phase: PATCH_DELIVERED
-- Scope: shared catalog template, admin dashboard/manager, AI catalog contract, catalog normalization, home grade selector, tests and docs
-- Baseline: `b49b992`
-- Verification: JavaScript syntax checks pass; 19/19 automated tests; catalog validation 0 errors; shared template remains compatible with RG and MGSD
-- Delivery: commit `e99b085` merged and pushed to `origin/main`; Cloudflare Pages production deployment `b7d797cc-0509-48f5-829d-bc8e953b7ce7` active
+- Event: `TOY-EC-023`
+- Outcome: SHOP 01 แสดงร้าน VCA พร้อมโลโก้และลิงก์ Shopee ที่เจ้าของเว็บระบุ
+- Acceptance: โลโก้ VCA แสดงเต็มกรอบ; การ์ดเปิดลิงก์ `https://s.shopee.co.th/1Bltd2F90`; SHOP 02–06 คงเดิม
+- Phase: PATCH_READY
+- Scope: sponsor configuration, supplied logo asset, sponsor-card image layout, regression test and roadmap
+- Baseline: `0353c3f`
+- Verification: supplied logo visually verified; JavaScript syntax passes; 20/20 automated tests; catalog validation 0 errors
+- Next action: commit, push, merge to main and verify production sponsor card

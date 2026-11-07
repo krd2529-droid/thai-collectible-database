@@ -28,7 +28,12 @@ const STORE_CATEGORIES = {
 // ใส่ข้อมูลร้านสปอนเซอร์ได้สูงสุด 6 ร้าน
 // ตัวอย่าง: { name: "ชื่อร้าน", description: "รายละเอียดสั้น ๆ", logo: "shop-01.jpg", url: "https://..." }
 const SPONSORS = [
-  null,
+  {
+    name: "VCA",
+    description: "GUNPLA MODEL HOBBY BASE",
+    logo: "/images/sponsors/vca.png",
+    url: "https://s.shopee.co.th/1Bltd2F90",
+  },
   null,
   null,
   null,
