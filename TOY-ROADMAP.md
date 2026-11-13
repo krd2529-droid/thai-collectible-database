@@ -183,6 +183,12 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - `Special Version` ยังคงแยกกลุ่มได้ตามเดิม
 - MGSD Template และ Auto Catalog ใช้ค่าเริ่มต้น `MGSD` เพื่อไม่สร้างกลุ่มผิดซ้ำ
 
+### TOY-EC-024: Authoritative Auto Catalog identity (Completed)
+
+- Auto Catalog จับคู่ชื่อสินค้ากับรายการเดิมใน D1 ภายในไลน์เดียวกันก่อนสร้าง Draft
+- รหัสภายใน `id`, `sku` และเลขลำดับมาจากแคตตาล็อก TOYSKUB ไม่บังคับให้ AI เดา
+- คำค้น `MGSD Gundam Barbatos` จับคู่ `mgsd-002` ได้แม้ AI คืนข้อมูลโดยไม่มีรหัส
+
 ### TOY-EC-021: Canonical RG product-name prefix
 
 - ชื่อสินค้าของไลน์ RG ใช้คำนำหน้า `RG 1/144` รูปแบบเดียวกันทั้งข้อมูลเดิมและรายการที่บันทึกใหม่
