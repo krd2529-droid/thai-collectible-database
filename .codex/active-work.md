@@ -7,4 +7,5 @@
 - Scope: AI catalog-fill identity resolution, Auto Catalog validation/error state, regression tests and roadmap
 - Baseline: `6ac4de1`
 - Verification: deterministic endpoint regression changed from null id to `mgsd-002`; 21/21 tests pass; catalog validation 0 errors (70 pre-existing missing-image warnings); syntax and diff checks pass; no secret/private-key pattern found
-- Next: commit and push `codex/toy-ec-024-mgsd-auto-catalog`; deployment remains gated by an explicit owner instruction
+- Delivery: implementation commit `ca55b7d` pushed to `origin/codex/toy-ec-024-mgsd-auto-catalog`
+- Next: merge to `main`, deploy Cloudflare Pages production, then verify the real MGSD Auto Catalog workflow; deployment remains gated by an explicit owner instruction
