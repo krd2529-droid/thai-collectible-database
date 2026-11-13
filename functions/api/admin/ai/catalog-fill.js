@@ -94,25 +94,44 @@ function catalogIdentityKey(value, catalogLine) {
   return name.replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 }
 
-export async function resolveExistingCatalogIdentity(db, catalogLine, query, item = {}) {
-  if (!db?.prepare) return item;
+function applyCatalogIdentity(catalogLine, item, candidate) {
+  let stored = {};
+  try { stored = JSON.parse(candidate.payloadJson || '{}'); } catch {}
+  const line = String(catalogLine || '').trim().toUpperCase();
+  const numberKey = line === 'MGSD' ? 'mgsdNumber' : line === 'MG' ? 'mgNumber' : 'rgNumber';
+  const numberMatch = String(candidate.id || '').match(/-(\d+)$/);
+  return {
+    ...item,
+    id: candidate.id,
+    sku: candidate.sku || stored.sku || String(candidate.id || '').toUpperCase(),
+    [numberKey]: candidate[numberKey] ?? stored[numberKey] ?? (numberMatch ? Number(numberMatch[1]) : null),
+  };
+}
+
+function matchCatalogIdentity(candidates, catalogLine, query, item) {
   const line = String(catalogLine || '').trim().toUpperCase();
   const wanted = new Set([catalogIdentityKey(query, line), catalogIdentityKey(item.name, line)].filter(Boolean));
   if (!wanted.size) return item;
+  const matches = (candidates || []).filter(row => wanted.has(catalogIdentityKey(row.name, line)));
+  return matches.length === 1 ? applyCatalogIdentity(line, item, matches[0]) : item;
+}
+
+export async function resolveStaticCatalogIdentity(request, catalogLine, query, item = {}) {
+  const folder = { RG: 'rg', MGSD: 'mgsd', MG: 'mg' }[String(catalogLine || '').trim().toUpperCase()];
+  if (!folder) return item;
+  const url = new URL(`/data/catalog/gundam/gunpla/${folder}/index.json`, request.url);
+  const response = await fetch(url.toString(), { headers: { accept: 'application/json' } });
+  if (!response.ok) return item;
+  const data = await response.json().catch(() => []);
+  const candidates = Array.isArray(data) ? data : Array.isArray(data.items) ? data.items : [];
+  return matchCatalogIdentity(candidates, catalogLine, query, item);
+}
+
+export async function resolveExistingCatalogIdentity(db, catalogLine, query, item = {}) {
+  if (!db?.prepare) return item;
+  const line = String(catalogLine || '').trim().toUpperCase();
   const result = await db.prepare(`SELECT id,name,sku,payload_json AS payloadJson FROM catalog_items WHERE UPPER(COALESCE(NULLIF(line,''),grade))=?`).bind(line).all();
-  const matches = (result.results || []).filter(row => wanted.has(catalogIdentityKey(row.name, line)));
-  if (matches.length !== 1) return item;
-  const row = matches[0];
-  let stored = {};
-  try { stored = JSON.parse(row.payloadJson || '{}'); } catch {}
-  const numberKey = line === 'MGSD' ? 'mgsdNumber' : line === 'MG' ? 'mgNumber' : 'rgNumber';
-  const numberMatch = String(row.id || '').match(/-(\d+)$/);
-  return {
-    ...item,
-    id: row.id,
-    sku: row.sku || stored.sku || String(row.id || '').toUpperCase(),
-    [numberKey]: stored[numberKey] ?? (numberMatch ? Number(numberMatch[1]) : null),
-  };
+  return matchCatalogIdentity(result.results || [], line, query, item);
 }
 
 export async function onRequestPost(context) {
@@ -171,6 +190,8 @@ export async function onRequestPost(context) {
   let item;
   try { item = JSON.parse(text); }
   catch { return json({ ok: false, error: 'รูปแบบข้อมูลจาก AI ไม่ถูกต้อง กรุณาลองใหม่' }, 502); }
+  try { item = await resolveStaticCatalogIdentity(context.request, catalogLine, query, item); }
+  catch { /* D1 lookup below remains authoritative when the static catalog is unavailable. */ }
   try { item = await resolveExistingCatalogIdentity(context.env.TOYSKUB_DB, catalogLine, query, item); }
   catch { /* AI data remains usable when the catalog lookup is temporarily unavailable. */ }
   if (catalogLine === 'MGSD' && (!item.seriesGroup || item.seriesGroup === 'Gundam')) item.seriesGroup = 'MGSD';

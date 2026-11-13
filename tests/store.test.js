@@ -296,6 +296,35 @@ test('AI catalog fill resolves an existing MGSD identity instead of requiring AI
   assert.equal(result.item.mgsdNumber,2);
 });
 
+test('AI catalog fill falls back to the static MGSD catalog when production D1 has no matching row',async(t)=>{
+  const db=new D1Mock('empty');t.after(()=>db.close());
+  db.sqlite.exec(`CREATE TABLE catalog_items(id TEXT PRIMARY KEY,name TEXT,sku TEXT,line TEXT,grade TEXT,payload_json TEXT,updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`);
+  const originalFetch=globalThis.fetch;
+  t.after(()=>{globalThis.fetch=originalFetch});
+  globalThis.fetch=async(input)=>{
+    const url=String(input);
+    if(url.includes('/data/catalog/gundam/gunpla/mgsd/index.json'))return new Response(JSON.stringify([
+      {id:'mgsd-002',sku:'MGSD-002',name:'MGSD Gundam Barbatos',line:'MGSD',grade:'MGSD',mgsdNumber:2}
+    ]),{status:200,headers:{'content-type':'application/json'}});
+    return new Response(JSON.stringify({id:'resp_static',output_text:JSON.stringify({
+      id:null,sku:null,name:'MGSD Gundam Barbatos',rgNumber:null,mgsdNumber:null,mgNumber:null,modelCode:'ASW-G-08',manufacturer:'Bandai Spirits',
+      series:'Mobile Suit Gundam: Iron-Blooded Orphans',scale:'Non-scale',releaseDate:null,launchPriceJPY:null,heightCm:null,recommendedAge:null,
+      productType:'โมเดลพลาสติกประกอบ (Gunpla MGSD)',material:null,seriesGroup:'MGSD',summary:'ข้อมูลทดสอบ',highlights:[],whatsDifferent:[],boxContents:[],
+      notIncluded:[],pros:[],considerations:[],faq:[],references:[],dalongPageUrl:'https://www.dalong.net/reviews/sd/mgsd02/mgsd02_i.htm'
+    })}),{status:200,headers:{'content-type':'application/json'}});
+  };
+  const secret='test-admin-secret';
+  const cookie=(await createSessionCookie(secret)).split(';')[0];
+  const response=await fillCatalogWithAi({
+    env:{TOYSKUB_DB:db,ADMIN_PASSWORD:secret,OPENAI_API_KEY:'test-key'},
+    request:request('/api/admin/ai/catalog-fill',{method:'POST',headers:{'content-type':'application/json',cookie},body:JSON.stringify({query:'mgsd Gundam Barbatos',catalogLine:'MGSD'})})
+  });
+  const result=await read(response);
+  assert.equal(result.item.id,'mgsd-002');
+  assert.equal(result.item.sku,'MGSD-002');
+  assert.equal(result.item.mgsdNumber,2);
+});
+
 test('catalog manager falls back to Dalong cover when an RG image is missing',()=>{
   const manager=fs.readFileSync('admin/catalog/catalog.js','utf8');
   assert.match(manager,/function dalongCoverFallback/);
