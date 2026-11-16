@@ -81,11 +81,19 @@ async function detectAdminSession() {
 }
 
 function catalogOrderValue(item) {
+  const line = String(item?.line || item?.grade || '').trim().toUpperCase();
+  const id = String(item?.id || '').trim();
+  if (line === 'MG' || /^m\d+$/i.test(id)) {
+    const mg = Number(item?.mgNumber);
+    if (Number.isFinite(mg) && mg > 0) return mg;
+    const dalongMatch = id.match(/^m(\d+)$/i);
+    if (dalongMatch) return Number(dalongMatch[1]);
+  }
   const explicit = Number(item?.sortOrder);
   if (Number.isFinite(explicit) && explicit > 0) return explicit;
   const rg = Number(item?.rgNumber);
   if (Number.isFinite(rg) && rg > 0) return rg;
-  const match = String(item?.id || '').match(/(\d+)(?!.*\d)/);
+  const match = id.match(/(\d+)(?!.*\d)/);
   return match ? Number(match[1]) : 999999;
 }
 

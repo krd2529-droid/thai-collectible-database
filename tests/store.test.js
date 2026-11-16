@@ -431,6 +431,7 @@ test('MG template uses MG identity and the home catalog exposes MG',()=>{
   const manager=fs.readFileSync('admin/catalog/catalog.js','utf8');
   const ai=fs.readFileSync('functions/api/admin/ai/catalog-fill.js','utf8');
   const app=fs.readFileSync('app.js','utf8');
+  const home=fs.readFileSync('index.html','utf8');
   assert.match(page,/id="templateBrandLabel"/);
   assert.match(page,/template\.js\?v=mg-dalong-id-20261116-1/);
   assert.match(template,/\['RG','MGSD','MG'\]/);
@@ -453,6 +454,14 @@ test('MG template uses MG identity and the home catalog exposes MG',()=>{
   assert.match(ai,/catalogLine === 'MG'.*item\.seriesGroup/s);
   assert.match(fs.readFileSync('functions/lib/catalog-db.js','utf8'),/\^m\(\?:g-\)\?/);
   assert.match(app,/const MG_SERIES_GROUP_ORDER/);
+  assert.match(home,/app\.js\?v=mg-dalong-sort-20261117-1/);
+  const orderSource=app.match(/function catalogOrderValue\(item\) \{[\s\S]*?\n\}/)?.[0];
+  const sortSource=app.match(/function sortCatalogItems\(a, b\) \{[\s\S]*?\n\}/)?.[0];
+  const sortMg=Function(`${orderSource}\n${sortSource}; return [
+    {id:'m225',line:'MG',mgNumber:225,sortOrder:1},
+    {id:'m217',line:'MG',mgNumber:217,sortOrder:2}
+  ].sort(sortCatalogItems).map(item=>item.id);`);
+  assert.deepEqual(sortMg(),['m217','m225']);
   const item=normalizeCatalogInput({id:'m217',name:'Eclipse Gundam',categoryLabel:'Gundam',categoryCode:'gd',productType:'Gunpla',productTypeCode:'gp',line:'MG',scale:'1/100',series:'Mobile Suit Gundam SEED ECLIPSE',seriesGroup:'GUNDAM SEED / ASTRAY'});
   assert.equal(item.mgNumber,217);
   assert.equal(item.sku,'');
