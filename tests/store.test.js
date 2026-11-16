@@ -476,6 +476,22 @@ test('MG template uses MG identity and the home catalog exposes MG',()=>{
   assert.equal(Function(`${groupSource}; return catalogGroupName({seriesGroup:'Gundam',series:'Mobile Suit Gundam SEED'},'MG');`)(),'Mobile Suit Gundam SEED');
 });
 
+test('MG Dalong identity migration moves legacy Eclipse to m217 without changing its media URL',()=>{
+  const db=new DatabaseSync(':memory:');
+  db.exec(`CREATE TABLE catalog_items(id TEXT PRIMARY KEY,name TEXT,sort_order INTEGER,payload_json TEXT,updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`);
+  const image='/media/catalog/mg-001/gallery/eclipse-thumb.webp';
+  db.prepare('INSERT INTO catalog_items(id,name,sort_order,payload_json) VALUES(?,?,?,?)').run('mg-001','MG1/100 Eclipse Gundam',1,JSON.stringify({id:'mg-001',mgNumber:1,sortOrder:1,catalogImage:image}));
+  db.exec(fs.readFileSync('migrations/0011_catalog_mg_dalong_identity.sql','utf8'));
+  const row=db.prepare('SELECT id,sort_order AS sortOrder,payload_json AS payloadJson FROM catalog_items').get();
+  const payload=JSON.parse(row.payloadJson);
+  assert.equal(row.id,'m217');
+  assert.equal(row.sortOrder,217);
+  assert.equal(payload.mgNumber,217);
+  assert.equal(payload.dalongPageUrl,'https://www.dalong.net/reviews/mg/m217/m217_i_e.htm');
+  assert.equal(payload.catalogImage,image);
+  db.close();
+});
+
 test('public order reserves availability and rejects overselling',async(t)=>{
   const db=new D1Mock();t.after(()=>db.close());
   db.sqlite.prepare("INSERT INTO store_products(id,name,price_satang,stock_quantity,status) VALUES(?,?,?,?,?)").run('op-001','Starter Deck',25000,2,'published');
