@@ -63,7 +63,7 @@ export function normalizeCatalogInput(raw = {}) {
     productTypeCode: code(raw.productTypeCode || (String(raw.productType || '').toLowerCase() === 'gunpla' ? 'gp' : raw.productType)),
     line,
     lineCode: code(raw.lineCode || line),
-    sku: String(raw.sku || id.toUpperCase()).trim(),
+    sku: line === 'MG' ? '' : String(raw.sku || id.toUpperCase()).trim(),
     rgNumber: raw.rgNumber === '' || raw.rgNumber == null ? inferredRgNumber : Number(raw.rgNumber),
     mgsdNumber: raw.mgsdNumber === '' || raw.mgsdNumber == null ? inferredMgsdNumber : Number(raw.mgsdNumber),
     mgNumber: raw.mgNumber === '' || raw.mgNumber == null ? inferredMgNumber : Number(raw.mgNumber),

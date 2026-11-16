@@ -355,7 +355,7 @@ test('AI catalog fill allocates the next MG identity before Auto Catalog uploads
   assert.equal(response.status,200);
   const result=await read(response);
   assert.equal(result.item.id,'mg-004');
-  assert.equal(result.item.sku,'MG-004');
+  assert.equal(result.item.sku,null);
   assert.equal(result.item.mgNumber,4);
   assert.equal(result.item.rgNumber,null);
   assert.equal(result.item.mgsdNumber,null);
@@ -444,6 +444,8 @@ test('MG template uses MG identity and the home catalog exposes MG',()=>{
   assert.match(template,/MG_SERIES_GROUPS/);
   assert.match(template,/templateConfig\.line==='MG'\?val\('series'\)/);
   assert.match(template,/seriesGroupOrder:seriesGroupOrder\(/);
+  assert.match(template,/itemSkuField.*hidden=templateLine==='MG'/s);
+  assert.match(template,/sku:templateConfig\.line==='MG'\?'':/);
   assert.match(template,/function validTemplateId/);
   assert.match(template,/setAttribute\('data-sku',`\$\{templateLine\}-TEMPLATE`\)/);
   assert.match(ai,/FIRST GUNDAM/);
@@ -452,6 +454,7 @@ test('MG template uses MG identity and the home catalog exposes MG',()=>{
   assert.match(app,/const MG_SERIES_GROUP_ORDER/);
   const item=normalizeCatalogInput({id:'mg-001',name:'RX-78-2 Gundam',categoryLabel:'Gundam',categoryCode:'gd',productType:'Gunpla',productTypeCode:'gp',line:'MG',scale:'1/100',mgNumber:1,series:'Mobile Suit Gundam',seriesGroup:'Gundam'});
   assert.equal(item.mgNumber,1);
+  assert.equal(item.sku,'');
   assert.equal(item.lineCode,'mg');
   assert.equal(item.catalogPath,'gd/gp/mg/mobile-suit-gundam');
   assert.equal(item.sortOrder,1);
