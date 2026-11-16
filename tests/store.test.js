@@ -432,6 +432,7 @@ test('MG template uses MG identity and the home catalog exposes MG',()=>{
   const ai=fs.readFileSync('functions/api/admin/ai/catalog-fill.js','utf8');
   const app=fs.readFileSync('app.js','utf8');
   assert.match(page,/id="templateBrandLabel"/);
+  assert.match(page,/template\.js\?v=mg-dalong-id-20261116-1/);
   assert.match(template,/\['RG','MGSD','MG'\]/);
   assert.match(template,/numberKey:'mgNumber'/);
   assert.match(template,/defaultScale:'1\/100'/);
