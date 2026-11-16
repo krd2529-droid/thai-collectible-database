@@ -368,6 +368,26 @@ test('MGSD legacy Gundam series group stays in the MGSD section',()=>{
   assert.equal(groupName,'MGSD');
 });
 
+test('static MGSD catalog includes Kshatriya as MGSD-006 with a local cover',()=>{
+  const index=JSON.parse(fs.readFileSync('data/catalog/gundam/gunpla/mgsd/index.json','utf8'));
+  const item=index.find((entry)=>entry.id==='mgsd-006');
+  assert.ok(item,'mgsd-006 must exist in the MGSD index');
+  assert.equal(item.sku,'MGSD-006');
+  assert.equal(item.mgsdNumber,6);
+  assert.equal(item.name,'MGSD Kshatriya');
+  assert.equal(item.grade,'MGSD');
+  assert.equal(item.catalogImage,'images/gundam/gunpla/mgsd/mgsd-006/mgsd06.jpg');
+  assert.deepEqual(index.slice(0,5).map((entry)=>entry.id),['mgsd-001','mgsd-002','mgsd-003','mgsd-004','mgsd-005']);
+
+  const detail=JSON.parse(fs.readFileSync(item.dataFile,'utf8'));
+  assert.equal(detail.id,item.id);
+  assert.equal(detail.modelCode,'NZ-666');
+  assert.match(detail.sourceUrl,/dalong\.net\/reviews\/sd\/mgsd06\/mgsd06_i_e\.htm/);
+  assert.ok(detail.references.some((reference)=>reference.url==='https://bandai-hobby.net/item/01_7135/'));
+  assert.ok(fs.statSync(item.catalogImage).size>0,'local MGSD-006 cover must not be empty');
+  assert.match(fs.readFileSync('sitemap.xml','utf8'),/https:\/\/toyskub\.com\/product\/mgsd-006/);
+});
+
 test('MG template uses MG identity and the home catalog exposes MG',()=>{
   const page=fs.readFileSync('admin/rg-template/index.html','utf8');
   const template=fs.readFileSync('admin/rg-template/template.js','utf8');

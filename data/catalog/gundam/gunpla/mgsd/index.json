@@ -78,5 +78,23 @@
     "images": [],
     "inStock": null,
     "dataFile": "data/catalog/gundam/gunpla/mgsd/mgsd-005.json"
+  },
+  {
+    "id": "mgsd-006",
+    "category": "model",
+    "categoryLabel": "โมเดลและกันพลา",
+    "sku": "MGSD-006",
+    "mgsdNumber": 6,
+    "name": "MGSD Kshatriya",
+    "grade": "MGSD",
+    "scale": "Non-scale",
+    "series": "Mobile Suit Gundam Unicorn",
+    "manufacturer": "Bandai Spirits",
+    "catalogImage": "images/gundam/gunpla/mgsd/mgsd-006/mgsd06.jpg",
+    "images": [
+      "images/gundam/gunpla/mgsd/mgsd-006/mgsd06.jpg"
+    ],
+    "inStock": null,
+    "dataFile": "data/catalog/gundam/gunpla/mgsd/mgsd-006.json"
   }
 ]

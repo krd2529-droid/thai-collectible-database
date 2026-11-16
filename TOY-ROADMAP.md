@@ -190,6 +190,12 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - รหัสภายใน `id`, `sku` และเลขลำดับมาจากแคตตาล็อก TOYSKUB ไม่บังคับให้ AI เดา
 - คำค้น `MGSD Gundam Barbatos` จับคู่ `mgsd-002` ได้แม้ AI คืนข้อมูลโดยไม่มีรหัส
 
+### TOY-EC-025: MGSD Kshatriya static catalog fallback (Completed)
+
+- เพิ่ม `MGSD-006` MGSD Kshatriya ต่อจากรายการ MGSD เดิมโดยไม่แก้ลำดับ 001–005
+- เก็บรูปปกไว้ในโปรเจกต์และเพิ่มหน้ารายละเอียดพร้อมแหล่งอ้างอิง Dalong/Bandai
+- รายการแสดงได้จาก static catalog แม้ฟอร์มเพิ่มสินค้าในหลังบ้านใช้งานไม่ได้
+
 ### TOY-EC-021: Canonical RG product-name prefix
 
 - ชื่อสินค้าของไลน์ RG ใช้คำนำหน้า `RG 1/144` รูปแบบเดียวกันทั้งข้อมูลเดิมและรายการที่บันทึกใหม่
