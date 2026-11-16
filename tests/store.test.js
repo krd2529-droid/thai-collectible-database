@@ -325,6 +325,42 @@ test('AI catalog fill falls back to the static MGSD catalog when production D1 h
   assert.equal(result.item.mgsdNumber,2);
 });
 
+test('AI catalog fill allocates the next MG identity before Auto Catalog uploads media',async(t)=>{
+  const db=new D1Mock('empty');t.after(()=>db.close());
+  db.sqlite.exec(`CREATE TABLE catalog_items(id TEXT PRIMARY KEY,name TEXT,sku TEXT,line TEXT,grade TEXT,payload_json TEXT,updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`);
+  db.sqlite.prepare('INSERT INTO catalog_items(id,name,sku,line,grade,payload_json) VALUES(?,?,?,?,?,?)').run(
+    'mg-002','MG 1/100 Existing Gundam','MG-002','MG','MG',JSON.stringify({id:'mg-002',sku:'MG-002',name:'MG 1/100 Existing Gundam',line:'MG',mgNumber:2})
+  );
+  const originalFetch=globalThis.fetch;
+  t.after(()=>{globalThis.fetch=originalFetch});
+  globalThis.fetch=async(input)=>{
+    const url=String(input);
+    if(url.includes('/data/catalog/gundam/gunpla/mg/index.json'))return new Response(JSON.stringify([
+      {id:'mg-001',sku:'MG-001',name:'MG 1/100 First Gundam',line:'MG',grade:'MG',mgNumber:1},
+      {id:'mg-003',sku:'MG-003',name:'MG 1/100 Third Gundam',line:'MG',grade:'MG',mgNumber:3}
+    ]),{status:200,headers:{'content-type':'application/json'}});
+    return new Response(JSON.stringify({id:'resp_new_mg',output_text:JSON.stringify({
+      id:null,sku:null,name:'MG 1/100 Eclipse Gundam',rgNumber:null,mgsdNumber:null,mgNumber:null,modelCode:'MVF-X08',manufacturer:'Bandai Spirits',
+      series:'Mobile Suit Gundam SEED ECLIPSE',scale:'1/100',releaseDate:'2021-08-21',launchPriceJPY:5000,heightCm:null,recommendedAge:null,
+      productType:'โมเดลพลาสติกประกอบ (Gunpla MG)',material:null,seriesGroup:'GUNDAM SEED / ASTRAY',summary:'ข้อมูลทดสอบ',highlights:[],whatsDifferent:[],boxContents:[],
+      notIncluded:[],pros:[],considerations:[],faq:[],references:[],dalongPageUrl:'https://www.dalong.net/reviews/mg/mg222/mg222_i.htm'
+    })}),{status:200,headers:{'content-type':'application/json'}});
+  };
+  const secret='test-admin-secret';
+  const cookie=(await createSessionCookie(secret)).split(';')[0];
+  const response=await fillCatalogWithAi({
+    env:{TOYSKUB_DB:db,ADMIN_PASSWORD:secret,OPENAI_API_KEY:'test-key'},
+    request:request('/api/admin/ai/catalog-fill',{method:'POST',headers:{'content-type':'application/json',cookie},body:JSON.stringify({query:'MG 1/100 Eclipse Gundam',catalogLine:'MG'})})
+  });
+  assert.equal(response.status,200);
+  const result=await read(response);
+  assert.equal(result.item.id,'mg-004');
+  assert.equal(result.item.sku,'MG-004');
+  assert.equal(result.item.mgNumber,4);
+  assert.equal(result.item.rgNumber,null);
+  assert.equal(result.item.mgsdNumber,null);
+});
+
 test('catalog manager falls back to Dalong cover when an RG image is missing',()=>{
   const manager=fs.readFileSync('admin/catalog/catalog.js','utf8');
   assert.match(manager,/function dalongCoverFallback/);

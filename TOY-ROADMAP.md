@@ -203,6 +203,12 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - หน้าแรกมีตัวเลือก MG แม้ยังไม่มี static item และจัดหัวข้อ MG ตามกลุ่มซีรีส์โดยไม่กระทบ RG/MGSD
 - static fallback ของ `mg-*` อ่านจาก `data/catalog/gundam/gunpla/mg/` แทนโฟลเดอร์ RG
 
+### TOY-EC-027: Auto Catalog identity allocation before media upload (Completed)
+
+- เมื่อ AI กรอกรายการใหม่ที่ยังไม่มีใน static/D1 ระบบจัดสรรรหัสถัดไปจากทั้งสองแหล่งก่อนส่งข้อมูลกลับฟอร์ม
+- รองรับ `rg-NNN`, `mgsd-NNN` และ `mg-NNN` พร้อม SKU และเลขลำดับของไลน์ที่ถูกต้อง
+- รายการที่มีอยู่แล้วยังคงจับคู่ identity เดิม; Auto Catalog และการอัปโหลดรูปไม่เริ่มด้วยรหัสว่าง
+
 ### TOY-EC-021: Canonical RG product-name prefix
 
 - ชื่อสินค้าของไลน์ RG ใช้คำนำหน้า `RG 1/144` รูปแบบเดียวกันทั้งข้อมูลเดิมและรายการที่บันทึกใหม่

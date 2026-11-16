@@ -116,14 +116,24 @@ function matchCatalogIdentity(candidates, catalogLine, query, item) {
   return matches.length === 1 ? applyCatalogIdentity(line, item, matches[0]) : item;
 }
 
-export async function resolveStaticCatalogIdentity(request, catalogLine, query, item = {}) {
-  const folder = { RG: 'rg', MGSD: 'mgsd', MG: 'mg' }[String(catalogLine || '').trim().toUpperCase()];
-  if (!folder) return item;
-  const url = new URL(`/data/catalog/gundam/gunpla/${folder}/index.json`, request.url);
+const CATALOG_IDENTITY = {
+  RG: { folder: 'rg', prefix: 'rg', skuPrefix: 'RG', numberKey: 'rgNumber' },
+  MGSD: { folder: 'mgsd', prefix: 'mgsd', skuPrefix: 'MGSD', numberKey: 'mgsdNumber' },
+  MG: { folder: 'mg', prefix: 'mg', skuPrefix: 'MG', numberKey: 'mgNumber' },
+};
+
+async function loadStaticCatalogCandidates(request, catalogLine) {
+  const config = CATALOG_IDENTITY[String(catalogLine || '').trim().toUpperCase()];
+  if (!config) return [];
+  const url = new URL(`/data/catalog/gundam/gunpla/${config.folder}/index.json`, request.url);
   const response = await fetch(url.toString(), { headers: { accept: 'application/json' } });
-  if (!response.ok) return item;
+  if (!response.ok) return [];
   const data = await response.json().catch(() => []);
-  const candidates = Array.isArray(data) ? data : Array.isArray(data.items) ? data.items : [];
+  return Array.isArray(data) ? data : Array.isArray(data.items) ? data.items : [];
+}
+
+export async function resolveStaticCatalogIdentity(request, catalogLine, query, item = {}) {
+  const candidates = await loadStaticCatalogCandidates(request, catalogLine);
   return matchCatalogIdentity(candidates, catalogLine, query, item);
 }
 
@@ -132,6 +142,37 @@ export async function resolveExistingCatalogIdentity(db, catalogLine, query, ite
   const line = String(catalogLine || '').trim().toUpperCase();
   const result = await db.prepare(`SELECT id,name,sku,payload_json AS payloadJson FROM catalog_items WHERE UPPER(COALESCE(NULLIF(line,''),grade))=?`).bind(line).all();
   return matchCatalogIdentity(result.results || [], line, query, item);
+}
+
+export async function allocateNextCatalogIdentity(request, db, catalogLine, item = {}) {
+  const line = String(catalogLine || '').trim().toUpperCase();
+  const config = CATALOG_IDENTITY[line];
+  if (!config) return item;
+  const validId = new RegExp(`^${config.prefix}-\\d+$`, 'i');
+  if (validId.test(String(item.id || ''))) return item;
+  const staticCandidates = await loadStaticCatalogCandidates(request, line).catch(() => []);
+  let databaseCandidates = [];
+  try {
+    if (db?.prepare) {
+      const result = await db.prepare(`SELECT id FROM catalog_items WHERE UPPER(COALESCE(NULLIF(line,''),grade))=?`).bind(line).all();
+      databaseCandidates = result.results || [];
+    }
+  } catch { databaseCandidates = []; }
+  const usedNumbers = [...staticCandidates, ...databaseCandidates].map(candidate => {
+    const match = String(candidate?.id || '').match(new RegExp(`^${config.prefix}-(\\d+)$`, 'i'));
+    return match ? Number(match[1]) : 0;
+  });
+  const nextNumber = Math.max(0, ...usedNumbers) + 1;
+  const padded = String(nextNumber).padStart(3, '0');
+  return {
+    ...item,
+    id: `${config.prefix}-${padded}`,
+    sku: `${config.skuPrefix}-${padded}`,
+    rgNumber: line === 'RG' ? nextNumber : null,
+    mgsdNumber: line === 'MGSD' ? nextNumber : null,
+    mgNumber: line === 'MG' ? nextNumber : null,
+    [config.numberKey]: nextNumber,
+  };
 }
 
 export async function onRequestPost(context) {
@@ -194,6 +235,8 @@ export async function onRequestPost(context) {
   catch { /* D1 lookup below remains authoritative when the static catalog is unavailable. */ }
   try { item = await resolveExistingCatalogIdentity(context.env.TOYSKUB_DB, catalogLine, query, item); }
   catch { /* AI data remains usable when the catalog lookup is temporarily unavailable. */ }
+  try { item = await allocateNextCatalogIdentity(context.request, context.env.TOYSKUB_DB, catalogLine, item); }
+  catch { /* The client will show its existing missing-id error if allocation is unavailable. */ }
   if (catalogLine === 'MGSD' && (!item.seriesGroup || item.seriesGroup === 'Gundam')) item.seriesGroup = 'MGSD';
   if (catalogLine === 'MG' && !item.seriesGroup) item.seriesGroup = item.series || 'ETC';
   item.series = normalizeCatalogSeries(item.series);

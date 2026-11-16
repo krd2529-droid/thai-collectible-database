@@ -1,12 +1,11 @@
 # Active patch
 
-- Event: `TOY-EC-026`
-- Outcome: ทำ MG Template สำหรับเพิ่ม Master Grade โดยแบ่งหน้ารวม MG ตามซีรีส์อ้างอิงโครงหมวด Dalong และเปิดเลือก MG จากหน้าแรก
-- Acceptance: หลังบ้านมีปุ่ม MG Template; ฟอร์มบังคับ identity `MG`/`mg-*`/`mgNumber`/`1/100`; เลือกกลุ่มซีรีส์ MG ได้; หน้าแรกมี MG และจัดรายการตามกลุ่มซีรีส์; Auto Catalog ใช้เส้นทาง Dalong `/reviews/mg/`; RG/MGSD ไม่เปลี่ยน
-- Phase: PATCH_DELIVERED
-- Scope: MG template identity and route/button, MG series groups/order, Auto Catalog MG rules/static lookup, homepage grouping, regression tests and roadmap
-- Baseline: `f3b00a7` (includes committed TOY-EC-025, not yet merged/deployed)
-- Evidence: Dalong Master Grade catalog groups Normal products by series including First Gundam, MSV, Z/ZZ, Sentinel, CCA, 0080, F91, 0083, Victory, G, Wing, 08th, X, Turn A, Seed, OO, UC, Age, Build and IBO
-- Verification: 23/23 tests pass; catalog validation 0 errors; production HTTP smoke passed for `/`, `/admin/`, `/member/`, MG Template, MGSD index/detail/image; browser smoke confirmed MG option, MGSD-006 card/detail, `MG-TEMPLATE` frame and no console errors
-- Delivery: implementation `fe52660` plus visual correction `5304bdd` merged to `main`; Cloudflare Pages production deployment `25106879-793c-4708-84fc-7e0044729893` active for `toyskub.com`
-- Next: none
+- Event: `TOY-EC-027`
+- Outcome: Auto Catalog ต้องจัดสรรรหัสรายการใหม่ก่อนนำเข้ารูป เพื่อให้รายการ MG ใหม่ที่ AI กรอกแล้วอัปโหลดปก/คู่มือและบันทึก Draft ต่อได้
+- Acceptance: MG ใหม่เมื่อไม่มี static/D1 match ได้ `mg-NNN`, `MG-NNN`, `mgNumber`; เลขถัดไปไม่ชน static หรือ D1; RG/MGSD ใช้กติกาเดียวกัน; รายการเดิมยังใช้ identity เดิม; upload ไม่เริ่มด้วย id ว่าง
+- Phase: PATCH_READY
+- Scope: AI catalog identity allocation, Auto Catalog upload precondition, regression tests and roadmap
+- Baseline: `360eafb`
+- Evidence: production screenshot shows AI-filled Eclipse Gundam fields while item id/SKU remain blank; client uploadMediaFile rejects empty id before calling media API
+- Verification: endpoint regression reproduced `id: null` before the fix; new MG now allocates the next number across static and D1; syntax checks, 24/24 tests and catalog validation with 0 errors pass
+- Next: run full tests/catalog validation, review diff, commit and push; deploy requires a separate owner instruction
