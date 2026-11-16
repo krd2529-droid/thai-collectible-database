@@ -1,11 +1,11 @@
 # Active patch
 
-- Event: `TOY-EC-025`
-- Outcome: เพิ่ม MGSD Kshatriya จาก Dalong เป็นรายการล่าสุดใน static catalog เพื่อให้หน้าเว็บมีรายการแม้ฟอร์มเพิ่มสินค้าขัดข้อง
-- Acceptance: ใช้รหัส `mgsd-006`/`MGSD-006`; ชื่อ MGSD Kshatriya; อยู่ MGSD กลุ่มเดิม; แสดงรูปปกจาก Dalong; มีหน้า product และแหล่งอ้างอิง; ไม่แก้รายการ 001–005
-- Phase: PATCH_COMMITTED
-- Scope: MGSD static index, detail JSON, catalog image/source metadata, regression test, sitemap and roadmap
-- Baseline: `f92b21a`
-- Verification: Dalong page HTTP 200; confirms MGSD Kshatriya, code NZ-666, release 2026.9, price ¥7,000, Bandai product page and cover URL; regression test failed before implementation then passed; 23/23 tests pass; catalog validation has 0 errors (70 pre-existing missing-image warnings); downloaded cover visually verified
-- Delivery: commit `6a417ce` pushed to `origin/codex/toy-ec-025-mgsd-kshatriya`
-- Next: merge and deploy only after a separate owner instruction
+- Event: `TOY-EC-026`
+- Outcome: ทำ MG Template สำหรับเพิ่ม Master Grade โดยแบ่งหน้ารวม MG ตามซีรีส์อ้างอิงโครงหมวด Dalong และเปิดเลือก MG จากหน้าแรก
+- Acceptance: หลังบ้านมีปุ่ม MG Template; ฟอร์มบังคับ identity `MG`/`mg-*`/`mgNumber`/`1/100`; เลือกกลุ่มซีรีส์ MG ได้; หน้าแรกมี MG และจัดรายการตามกลุ่มซีรีส์; Auto Catalog ใช้เส้นทาง Dalong `/reviews/mg/`; RG/MGSD ไม่เปลี่ยน
+- Phase: PATCH_READY
+- Scope: MG template identity and route/button, MG series groups/order, Auto Catalog MG rules/static lookup, homepage grouping, regression tests and roadmap
+- Baseline: `f3b00a7` (includes committed TOY-EC-025, not yet merged/deployed)
+- Evidence: Dalong Master Grade catalog groups Normal products by series including First Gundam, MSV, Z/ZZ, Sentinel, CCA, 0080, F91, 0083, Victory, G, Wing, 08th, X, Turn A, Seed, OO, UC, Age, Build and IBO
+- Verification: targeted MG test failed before implementation then passed; syntax checks pass; 23/23 tests pass; catalog validation has 0 errors (70 pre-existing RG image warnings); Dalong MG catalog grouping inspected
+- Next: final diff review, commit and push; merge/deploy remains a separate owner-approved step

@@ -405,13 +405,24 @@ test('MG template uses MG identity and the home catalog exposes MG',()=>{
   assert.match(ai,/Master Grade เท่านั้น/);
   assert.match(ai,/catalogLine === 'MG'/);
   assert.match(app,/configuredGrades\.filter\(\(grade\) => grade === 'MG'\)/);
-  const item=normalizeCatalogInput({id:'mg-001',name:'RX-78-2 Gundam',categoryLabel:'Gundam',categoryCode:'gd',productType:'Gunpla',productTypeCode:'gp',line:'MG',scale:'1/100',mgNumber:1,seriesGroup:'Gundam'});
+  assert.match(template,/MG_SERIES_GROUPS/);
+  assert.match(template,/templateConfig\.line==='MG'\?val\('series'\)/);
+  assert.match(template,/seriesGroupOrder:seriesGroupOrder\(/);
+  assert.match(template,/function validTemplateId/);
+  assert.match(ai,/FIRST GUNDAM/);
+  assert.match(ai,/catalogLine === 'MG'.*item\.seriesGroup/s);
+  assert.match(fs.readFileSync('functions/lib/catalog-db.js','utf8'),/\^mg-.*\? 'mg'/s);
+  assert.match(app,/const MG_SERIES_GROUP_ORDER/);
+  const item=normalizeCatalogInput({id:'mg-001',name:'RX-78-2 Gundam',categoryLabel:'Gundam',categoryCode:'gd',productType:'Gunpla',productTypeCode:'gp',line:'MG',scale:'1/100',mgNumber:1,series:'Mobile Suit Gundam',seriesGroup:'Gundam'});
   assert.equal(item.mgNumber,1);
   assert.equal(item.lineCode,'mg');
-  assert.equal(item.catalogPath,'gd/gp/mg');
+  assert.equal(item.catalogPath,'gd/gp/mg/mobile-suit-gundam');
   assert.equal(item.sortOrder,1);
   assert.equal(item.rgNumber,null);
   assert.equal(item.mgsdNumber,null);
+  assert.equal(item.seriesGroup,'Mobile Suit Gundam');
+  const groupSource=app.match(/function catalogGroupName\(product, activeLine\) \{[\s\S]*?\n\}/)?.[0];
+  assert.equal(Function(`${groupSource}; return catalogGroupName({seriesGroup:'Gundam',series:'Mobile Suit Gundam SEED'},'MG');`)(),'Mobile Suit Gundam SEED');
 });
 
 test('public order reserves availability and rejects overselling',async(t)=>{

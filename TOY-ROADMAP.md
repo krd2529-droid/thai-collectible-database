@@ -196,6 +196,13 @@ Baseline: `31327a7ee0a911d51485beb5282d026c505e6e86`
 - เก็บรูปปกไว้ในโปรเจกต์และเพิ่มหน้ารายละเอียดพร้อมแหล่งอ้างอิง Dalong/Bandai
 - รายการแสดงได้จาก static catalog แม้ฟอร์มเพิ่มสินค้าในหลังบ้านใช้งานไม่ได้
 
+### TOY-EC-026: MG template and series catalog groups (Completed)
+
+- ปุ่ม MG Template ในหลังบ้านเปิดฟอร์มร่วมที่บังคับ `MG`, รหัส `mg-*`, ลำดับ `mgNumber` และสเกล `1/100`
+- ฟอร์มและ Auto Catalog เลือกกลุ่มซีรีส์ MG ตามโครงหมวด Master Grade ของ Dalong; รายการเก่าที่ใช้กลุ่ม `Gundam` จะ fallback ไปใช้ชื่อซีรีส์
+- หน้าแรกมีตัวเลือก MG แม้ยังไม่มี static item และจัดหัวข้อ MG ตามกลุ่มซีรีส์โดยไม่กระทบ RG/MGSD
+- static fallback ของ `mg-*` อ่านจาก `data/catalog/gundam/gunpla/mg/` แทนโฟลเดอร์ RG
+
 ### TOY-EC-021: Canonical RG product-name prefix
 
 - ชื่อสินค้าของไลน์ RG ใช้คำนำหน้า `RG 1/144` รูปแบบเดียวกันทั้งข้อมูลเดิมและรายการที่บันทึกใหม่

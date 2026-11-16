@@ -30,9 +30,12 @@ export async function ensureCatalogTables(db) {
   await db.prepare(`CREATE INDEX IF NOT EXISTS idx_catalog_status_sort ON catalog_items(status,sort_order,id)`).run();
 }
 const code = value => String(value || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-export function normalizeSeriesGroup(value, line = '') {
+export function normalizeSeriesGroup(value, line = '', series = '') {
   const group = String(value || '').trim();
-  return String(line || '').trim().toUpperCase() === 'MGSD' && (!group || group === 'Gundam' || group === 'MGSD') ? 'MGSD' : group;
+  const normalizedLine = String(line || '').trim().toUpperCase();
+  if (normalizedLine === 'MGSD' && (!group || group === 'Gundam' || group === 'MGSD')) return 'MGSD';
+  if (normalizedLine === 'MG' && (!group || group === 'Gundam')) return String(series || '').trim() || 'ETC';
+  return group;
 }
 export function normalizeCatalogProductName(value, line = '') {
   const name = String(value || '').trim();
@@ -67,7 +70,7 @@ export function normalizeCatalogInput(raw = {}) {
     name: normalizeCatalogProductName(raw.name, line),
     grade: line,
     scale: String(raw.scale || '').trim(),
-    seriesGroup: normalizeSeriesGroup(raw.seriesGroup, line),
+    seriesGroup: normalizeSeriesGroup(raw.seriesGroup, line, raw.series),
     seriesGroupOrder: Number(raw.seriesGroupOrder) || 0,
     series: String(raw.series || '').trim(),
     manufacturer: String(raw.manufacturer || '').trim(),
@@ -113,7 +116,7 @@ export function summaryFromPayload(p) {
     id:p.id, category:p.category, categoryLabel:p.categoryLabel, categoryCode:p.categoryCode,
     productType:p.productType, productTypeCode:p.productTypeCode, line:p.line, lineCode:p.lineCode,
     sku:p.sku, rgNumber:p.rgNumber, mgsdNumber:p.mgsdNumber, mgNumber:p.mgNumber, name:p.name, grade:p.grade, scale:p.scale,
-    seriesGroup:normalizeSeriesGroup(p.seriesGroup,p.line||p.grade), seriesGroupOrder:p.seriesGroupOrder, series:p.series, manufacturer:p.manufacturer, catalogImage:p.catalogImage,
+    seriesGroup:normalizeSeriesGroup(p.seriesGroup,p.line||p.grade,p.series), seriesGroupOrder:p.seriesGroupOrder, series:p.series, manufacturer:p.manufacturer, catalogImage:p.catalogImage,
     images:p.images?.length ? p.images : (p.catalogImage ? [p.catalogImage] : []), showGalleryImages:p.showGalleryImages !== false,
     catalogPath:p.catalogPath, sortOrder:Number(p.sortOrder)||Number(p.rgNumber)||Number(p.mgsdNumber)||Number(p.mgNumber)||0, status:p.status, inStock:null, source:'d1'
   };
@@ -147,7 +150,8 @@ export function mergeCatalogPayload(base = {}, incoming = {}) {
 
 export async function loadStaticCatalogItem(request, id) {
   try {
-    const folder = /^mgsd-/i.test(String(id || '')) ? 'mgsd' : 'rg';
+    const itemId = String(id || '');
+    const folder = /^mgsd-/i.test(itemId) ? 'mgsd' : /^mg-/i.test(itemId) ? 'mg' : 'rg';
     const url = new URL(`/data/catalog/gundam/gunpla/${folder}/${encodeURIComponent(id)}.json`, request.url);
     const response = await fetch(url.toString(), { headers: { accept: 'application/json' } });
     if (!response.ok) return null;

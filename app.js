@@ -552,9 +552,12 @@ function setupStoreCheckout() {
   document.getElementById("storeFacebookButton").addEventListener("click", async () => { try { await navigator.clipboard.writeText(storeOrderMessage); } catch {} });
 }
 
+const MG_SERIES_GROUP_ORDER = ['FIRST GUNDAM','MSV','Z & ZZ GUNDAM','GUNDAM SENTINEL',"CHAR'S COUNTER ATTACK",'GUNDAM 0080','GUNDAM F91 / CROSSBONE','GUNDAM 0083','VICTORY GUNDAM','G GUNDAM','GUNDAM W / ENDLESS WALTZ','THE 08TH MS TEAM','GUNDAM X','TURN A GUNDAM','GUNDAM SEED / ASTRAY','GUNDAM OO','UNICORN / NARRATIVE','GUNDAM AGE','GUNDAM BUILD SERIES','IRON-BLOODED ORPHANS','ETC','PATLABOR / DUNBINE','SPECIAL VERSION'];
+
 function catalogGroupName(product, activeLine) {
   const explicit = String(product.seriesGroup || "").trim();
   if (activeLine === "MGSD" && (!explicit || explicit === "Gundam" || explicit === "MGSD")) return "MGSD";
+  if (activeLine === "MG" && (!explicit || explicit === "Gundam")) return String(product.series || "").trim() || "ETC";
   if (explicit) return explicit;
   if (activeLine === "RG") return "Gundam";
   return String(product.series || "").trim() || "รายการอื่น ๆ";
@@ -570,7 +573,7 @@ function catalogGroupedGridHTML(products, activeLine) {
     group.order = Math.min(group.order, Number(product.seriesGroupOrder) || 9999);
     group.items.push(product);
   }
-  const preferred = ["Gundam", "Evangelion", "Gaogaigar", "Patlabor", "Special Version"];
+  const preferred = activeLine === 'MG' ? MG_SERIES_GROUP_ORDER : ["Gundam", "Evangelion", "Gaogaigar", "Patlabor", "Special Version"];
   const rank = name => { const i = preferred.indexOf(name); return i < 0 ? 999 : i; };
   const sorted = [...groups.values()].sort((a,b)=>(a.order-b.order)||(rank(a.name)-rank(b.name))||a.name.localeCompare(b.name));
   sorted.forEach(group=>group.items.sort(sortCatalogItems));
