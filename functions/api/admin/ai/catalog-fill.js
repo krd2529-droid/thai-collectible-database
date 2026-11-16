@@ -119,8 +119,16 @@ function matchCatalogIdentity(candidates, catalogLine, query, item) {
 const CATALOG_IDENTITY = {
   RG: { folder: 'rg', prefix: 'rg', skuPrefix: 'RG', numberKey: 'rgNumber' },
   MGSD: { folder: 'mgsd', prefix: 'mgsd', skuPrefix: 'MGSD', numberKey: 'mgsdNumber' },
-  MG: { folder: 'mg', prefix: 'mg', skuPrefix: null, numberKey: 'mgNumber' },
+  MG: { folder: 'mg', prefix: 'm', skuPrefix: null, numberKey: 'mgNumber' },
 };
+
+export function deriveMgIdentityFromDalong(item = {}) {
+  const pageUrl = String(item.dalongPageUrl || '').trim();
+  const match = pageUrl.match(/^https?:\/\/(?:www\.)?dalong\.net\/reviews\/mg\/(m\d+)\/\1_i(?:_e)?\.htm(?:[?#].*)?$/i);
+  if (!match) return { ...item, id: null, sku: null, mgNumber: null };
+  const id = match[1].toLowerCase();
+  return { ...item, id, sku: null, mgNumber: Number(id.slice(1)), rgNumber: null, mgsdNumber: null };
+}
 
 async function loadStaticCatalogCandidates(request, catalogLine) {
   const config = CATALOG_IDENTITY[String(catalogLine || '').trim().toUpperCase()];
@@ -148,6 +156,7 @@ export async function allocateNextCatalogIdentity(request, db, catalogLine, item
   const line = String(catalogLine || '').trim().toUpperCase();
   const config = CATALOG_IDENTITY[line];
   if (!config) return item;
+  if (line === 'MG') return deriveMgIdentityFromDalong(item);
   const validId = new RegExp(`^${config.prefix}-\\d+$`, 'i');
   if (validId.test(String(item.id || ''))) return line === 'MG' ? { ...item, sku: null } : item;
   const staticCandidates = await loadStaticCatalogCandidates(request, line).catch(() => []);
@@ -193,7 +202,7 @@ export async function onRequestPost(context) {
   let lineRule = catalogLine === 'MGSD'
     ? '- งานนี้เป็น MGSD เท่านั้น: id ใช้ mgsd-เลขสามหลัก เช่น mgsd-001, sku ใช้ MGSD-001, mgsdNumber ใส่ลำดับ, rgNumber และ mgNumber เป็น null, scale เป็น Non-scale, seriesGroup ใช้ MGSD หรือ Special Version และห้ามนำข้อมูลรุ่น RG/MG มาปะปน'
     : catalogLine === 'MG'
-      ? '- งานนี้เป็น Master Grade เท่านั้น: id ใช้ mg-เลขสามหลัก เช่น mg-001 เป็นรหัสภายในสำหรับ URL และไฟล์รูป, sku ต้องเป็น null เพราะ MG ไม่มี SKU ของ TOYSKUB, mgNumber ใส่ลำดับ, rgNumber และ mgsdNumber เป็น null, scale เป็น 1/100, seriesGroup ต้องเป็นหมวดซีรีส์ตาม Dalong เช่น FIRST GUNDAM, MSV, Z & ZZ GUNDAM, GUNDAM SENTINEL, CHAR\'S COUNTER ATTACK, GUNDAM 0080, GUNDAM F91 / CROSSBONE, GUNDAM 0083, VICTORY GUNDAM, G GUNDAM, GUNDAM W / ENDLESS WALTZ, THE 08TH MS TEAM, GUNDAM X, TURN A GUNDAM, GUNDAM SEED / ASTRAY, GUNDAM OO, UNICORN / NARRATIVE, GUNDAM AGE, GUNDAM BUILD SERIES, IRON-BLOODED ORPHANS, ETC, PATLABOR / DUNBINE หรือ SPECIAL VERSION และห้ามนำข้อมูลรุ่น RG/MGSD มาปะปน'
+      ? '- งานนี้เป็น Master Grade เท่านั้น: id ต้องอิงรหัสหน้าสินค้า Dalong เช่น URL /reviews/mg/m217/m217_i_e.htm ใช้ id m217 และ mgNumber 217; ห้ามแต่งรหัส mg-001 หรือเลขลำดับใหม่เอง; ถ้าหา dalongPageUrl ที่ตรงรุ่นไม่ได้ให้ id และ mgNumber เป็น null; sku ต้องเป็น null เพราะ MG ไม่มี SKU ของ TOYSKUB; rgNumber และ mgsdNumber เป็น null, scale เป็น 1/100, seriesGroup ต้องเป็นหมวดซีรีส์ตาม Dalong เช่น FIRST GUNDAM, MSV, Z & ZZ GUNDAM, GUNDAM SENTINEL, CHAR\'S COUNTER ATTACK, GUNDAM 0080, GUNDAM F91 / CROSSBONE, GUNDAM 0083, VICTORY GUNDAM, G GUNDAM, GUNDAM W / ENDLESS WALTZ, THE 08TH MS TEAM, GUNDAM X, TURN A GUNDAM, GUNDAM SEED / ASTRAY, GUNDAM OO, UNICORN / NARRATIVE, GUNDAM AGE, GUNDAM BUILD SERIES, IRON-BLOODED ORPHANS, ETC, PATLABOR / DUNBINE หรือ SPECIAL VERSION และห้ามนำข้อมูลรุ่น RG/MGSD มาปะปน'
       : '- งานนี้เป็น Real Grade เท่านั้น: id ใช้ rg-เลขสามหลัก เช่น rg-039, sku ใช้ RG-039, rgNumber ใส่ลำดับ และ mgsdNumber กับ mgNumber เป็น null';
   if (catalogLine === 'MG') lineRule += '\n- หน้า Dalong ของ MG ต้องอยู่ใน /reviews/mg/mgXX/ และลงท้าย _i.htm';
   const prompt = `ค้นคว้าข้อมูลสินค้า ${catalogLine} ต่อไปนี้เพื่อกรอกฐานข้อมูล TOYSKUB: "${query}"\n\nกติกา:\n- เน้นข้อมูลทางการจาก Bandai Hobby Site / Bandai Spirits และใช้ Dalong.net เป็นแหล่งเสริมเมื่อเกี่ยวข้อง\n${lineRule}\n- id, sku และเลขลำดับเป็นรหัสภายในของ TOYSKUB: ถ้ายืนยันจากคำค้นไม่ได้ให้คืน null ระบบจะจับคู่จากแคตตาล็อกเอง ห้ามเดา\n- ห้ามเดาข้อมูลเชิงข้อเท็จจริง ถ้ายืนยันไม่ได้ให้คืน null หรือ array ว่าง\n- ราคา launchPriceJPY ต้องเป็นราคาเปิดตัวญี่ปุ่นก่อนภาษี\n- releaseDate ใช้ YYYY-MM-DD เฉพาะเมื่อยืนยันวันได้\n- series ต้องเป็นชื่อซีรีส์/ผลงานต้นทางที่ตัวหุ่นปรากฏ เช่น Mobile Suit Gundam SEED หรือ Mobile Suit Gundam: Iron-Blooded Orphans เท่านั้น ห้ามใส่ชื่อเกรดสินค้า RG, Real Grade, MGSD หรือคำว่า Gundam ลอย ๆ\n- grade ของหน้านี้กำหนดจาก catalogLine อยู่แล้ว จึงห้ามนำชื่อเกรดไปกรอกซ้ำใน series\n- seriesGroup เลือก Gundam หรือ Special Version สำหรับ MGSD; ส่วน RG เลือก Gundam, Evangelion, Gaogaigar, Patlabor หรือ Special Version ตามที่เหมาะสม\n- เขียนภาษาไทยอ่านง่าย ไม่โฆษณาเกินจริง\n- references ใส่เฉพาะ URL ที่ค้นพบจริง พร้อมชื่อเว็บไซต์\n- หา Dalong Information URL ที่ตรงรุ่นและลงท้าย _i.htm ใส่ dalongPageUrl; MGSD อยู่ในหมวด /reviews/sd/mgsdXX/ ส่วน RG อยู่ใน /reviews/rg/rgXX/; ถ้ายืนยันไม่ได้ให้คืน null\n- ไม่ต้องเดา URL รูปโดยตรง ระบบจะตรวจและนำเข้ารูปปกกับคู่มือจากหน้า Dalong เอง\n- ไม่ต้องหา YouTube Shopee Lazada TikTok หรือ Affiliate\n${includeEditorial ? '- สร้างจุดเด่น ข้อแตกต่าง ข้อดี ข้อควรพิจารณา และ FAQ จากข้อมูลที่รองรับ' : '- highlights, whatsDifferent, pros, considerations และ faq ให้เป็น array ว่าง'}\n${includeBox ? '- เติมอุปกรณ์ในกล่องเฉพาะที่มีหลักฐานรองรับ' : '- boxContents และ notIncluded ให้เป็น array ว่าง'}`;

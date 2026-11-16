@@ -15,7 +15,7 @@ import { onRequestPost as recordTraffic } from '../functions/api/analytics/view.
 import { onRequestGet as getTrafficStats } from '../functions/api/analytics/stats.js';
 import { extractCoverUrl, extractManualUrls } from '../functions/api/admin/media/import-dalong-manual.js';
 import { buildDalongCoverUrl } from '../functions/api/admin/media/dalong-cover.js';
-import { normalizeCatalogName, normalizeCatalogSeries, normalizeRecommendedAge } from '../functions/api/admin/ai/catalog-fill.js';
+import { deriveMgIdentityFromDalong, normalizeCatalogName, normalizeCatalogSeries, normalizeRecommendedAge } from '../functions/api/admin/ai/catalog-fill.js';
 import { onRequestPost as fillCatalogWithAi } from '../functions/api/admin/ai/catalog-fill.js';
 
 class BoundStatement {
@@ -325,25 +325,25 @@ test('AI catalog fill falls back to the static MGSD catalog when production D1 h
   assert.equal(result.item.mgsdNumber,2);
 });
 
-test('AI catalog fill allocates the next MG identity before Auto Catalog uploads media',async(t)=>{
+test('AI catalog fill derives the MG identity from the verified Dalong page before Auto Catalog uploads media',async(t)=>{
   const db=new D1Mock('empty');t.after(()=>db.close());
   db.sqlite.exec(`CREATE TABLE catalog_items(id TEXT PRIMARY KEY,name TEXT,sku TEXT,line TEXT,grade TEXT,payload_json TEXT,updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`);
   db.sqlite.prepare('INSERT INTO catalog_items(id,name,sku,line,grade,payload_json) VALUES(?,?,?,?,?,?)').run(
-    'mg-002','MG 1/100 Existing Gundam','MG-002','MG','MG',JSON.stringify({id:'mg-002',sku:'MG-002',name:'MG 1/100 Existing Gundam',line:'MG',mgNumber:2})
+    'm2','MG 1/100 Existing Gundam','','MG','MG',JSON.stringify({id:'m2',sku:'',name:'MG 1/100 Existing Gundam',line:'MG',mgNumber:2})
   );
   const originalFetch=globalThis.fetch;
   t.after(()=>{globalThis.fetch=originalFetch});
   globalThis.fetch=async(input)=>{
     const url=String(input);
     if(url.includes('/data/catalog/gundam/gunpla/mg/index.json'))return new Response(JSON.stringify([
-      {id:'mg-001',sku:'MG-001',name:'MG 1/100 First Gundam',line:'MG',grade:'MG',mgNumber:1},
-      {id:'mg-003',sku:'MG-003',name:'MG 1/100 Third Gundam',line:'MG',grade:'MG',mgNumber:3}
+      {id:'m1',sku:'',name:'MG 1/100 First Gundam',line:'MG',grade:'MG',mgNumber:1},
+      {id:'m3',sku:'',name:'MG 1/100 Third Gundam',line:'MG',grade:'MG',mgNumber:3}
     ]),{status:200,headers:{'content-type':'application/json'}});
     return new Response(JSON.stringify({id:'resp_new_mg',output_text:JSON.stringify({
       id:null,sku:null,name:'MG 1/100 Eclipse Gundam',rgNumber:null,mgsdNumber:null,mgNumber:null,modelCode:'MVF-X08',manufacturer:'Bandai Spirits',
       series:'Mobile Suit Gundam SEED ECLIPSE',scale:'1/100',releaseDate:'2021-08-21',launchPriceJPY:5000,heightCm:null,recommendedAge:null,
       productType:'โมเดลพลาสติกประกอบ (Gunpla MG)',material:null,seriesGroup:'GUNDAM SEED / ASTRAY',summary:'ข้อมูลทดสอบ',highlights:[],whatsDifferent:[],boxContents:[],
-      notIncluded:[],pros:[],considerations:[],faq:[],references:[],dalongPageUrl:'https://www.dalong.net/reviews/mg/mg222/mg222_i.htm'
+      notIncluded:[],pros:[],considerations:[],faq:[],references:[],dalongPageUrl:'https://www.dalong.net/reviews/mg/m217/m217_i_e.htm'
     })}),{status:200,headers:{'content-type':'application/json'}});
   };
   const secret='test-admin-secret';
@@ -354,9 +354,9 @@ test('AI catalog fill allocates the next MG identity before Auto Catalog uploads
   });
   assert.equal(response.status,200);
   const result=await read(response);
-  assert.equal(result.item.id,'mg-004');
+  assert.equal(result.item.id,'m217');
   assert.equal(result.item.sku,null);
-  assert.equal(result.item.mgNumber,4);
+  assert.equal(result.item.mgNumber,217);
   assert.equal(result.item.rgNumber,null);
   assert.equal(result.item.mgsdNumber,null);
 });
@@ -450,17 +450,18 @@ test('MG template uses MG identity and the home catalog exposes MG',()=>{
   assert.match(template,/setAttribute\('data-sku',`\$\{templateLine\}-TEMPLATE`\)/);
   assert.match(ai,/FIRST GUNDAM/);
   assert.match(ai,/catalogLine === 'MG'.*item\.seriesGroup/s);
-  assert.match(fs.readFileSync('functions/lib/catalog-db.js','utf8'),/\^mg-.*\? 'mg'/s);
+  assert.match(fs.readFileSync('functions/lib/catalog-db.js','utf8'),/\^m\(\?:g-\)\?/);
   assert.match(app,/const MG_SERIES_GROUP_ORDER/);
-  const item=normalizeCatalogInput({id:'mg-001',name:'RX-78-2 Gundam',categoryLabel:'Gundam',categoryCode:'gd',productType:'Gunpla',productTypeCode:'gp',line:'MG',scale:'1/100',mgNumber:1,series:'Mobile Suit Gundam',seriesGroup:'Gundam'});
-  assert.equal(item.mgNumber,1);
+  const item=normalizeCatalogInput({id:'m217',name:'Eclipse Gundam',categoryLabel:'Gundam',categoryCode:'gd',productType:'Gunpla',productTypeCode:'gp',line:'MG',scale:'1/100',series:'Mobile Suit Gundam SEED ECLIPSE',seriesGroup:'GUNDAM SEED / ASTRAY'});
+  assert.equal(item.mgNumber,217);
   assert.equal(item.sku,'');
   assert.equal(item.lineCode,'mg');
-  assert.equal(item.catalogPath,'gd/gp/mg/mobile-suit-gundam');
-  assert.equal(item.sortOrder,1);
+  assert.equal(item.catalogPath,'gd/gp/mg/mobile-suit-gundam-seed-eclipse');
+  assert.equal(item.sortOrder,217);
   assert.equal(item.rgNumber,null);
   assert.equal(item.mgsdNumber,null);
-  assert.equal(item.seriesGroup,'Mobile Suit Gundam');
+  assert.equal(item.seriesGroup,'GUNDAM SEED / ASTRAY');
+  assert.deepEqual(deriveMgIdentityFromDalong({name:'Unknown MG',dalongPageUrl:null}),{name:'Unknown MG',dalongPageUrl:null,id:null,sku:null,mgNumber:null});
   const groupSource=app.match(/function catalogGroupName\(product, activeLine\) \{[\s\S]*?\n\}/)?.[0];
   assert.equal(Function(`${groupSource}; return catalogGroupName({seriesGroup:'Gundam',series:'Mobile Suit Gundam SEED'},'MG');`)(),'Mobile Suit Gundam SEED');
 });

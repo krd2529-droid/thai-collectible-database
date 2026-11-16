@@ -52,7 +52,7 @@ export function normalizeCatalogInput(raw = {}) {
   const inferredRgNumber = idNumberMatch ? Number(idNumberMatch[1]) : null;
   const mgsdNumberMatch = id.match(/^mgsd-(\d+)$/i);
   const inferredMgsdNumber = mgsdNumberMatch ? Number(mgsdNumberMatch[1]) : null;
-  const mgNumberMatch = id.match(/^mg-(\d+)$/i);
+  const mgNumberMatch = id.match(/^m(?:g-)?(\d+)$/i);
   const inferredMgNumber = mgNumberMatch ? Number(mgNumberMatch[1]) : null;
   const p = {
     id,
