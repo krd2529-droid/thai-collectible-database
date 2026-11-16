@@ -12,6 +12,7 @@ function applyTemplateIdentity(){
  const setText=(id,text)=>{const element=$(id);if(element)element.textContent=text};
  document.body.dataset.templateLine=templateLine;
  document.title=`${templateLine} Blank Template · TOYSKUB`;
+ document.querySelector('.spec-plate')?.setAttribute('data-sku',`${templateLine}-TEMPLATE`);
  setText('templateBrandLabel',`${templateLine} INLINE TEMPLATE`);
  setText('templateSearchExample',templateConfig.queryExample);
  $('jarvisQuery').placeholder=`เช่น ${templateConfig.queryExample} หรือ ${templateConfig.idExample.toUpperCase()}`;

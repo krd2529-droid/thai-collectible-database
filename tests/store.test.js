@@ -409,6 +409,7 @@ test('MG template uses MG identity and the home catalog exposes MG',()=>{
   assert.match(template,/templateConfig\.line==='MG'\?val\('series'\)/);
   assert.match(template,/seriesGroupOrder:seriesGroupOrder\(/);
   assert.match(template,/function validTemplateId/);
+  assert.match(template,/setAttribute\('data-sku',`\$\{templateLine\}-TEMPLATE`\)/);
   assert.match(ai,/FIRST GUNDAM/);
   assert.match(ai,/catalogLine === 'MG'.*item\.seriesGroup/s);
   assert.match(fs.readFileSync('functions/lib/catalog-db.js','utf8'),/\^mg-.*\? 'mg'/s);
